@@ -1,0 +1,1859 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="ftp协议介绍及代码, hi,it&#39;s Qiu Yinlan!">
+    <meta name="description" content="分享技术、生活和学习笔记">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>ftp协议介绍及代码 | hi,it&#39;s Qiu Yinlan!</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">hi,it&#39;s Qiu Yinlan!</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">hi,it&#39;s Qiu Yinlan!</div>
+        <div class="logo-desc">
+            
+            分享技术、生活和学习笔记
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/qiuyinlan" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/qiuyinlan" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/11.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">ftp协议介绍及代码</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/recvfrom/">
+                                <span class="chip bg-color">recvfrom</span>
+                            </a>
+                        
+                            <a href="/tags/include/">
+                                <span class="chip bg-color">include</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/blog/" class="post-category">
+                                blog
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2025-06-04
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="reference"><a href="#reference" class="headerlink" title="reference"></a>reference</h1><p>请教我用c++写ftp</p>
+<p>[[c++]]<br>[[端口号]]<br>[[网络协议]].<br>[[errorno]]<br>[[初代码+知识点索引]]</p>
+<p>21是ftp服务器绑定的端口号</p>
+<h1 id="ai"><a href="#ai" class="headerlink" title="ai"></a>ai</h1><h3 id="基于-客户端-服务器模式（C-S架构）"><a href="#基于-客户端-服务器模式（C-S架构）" class="headerlink" title="基于 客户端-服务器模式（C&#x2F;S架构）"></a>基于 <strong>客户端-服务器模式（C&#x2F;S架构）</strong></h3><ul>
+<li><p><strong>客户端</strong>：向服务器发起连接、命令、请求传输文件。</p>
+</li>
+<li><p><strong>服务器</strong>：接受连接，响应命令，执行文件操作。</p>
+</li>
+</ul>
+<h3 id="2-使用两个通道："><a href="#2-使用两个通道：" class="headerlink" title="2. 使用两个通道："></a>2. 使用两个通道：</h3><table>
+<thead>
+<tr>
+<th>通道类型</th>
+<th>作用</th>
+<th>默认端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>控制通道</td>
+<td>传输命令</td>
+<td>21</td>
+</tr>
+<tr>
+<td>数据通道</td>
+<td>传输文件</td>
+<td>20 或动态</td>
+</tr>
+</tbody></table>
+<p><strong>两条独立的 TCP 连接</strong></p>
+<table>
+<thead>
+<tr>
+<th>连接类型</th>
+<th>作用</th>
+<th>举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>控制连接</strong></td>
+<td>👮‍♀️ &#x3D;&#x3D;用来收发命令和响应（纯文本）&#x3D;&#x3D;</td>
+<td><code>USER</code>、<code>PASS</code>、<code>LIST</code> 等</td>
+</tr>
+<tr>
+<td><strong>数据连接</strong></td>
+<td>📦 用来传输数据（比如文件、目录）</td>
+<td>上传、下载、列出文件等</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>控制通道一直保持打开，负责发送 <code>USER</code>, <code>PASS</code>, <code>LIST</code>, <code>RETR</code> 等命令。</p>
+</li>
+<li><p>数据通道则在需要传输数据时打开，如下载文件、上传文件等。<br>  [[端口号]]</p>
+</li>
+</ul>
+<h3 id="3-模式分为两种："><a href="#3-模式分为两种：" class="headerlink" title="3. 模式分为两种："></a>3. 模式分为两种：</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主动模式 (PORT)</td>
+<td>客户端监听端口，服务器主动连接传数据</td>
+</tr>
+<tr>
+<td>被动模式 (PASV)</td>
+<td>服务器监听端口，客户端主动连接</td>
+</tr>
+</tbody></table>
+<p>“主动&#x2F;被动”，是<strong>针对数据连接的建立方式</strong>说的：</p>
+<ul>
+<li><p><strong>主动模式</strong>：客户端通过 <code>PORT</code> 命令告诉服务器：“我监听着一个端口，你连我”</p>
+<ul>
+<li>所以是服务器主动发起数据连接</li>
+</ul>
+</li>
+<li><p><strong>被动模式</strong>：客户端发送 <code>PASV</code> 命令，服务器回复：“我开放了某个端口，你来连我”</p>
+<ul>
+<li>所以是客户端主动发起数据连接</li>
+</ul>
+</li>
+</ul>
+<p>在 <strong>FTP 的主动模式</strong>中，客户端会向服务器发送一个&#x3D;&#x3D;PORT&#x3D;&#x3D; 命令，这个命令的意思其实很简单：</p>
+<blockquote>
+<p><strong>告诉服务器我监听在哪个 IP 和端口，请你来连我。</strong></p>
+</blockquote>
+<ol>
+<li><strong>第1步</strong>：只实现连接和登录服务器</li>
+</ol>
+<p>FTP协议规定的第一个步骤是：</p>
+<blockquote>
+<p>客户端一连接上服务器控制端口后，服务器就必须返回一条 <code>220</code> 开头的欢迎信息</p>
+</blockquote>
+<ol start="2">
+<li><p><strong>第2步</strong>：实现 LIST 命令（目录列表）</p>
+</li>
+<li><p><strong>第3步</strong>：实现下载文件（RETR）</p>
+</li>
+<li><p><strong>第4步</strong>：实现上传文件（STOR）</p>
+</li>
+<li><p><strong>第5步</strong>：实现被动模式和主动模式选择</p>
+</li>
+</ol>
+<h1 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h1><ul>
+<li><p>客户端<strong>必须指定服务器的 IP 和端口</strong>，因为它是“主动发起连接的一方”</p>
+</li>
+<li><p>客户端调用 <code>connect()</code>，需要告诉系统“我要连接哪个服务器（IP）和哪个端口”</p>
+</li>
+<li><p><strong>普通 TCP 连接：&#x3D;&#x3D;服务器写自己端口，客户端写服务器端口</strong>&#x3D;&#x3D;</p>
+</li>
+<li><p><strong>FTP 这种复杂协议：控制连接类似普通 TCP，数据连接双方都需要知道对方的数据端口</strong></p>
+</li>
+</ul>
+<p>📁 FTPClient.cpp<br>├─ 🔹 connectToServer()      连接服务器<br>├─ 🔹 login()                登录账户（发送 USER&#x2F;PASS）<br>├─ 🔹 listFiles()            查看文件列表（LIST命令）<br>├─ 🔹 downloadFile()         下载文件（RETR命令）<br>├─ 🔹 uploadFile()           上传文件（STOR命令）<br>├─ 🔹 quit()                 退出（QUIT命令）</p>
+<blockquote>
+<p>在 <strong>FTP 通信中，客户端和服务器都需要使用两个 socket</strong>：</p>
+</blockquote>
+<ul>
+<li><p>一个用于 <strong>控制连接</strong></p>
+</li>
+<li><p>一个用于 <strong>数据连接</strong></p>
+</li>
+</ul>
+<p>但注意：</p>
+<ul>
+<li><p><strong>控制连接</strong> 是<strong>客户端主动连接服务器</strong>的。</p>
+</li>
+<li><p><strong>数据连接</strong> 有两种方式（主动模式和被动模式），客户端和服务器的角色会不同。</p>
+</li>
+</ul>
+<h1 id="ftp-通信逻辑"><a href="#ftp-通信逻辑" class="headerlink" title="ftp 通信逻辑"></a>ftp 通信逻辑</h1><p>recv和send对应的socket都是自己的呀,因为socket本身就是通信接口嘛,电话插座</p>
+<blockquote>
+<p>✅ 一般我们先 <code>send()</code> 一个请求，才会 <code>recv()</code> 一个响应。</p>
+</blockquote>
+<p>但 FTP 是个<strong>特例</strong>，因为——</p>
+<hr>
+<h2 id="在-FTP-中，服务器一开始就会主动发消息"><a href="#在-FTP-中，服务器一开始就会主动发消息" class="headerlink" title="在 FTP 中，服务器一开始就会主动发消息"></a>在 FTP 中，服务器<strong>一开始就会主动发消息</strong></h2><h3 id="➤-即：不等客户端先发，服务器就先说话了！"><a href="#➤-即：不等客户端先发，服务器就先说话了！" class="headerlink" title="➤ 即：不等客户端先发，服务器就先说话了！"></a>➤ 即：<strong>不等客户端先发，服务器就先说话了！</strong></h3><h3 id="🔁-所以流程是这样的："><a href="#🔁-所以流程是这样的：" class="headerlink" title="🔁 所以流程是这样的："></a>🔁 所以流程是这样的：</h3><ol>
+<li><p>客户端用 <code>connect()</code> 连接上 FTP 服务器的控制端口（如 2100）。</p>
+</li>
+<li><p><strong>服务器主动发送欢迎信息</strong>，比如：<br> <code>220 Welcome to my FTP server\r\n</code></p>
+</li>
+<li><p>客户端用 <code>recv()</code>（就是你写的 <code>recv_response()</code>）<strong>先接收这个欢迎信息</strong>！<br> 客户端开始发命令（如 USER、PASS、PASV 等）</p>
+</li>
+</ol>
+<h3 id="📌-FTP-协议的规范就这么规定的："><a href="#📌-FTP-协议的规范就这么规定的：" class="headerlink" title="📌 FTP 协议的规范就这么规定的："></a>📌 FTP 协议的规范就这么规定的：</h3><blockquote>
+<p><strong>RFC 959：</strong></p>
+<blockquote>
+<p>Upon connection, the server must send a <strong>220</strong> Service ready message, before the client sends any command.</p>
+</blockquote>
+</blockquote>
+<hr>
+<h2 id="🔍-所以-recv-response-是对的！"><a href="#🔍-所以-recv-response-是对的！" class="headerlink" title="🔍 所以 recv_response() 是对的！"></a>🔍 所以 <code>recv_response()</code> 是对的！</h2><p>你的代码：</p>
+<p><code>recv_response(ctrl_sock, response);</code></p>
+<p>是等着接收这句 <code>220 Welcome to my FTP server\r\n</code>。</p>
+<p>[[U56socket]]</p>
+<h2 id="收消息的打印message"><a href="#收消息的打印message" class="headerlink" title="收消息的打印message"></a>收消息的打印message</h2><ul>
+<li><p><strong>发消息的那一方</strong>，消息是它发出去的，它知道自己发了啥。</p>
+</li>
+<li><p><strong>接收消息的那一方</strong>，接收到消息后打印显示，这样才能看到对方发的内容。</p>
+</li>
+</ul>
+<p>所以打印谁说了啥，<strong>一般都是由接收消息的那一方打印“对方说了啥”</strong>。</p>
+<p>举例：</p>
+<ul>
+<li><p>客户端调用 <code>recv</code> 接收数据，然后打印 <code>Server: ...</code>，表示“服务器说了这些话”。</p>
+</li>
+<li><p>服务器调用 <code>recv</code> 接收数据，然后打印 <code>Client: ...</code>，表示“客户端说了这些话”。</p>
+</li>
+</ul>
+<hr>
+<p>为什么不打印“自己说了啥”呢？</p>
+<ul>
+<li><p>因为发送消息是主动的，你本来就知道你发了什么。</p>
+</li>
+<li><p>接收消息是被动的，你不知道对方到底发了什么，所以打印出来方便查看。</p>
+</li>
+</ul>
+<h2 id="每次发送都会有响应"><a href="#每次发送都会有响应" class="headerlink" title="每次发送都会有响应"></a>每次发送都会有响应</h2><p>在<strong>FTP 协议</strong>和很多其他<strong>应用层协议</strong>中（如 HTTP、SMTP、POP3 等），<strong>客户端每发送一个命令，服务器都会响应</strong><br>你（客户端）问一句话<br>客服（服务器）必须回你一句话</p>
+<h3 id="一般控制连接：客户端“先说话”，服务器“被动回话”"><a href="#一般控制连接：客户端“先说话”，服务器“被动回话”" class="headerlink" title="一般控制连接：客户端“先说话”，服务器“被动回话”"></a>一般控制连接：客户端“先说话”，服务器“被动回话”</h3><p>比如 FTP 里的控制连接（就是你用 <code>send_command</code> 的那个）：</p>
+<ul>
+<li><p>客户端发命令（例如：<code>PASV</code>、<code>RETR</code>、<code>QUIT</code>）</p>
+</li>
+<li><p>服务器给出响应（例如：<code>227</code>、<code>150</code>、<code>226</code>）</p>
+</li>
+</ul>
+<p>🔁 <strong>客户端控制整个流程，服务器只是在回应，不要求客户端“再回应”服务器的回应</strong></p>
+<hr>
+<h3 id="✅-数据连接-特殊情况：服务器“主动发数据”，客户端“接受处理”"><a href="#✅-数据连接-特殊情况：服务器“主动发数据”，客户端“接受处理”" class="headerlink" title="✅ 数据连接&#x2F;特殊情况：服务器“主动发数据”，客户端“接受处理”"></a>✅ 数据连接&#x2F;特殊情况：服务器“主动发数据”，客户端“接受处理”</h3><p>控制连接–&gt;control socket  –&gt;cfd<br>数据连接–&gt;data socket   –&gt;dfd</p>
+<h2 id="代码知识–ctrl-sock"><a href="#代码知识–ctrl-sock" class="headerlink" title="代码知识–ctrl_sock"></a>代码知识–ctrl_sock</h2><p>代指的就是socket套接字而已,只不过是客户端创建的罢了,控制连接的socket</p>
+<h2 id="当-FTP-客户端发送-PASV-命令时，FTP-服务器会返回一个如下格式的响应："><a href="#当-FTP-客户端发送-PASV-命令时，FTP-服务器会返回一个如下格式的响应：" class="headerlink" title="当 FTP 客户端发送 PASV 命令时，FTP 服务器会返回一个如下格式的响应："></a>当 FTP 客户端发送 <code>PASV</code> 命令时，FTP 服务器会返回一个如下格式的响应：</h2><p><code>227 Entering Passive Mode (h1,h2,h3,h4,p1,p2)</code></p>
+<p>这个响应的含义是：</p>
+<ul>
+<li><p>服务器开放了一个数据连接端口</p>
+</li>
+<li><p>客户端需要连接这个指定的 IP 地址 和 端口号 来传输数据（比如传文件、列目录）</p>
+</li>
+</ul>
+<hr>
+<h3 id="✅-举个例子："><a href="#✅-举个例子：" class="headerlink" title="✅ 举个例子："></a>✅ 举个例子：</h3><p>txt</p>
+<p>复制编辑</p>
+<p><code>227 Entering Passive Mode (192,168,1,100,195,43)</code></p>
+<p>这是一个典型的响应。</p>
+<hr>
+<h3 id="🚀-如何解释这个响应？"><a href="#🚀-如何解释这个响应？" class="headerlink" title="🚀 如何解释这个响应？"></a>🚀 如何解释这个响应？</h3><ul>
+<li><p>IP 地址 &#x3D; <code>192.168.1.100</code>（就是前 4 个数字）</p>
+</li>
+<li><p>端口号 &#x3D; <code>195 * 256 + 43 = 49963</code></p>
+</li>
+</ul>
+<h1 id="ftp响应"><a href="#ftp响应" class="headerlink" title="ftp响应"></a>ftp响应</h1><hr>
+<h1 id="FTP响应码结构和分类"><a href="#FTP响应码结构和分类" class="headerlink" title="FTP响应码结构和分类"></a>FTP响应码结构和分类</h1><p>FTP响应码是 <strong>三位数字</strong>，每一位数字都有特定含义：</p>
+<p>nginx</p>
+<p>复制编辑</p>
+<p><code>XYZ</code></p>
+<ul>
+<li><p><strong>X（第一位数字）</strong> — 响应的类别（类别大类）</p>
+</li>
+<li><p><strong>Y（第二位数字）</strong> — 子类别，进一步细分响应类型</p>
+</li>
+<li><p><strong>Z（第三位数字）</strong> — 具体响应代码的细节</p>
+</li>
+</ul>
+<hr>
+<h2 id="第一位数字分类（X）"><a href="#第一位数字分类（X）" class="headerlink" title="第一位数字分类（X）"></a>第一位数字分类（X）</h2><table>
+<thead>
+<tr>
+<th>第一位数字X</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>正在进行，等待后续信息</td>
+</tr>
+<tr>
+<td>2</td>
+<td>成功，命令执行完成</td>
+</tr>
+<tr>
+<td>3</td>
+<td>需要进一步的命令</td>
+</tr>
+<tr>
+<td>4</td>
+<td>临时错误，命令未执行，稍后重试</td>
+</tr>
+<tr>
+<td>5</td>
+<td>永久错误，命令失败，不能执行</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="第二位数字分类（Y）"><a href="#第二位数字分类（Y）" class="headerlink" title="第二位数字分类（Y）"></a>第二位数字分类（Y）</h2><table>
+<thead>
+<tr>
+<th>第二位数字Y</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>通用响应</td>
+</tr>
+<tr>
+<td>1</td>
+<td>信息性回复</td>
+</tr>
+<tr>
+<td>2</td>
+<td>连接相关</td>
+</tr>
+<tr>
+<td>3</td>
+<td>用户相关（认证等）</td>
+</tr>
+<tr>
+<td>4</td>
+<td>文件系统相关（文件访问权限等）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="常见FTP响应码及解释"><a href="#常见FTP响应码及解释" class="headerlink" title="常见FTP响应码及解释"></a>常见FTP响应码及解释</h2><table>
+<thead>
+<tr>
+<th>代码</th>
+<th>含义</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>110</td>
+<td>重启标记，应答重新启动或等待</td>
+<td>正在等待客户端确认或完成操作</td>
+</tr>
+<tr>
+<td>120</td>
+<td>服务准备就绪，稍后开始执行</td>
+<td>服务已准备好，但需等待</td>
+</tr>
+<tr>
+<td>125</td>
+<td>数据连接已打开，开始传输</td>
+<td>数据连接打开，传输马上开始</td>
+</tr>
+<tr>
+<td>150</td>
+<td>文件状态正常，准备打开数据连接</td>
+<td>服务器准备传输数据，如LIST或RETR命令</td>
+</tr>
+<tr>
+<td>200</td>
+<td>命令成功</td>
+<td>命令执行成功</td>
+</tr>
+<tr>
+<td>202</td>
+<td>命令未执行（命令未实现）</td>
+<td>命令未被执行，可能是客户端发了不支持的命令</td>
+</tr>
+<tr>
+<td>211</td>
+<td>系统状态或帮助回复</td>
+<td>一般信息，如服务器状态</td>
+</tr>
+<tr>
+<td>212</td>
+<td>目录状态</td>
+<td>返回目录信息</td>
+</tr>
+<tr>
+<td>213</td>
+<td>文件状态</td>
+<td>返回文件信息</td>
+</tr>
+<tr>
+<td>214</td>
+<td>帮助信息</td>
+<td>返回命令帮助信息</td>
+</tr>
+<tr>
+<td>220</td>
+<td>服务就绪，欢迎消息</td>
+<td>连接成功，准备好接收命令</td>
+</tr>
+<tr>
+<td>221</td>
+<td>服务关闭控制连接</td>
+<td>服务器关闭控制连接</td>
+</tr>
+<tr>
+<td>225</td>
+<td>数据连接打开，没有传输</td>
+<td>数据连接已打开，当前无数据传输</td>
+</tr>
+<tr>
+<td>226</td>
+<td>关闭数据连接，传输完成</td>
+<td>传输完成，数据连接关闭</td>
+</tr>
+<tr>
+<td>227</td>
+<td>进入被动模式</td>
+<td>返回PASV命令中服务器监听的数据端口</td>
+</tr>
+<tr>
+<td>230</td>
+<td>用户登录成功</td>
+<td>用户验证通过，已登录成功</td>
+</tr>
+<tr>
+<td>250</td>
+<td>请求的文件操作成功</td>
+<td>文件操作成功，如删除、重命名</td>
+</tr>
+<tr>
+<td>257</td>
+<td>路径名创建成功</td>
+<td>返回当前目录路径名</td>
+</tr>
+<tr>
+<td>331</td>
+<td>用户名正确，需要密码</td>
+<td>用户名正确，等待输入密码</td>
+</tr>
+<tr>
+<td>332</td>
+<td>需要账户信息</td>
+<td>需要额外的账户信息</td>
+</tr>
+<tr>
+<td>350</td>
+<td>请求的文件操作等待进一步指令</td>
+<td>需要更多信息或等待用户操作</td>
+</tr>
+<tr>
+<td>421</td>
+<td>服务不可用，关闭控制连接</td>
+<td>服务器临时关闭控制连接</td>
+</tr>
+<tr>
+<td>425</td>
+<td>无法打开数据连接</td>
+<td>无法建立数据连接</td>
+</tr>
+<tr>
+<td>426</td>
+<td>连接关闭，传输中止</td>
+<td>传输中断，连接关闭</td>
+</tr>
+<tr>
+<td>450</td>
+<td>文件不可用（文件忙或锁定）</td>
+<td>文件暂时不可用</td>
+</tr>
+<tr>
+<td>451</td>
+<td>处理请求时出错</td>
+<td>服务器错误，未能完成请求</td>
+</tr>
+<tr>
+<td>500</td>
+<td>语法错误，命令未识别</td>
+<td>客户端命令错误</td>
+</tr>
+<tr>
+<td>501</td>
+<td>参数语法错误</td>
+<td>命令参数错误</td>
+</tr>
+<tr>
+<td>502</td>
+<td>命令未实现</td>
+<td>命令不支持或未实现</td>
+</tr>
+<tr>
+<td>503</td>
+<td>错误的命令序列</td>
+<td>命令顺序错误</td>
+</tr>
+<tr>
+<td>504</td>
+<td>命令参数未实现</td>
+<td>参数错误或不支持</td>
+</tr>
+<tr>
+<td>530</td>
+<td>未登录</td>
+<td>用户未登录，访问被拒绝</td>
+</tr>
+<tr>
+<td>532</td>
+<td>存储空间不足</td>
+<td>服务器存储空间不足</td>
+</tr>
+<tr>
+<td>550</td>
+<td>请求的操作未执行（文件不可用）</td>
+<td>文件不存在或权限不足</td>
+</tr>
+<tr>
+<td>551</td>
+<td>请求的操作中止，页面类型未知</td>
+<td>传输失败</td>
+</tr>
+<tr>
+<td>552</td>
+<td>存储分配失败</td>
+<td>空间不足或配额超限</td>
+</tr>
+<tr>
+<td>553</td>
+<td>文件名非法</td>
+<td>文件名错误或不合法</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h1 id="ftp协议命令"><a href="#ftp协议命令" class="headerlink" title="ftp协议命令"></a>ftp协议命令</h1><h2 id="数据传输相关命令"><a href="#数据传输相关命令" class="headerlink" title="数据传输相关命令"></a>数据传输相关命令</h2><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>PASV</code></td>
+<td>被动模式启动数据连接</td>
+<td>告诉服务器&#x3D;&#x3D;开启被动数据端口&#x3D;&#x3D;，客户端连接它</td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td>主动模式启动&#x3D;&#x3D;数据连接&#x3D;&#x3D;</td>
+<td>告诉服务器客户端开放端口，服务器主动连接客户端</td>
+</tr>
+<tr>
+<td><code>RETR</code></td>
+<td>下载文件</td>
+<td>从服务器下载指定文件</td>
+</tr>
+<tr>
+<td><code>STOR</code></td>
+<td>上传文件</td>
+<td>上传文件到服务器</td>
+</tr>
+<tr>
+<td><code>ABOR</code></td>
+<td>中止当前数据传输</td>
+<td>取消正在进行的上传或下载</td>
+</tr>
+</tbody></table>
+<h3 id="上传文件相关命令"><a href="#上传文件相关命令" class="headerlink" title="上传文件相关命令"></a>上传文件相关命令</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>含义</th>
+<th>示例操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>STOR</code></td>
+<td><strong>Store</strong>：上传文件</td>
+<td><code>STOR test.txt</code> → 上传 test.txt 到服务器</td>
+</tr>
+<tr>
+<td><code>APPE</code></td>
+<td><strong>Append</strong>：追加到已有文件</td>
+<td><code>APPE log.txt</code> → 向 log.txt 追加内容</td>
+</tr>
+<tr>
+<td><code>STOU</code></td>
+<td><strong>Store Unique</strong>：上传文件并自动重命名</td>
+<td><code>STOU</code> → 自动命名如 <code>file0001.txt</code> 上传</td>
+</tr>
+</tbody></table>
+<h1 id="代码流程"><a href="#代码流程" class="headerlink" title="代码流程"></a>代码流程</h1><blockquote>
+<p>创建套接字–&gt; 结构体设置服务器地址–&gt;connect<br>端口是2100,因为这是一个自己写的测试项目啦</p>
+</blockquote>
+<blockquote>
+<p>得到了服务器的response后,因为返回了字节数,所以美美转成string类型</p>
+</blockquote>
+<p>[[sin和addr]]</p>
+<h1 id="思维-能替代表示就替代表示"><a href="#思维-能替代表示就替代表示" class="headerlink" title="思维,能替代表示就替代表示"></a>思维,能替代表示就替代表示</h1><p>要方面修改和复用</p>
+<h2 id="要在主函数外面先写这些函数"><a href="#要在主函数外面先写这些函数" class="headerlink" title="要在主函数外面先写这些函数"></a>要在主函数外面先写这些函数</h2><p>尽量把代码模块化!!!</p>
+<h3 id="1-代码模块化与复用"><a href="#1-代码模块化与复用" class="headerlink" title="1. 代码模块化与复用"></a>1. <strong>代码模块化与复用</strong></h3><ul>
+<li><p>这些功能（接收响应、发送命令、解析PASV响应、建立数据连接）是FTP客户端实现中的基础操作，写成函数，可以方便<strong>反复调用</strong>，不必在主函数里写一大堆重复代码。</p>
+</li>
+<li><p>比如，你在不同地方都可能需要用<code>recv_response()</code>来接收服务器响应，写成函数调用更方便。</p>
+</li>
+</ul>
+<hr>
+<h3 id="2-代码可读性和维护性"><a href="#2-代码可读性和维护性" class="headerlink" title="2. 代码可读性和维护性"></a>2. <strong>代码可读性和维护性</strong></h3><ul>
+<li><p>主函数一般用来控制整体流程，写得简洁明了。</p>
+</li>
+<li><p>细节实现放到函数外部，主函数看起来像“流程图”，让人一眼明白做什么，而不用纠结实现细节。</p>
+</li>
+<li><p>如果将来要修改某个细节，只要改对应函数就行，方便维护。</p>
+</li>
+</ul>
+<h2 id="函数内"><a href="#函数内" class="headerlink" title="函数内"></a>函数内</h2><p>已经打印好了日志报错信息..</p>
+<h2 id="recv函数是包括在我写的接受函数里的"><a href="#recv函数是包括在我写的接受函数里的" class="headerlink" title="recv函数是包括在我写的接受函数里的"></a>recv函数是包括在我写的接受函数里的</h2><p>在这个大函数里,我可以实现输出功能</p>
+<h2 id="保留数据"><a href="#保留数据" class="headerlink" title="保留数据"></a>保留数据</h2><p>如果你现在代码里没用到它，没关系，先把数据收下来是个好习惯，后面调试或扩展功能时就方便了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">recv_response</span><span class="params">(<span class="type">int</span> sockfd,<span class="built_in">string</span>&amp; response)</span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="type">char</span> buf[<span class="number">1024</span>]=&#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">response.clear();</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n = recv(sockfd,buf,<span class="keyword">sizeof</span>(buf)<span class="number">-1</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(n &lt;= <span class="number">0</span>)&#123;</span><br><span class="line"></span><br><span class="line">perror(<span class="string">&quot;recv:&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response = <span class="built_in">string</span>(buf, n);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="写if-写的是非的情况"><a href="#写if-写的是非的情况" class="headerlink" title="写if,写的是非的情况"></a>写if,写的是非的情况</h2><p>因为此时,既可以代表执行了true,且本来要写的是,没成功怎么办.</p>
+<h2 id="要用啥函数-你就想想他的报错"><a href="#要用啥函数-你就想想他的报错" class="headerlink" title="要用啥函数,你就想想他的报错"></a>要用啥函数,你就想想他的报错</h2><h2 id="📦-原则总结：职责分离（Separation-of-Concerns）"><a href="#📦-原则总结：职责分离（Separation-of-Concerns）" class="headerlink" title="📦 原则总结：职责分离（Separation of Concerns）"></a>📦 原则总结：职责分离（Separation of Concerns）</h2><table>
+<thead>
+<tr>
+<th>模块</th>
+<th>负责内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>封装函数</td>
+<td>报错定位 + 内部处理（perror）</td>
+</tr>
+<tr>
+<td>主函数&#x2F;调用者</td>
+<td>只负责判断函数是否成功</td>
+</tr>
+<tr>
+<td>如果需要统一处理</td>
+<td>可以用日志模块统一输出</td>
+</tr>
+<tr>
+<td>&#x3D;&#x3D;<strong>封装函数返回 <code>-1</code> 只是“通知错误”</strong>，但并<strong>不会自动结束主函数或整个程序</strong>，<strong>你必须在主函数里根据返回值决定怎么处理</strong>（退出？报错？继续？）。&#x3D;&#x3D;</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="打印信息"><a href="#打印信息" class="headerlink" title="打印信息"></a>打印信息</h2><p><img src="/images/Pasted_image_20250602220834.png"></p>
+<h1 id="tip"><a href="#tip" class="headerlink" title="tip:"></a>tip:</h1><h3 id="为什么常用1024这个大小？"><a href="#为什么常用1024这个大小？" class="headerlink" title="为什么常用1024这个大小？"></a><strong>为什么常用1024这个大小？</strong></h3><ul>
+<li><p><strong>1024 字节 &#x3D; 1KB</strong>，是计算机存储里一个很常用且方便的单位（2的10次方）。</p>
+</li>
+<li><p>不算太大，内存开销小，性能好。</p>
+</li>
+<li><p>够装下大部分简单协议的响应内容（比如 FTP、HTTP等文本协议的响应）。</p>
+</li>
+<li><p>也方便调试和理解。</p>
+</li>
+</ul>
+<p>注意,inet_pton 是放到结构体里面的sin_addr结构体里</p>
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br></pre></td><td class="code"><pre><span class="line"> &lt;iostream&gt;</span><br><span class="line"> &lt;string&gt;</span><br><span class="line"> &lt;cstring&gt;</span><br><span class="line"> &lt;vector&gt;</span><br><span class="line"> &lt;sys/socket.h&gt;</span><br><span class="line"> &lt;arpa/inet.h&gt;</span><br><span class="line"> &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接收服务器响应（控制连接）</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">recv_response</span><span class="params">(<span class="type">int</span> sockfd, string&amp; response)</span> </span>&#123;</span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">1024</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line">    response.<span class="built_in">clear</span>();</span><br><span class="line">    <span class="type">int</span> n = <span class="built_in">recv</span>(sockfd, buffer, <span class="built_in">sizeof</span>(buffer) - <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (n &lt;= <span class="number">0</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    response = <span class="built_in">string</span>(buffer, n);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Server: &quot;</span> &lt;&lt; response;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送命令（控制连接）</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">send_command</span><span class="params">(<span class="type">int</span> sockfd, <span class="type">const</span> string&amp; cmd)</span> </span>&#123;</span><br><span class="line">    string message = cmd + <span class="string">&quot;\r\n&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">send</span>(sockfd, message.<span class="built_in">c_str</span>(), message.<span class="built_in">size</span>(), <span class="number">0</span>) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;send&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Client: &quot;</span> &lt;&lt; cmd &lt;&lt; endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解析PASV响应，提取IP和端口</span></span><br><span class="line"><span class="function"><span class="type">bool</span> <span class="title">parse_pasv_response</span><span class="params">(<span class="type">const</span> string&amp; response, string&amp; ip, <span class="type">int</span>&amp; port)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 服务器响应示例: 227 Entering Passive Mode (h1,h2,h3,h4,p1,p2).</span></span><br><span class="line">    <span class="keyword">auto</span> start = response.<span class="built_in">find</span>(<span class="string">&#x27;(&#x27;</span>);</span><br><span class="line">    <span class="keyword">auto</span> end = response.<span class="built_in">find</span>(<span class="string">&#x27;)&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span> (start == string::npos || end == string::npos || end &lt;= start) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    string data = response.<span class="built_in">substr</span>(start + <span class="number">1</span>, end - start - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums;</span><br><span class="line">    <span class="type">size_t</span> pos = <span class="number">0</span>, prev = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ((pos = data.<span class="built_in">find</span>(<span class="string">&#x27;,&#x27;</span>, prev)) != string::npos) &#123;</span><br><span class="line">        nums.<span class="built_in">push_back</span>(<span class="built_in">stoi</span>(data.<span class="built_in">substr</span>(prev, pos - prev)));</span><br><span class="line">        prev = pos + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    nums.<span class="built_in">push_back</span>(<span class="built_in">stoi</span>(data.<span class="built_in">substr</span>(prev)));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (nums.<span class="built_in">size</span>() != <span class="number">6</span>) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    ip = <span class="built_in">to_string</span>(nums[<span class="number">0</span>]) + <span class="string">&quot;.&quot;</span> + <span class="built_in">to_string</span>(nums[<span class="number">1</span>]) + <span class="string">&quot;.&quot;</span> + <span class="built_in">to_string</span>(nums[<span class="number">2</span>]) + <span class="string">&quot;.&quot;</span> + <span class="built_in">to_string</span>(nums[<span class="number">3</span>]);</span><br><span class="line">    port = nums[<span class="number">4</span>] * <span class="number">256</span> + nums[<span class="number">5</span>];</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立数据连接</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">connect_data_socket</span><span class="params">(<span class="type">const</span> string&amp; ip, <span class="type">int</span> port)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> data_sock = <span class="built_in">socket</span>(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (data_sock &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;socket&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> data_addr&#123;&#125;;</span><br><span class="line">    data_addr.sin_family = AF_INET;</span><br><span class="line">    data_addr.sin_port = <span class="built_in">htons</span>(port);</span><br><span class="line">    <span class="built_in">inet_pton</span>(AF_INET, ip.<span class="built_in">c_str</span>(), &amp;data_addr.sin_addr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">connect</span>(data_sock, (<span class="keyword">struct</span> sockaddr*)&amp;data_addr, <span class="built_in">sizeof</span>(data_addr)) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;connect data socket&quot;</span>);</span><br><span class="line">        <span class="built_in">close</span>(data_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> data_sock;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    string server_ip = <span class="string">&quot;127.0.0.1&quot;</span>;   <span class="comment">// 服务器IP，改成你服务器的地址</span></span><br><span class="line">    <span class="type">int</span> server_port = <span class="number">2100</span>;           <span class="comment">// 服务器控制端口2100</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. 创建控制连接socket</span></span><br><span class="line">    <span class="type">int</span> ctrl_sock = <span class="built_in">socket</span>(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (ctrl_sock &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;socket&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">sockaddr_in</span> server_addr&#123;&#125;;</span><br><span class="line">    server_addr.sin_family = AF_INET;</span><br><span class="line">    server_addr.sin_port = <span class="built_in">htons</span>(server_port);</span><br><span class="line">    <span class="built_in">inet_pton</span>(AF_INET, server_ip.<span class="built_in">c_str</span>(), &amp;server_addr.sin_addr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">connect</span>(ctrl_sock, (<span class="keyword">struct</span> sockaddr*)&amp;server_addr, <span class="built_in">sizeof</span>(server_addr)) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">perror</span>(<span class="string">&quot;connect&quot;</span>);</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. 接收欢迎信息</span></span><br><span class="line">    string response;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">recv_response</span>(ctrl_sock, response)) &#123;</span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;Failed to receive welcome message\n&quot;</span>;</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3. 发送 PASV 命令</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">send_command</span>(ctrl_sock, <span class="string">&quot;PASV&quot;</span>)) &#123;</span><br><span class="line">	    cerr &lt;&lt; <span class="string">&quot;Failed to send PASV command\n&quot;</span>;</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">recv_response</span>(ctrl_sock, response)) &#123;</span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;Failed to receive PASV response\n&quot;</span>;</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 4. 解析 PASV 响应，得到数据连接 IP 和端口</span></span><br><span class="line">    string data_ip;</span><br><span class="line">    <span class="type">int</span> data_port;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">parse_pasv_response</span>(response, data_ip, data_port)) &#123;</span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;Failed to parse PASV response\n&quot;</span>;</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Data connection IP: &quot;</span> &lt;&lt; data_ip &lt;&lt; <span class="string">&quot;, Port: &quot;</span> &lt;&lt; data_port &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 5. 建立数据连接</span></span><br><span class="line">    <span class="type">int</span> data_sock = <span class="built_in">connect_data_socket</span>(data_ip, data_port);</span><br><span class="line">    <span class="keyword">if</span> (data_sock &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 6. 发送 LIST 命令，通过数据连接接收目录列表</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">send_command</span>(ctrl_sock, <span class="string">&quot;LIST&quot;</span>)) &#123;</span><br><span class="line">        <span class="built_in">close</span>(data_sock);</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">recv_response</span>(ctrl_sock, response)) &#123;  <span class="comment">// 服务器对LIST命令的初步响应</span></span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;Failed to receive LIST response\n&quot;</span>;</span><br><span class="line">        <span class="built_in">close</span>(data_sock);</span><br><span class="line">        <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 7. 从数据连接读取目录列表</span></span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;Directory listing:\n&quot;</span>;</span><br><span class="line">    <span class="type">char</span> buffer[<span class="number">4096</span>];</span><br><span class="line">    <span class="type">ssize_t</span> n;</span><br><span class="line">    <span class="keyword">while</span> ((n = <span class="built_in">recv</span>(data_sock, buffer, <span class="built_in">sizeof</span>(buffer) - <span class="number">1</span>, <span class="number">0</span>)) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        buffer[n] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">        cout &lt;&lt; buffer;</span><br><span class="line">    &#125;</span><br><span class="line">    cout &lt;&lt; endl;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">close</span>(data_sock);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 8. 接收控制连接传来的传输结束消息</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">recv_response</span>(ctrl_sock, response)) &#123;</span><br><span class="line">        cerr &lt;&lt; <span class="string">&quot;Failed to receive transfer completion message\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 9. 关闭控制连接</span></span><br><span class="line">    <span class="built_in">close</span>(ctrl_sock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="代码讲解"><a href="#代码讲解" class="headerlink" title="代码讲解"></a>代码讲解</h1><p>为什么我们要把 <code>recv_response()</code> 里的服务器回复传回主程序？</p>
+<ul>
+<li><p>FTP 协议每条服务器回应都是“数字代码 + 空格 + 内容”，比如：</p>
+<ul>
+<li><p><code>220 Welcome</code></p>
+</li>
+<li><p><code>331 Please enter password</code></p>
+</li>
+</ul>
+</li>
+<li><p>所以我们需要判断开头是 <code>220</code> 吗？还是 <code>530</code> 拒绝了？</p>
+</li>
+</ul>
+<blockquote>
+<p>🧠 这就需要把那句欢迎语（response）传回主函数来做判断！</p>
+</blockquote>
+<p>response &#x3D; string(buf, n);</p>
+<ul>
+<li><p><code>buffer</code> 是字符数组（C 风格字符串）。</p>
+</li>
+<li><p><code>n</code> 是接收到的字节数，<strong>注意这里不一定有结束符 <code>\0</code></strong>，所以不能直接用 <code>response = buffer;</code>，因为没结束符会导致错误。</p>
+</li>
+</ul>
+<p>接受是从buf那里接受的,所以是字符串类型</p>
+<ul>
+<li><p><code>string(buffer, n)</code> 是用 <strong><code>buffer</code> 中前 <code>n</code> 个字符</strong> 构造一个 <code>std::string</code> 对象，保证字符串长度正确，不依赖结束符。</p>
+</li>
+<li><p><strong>发送方</strong> 调用 <code>send(sockfd, data, len, flags)</code> 把数据写入套接字的发送缓冲区，发送给对方。</p>
+</li>
+<li><p><strong>网络层</strong> 把数据通过 TCP&#x2F;IP 协议传输过去。</p>
+</li>
+<li><p><strong>接收方</strong> 调用 <code>recv(sockfd, buffer, size, flags)</code> 从套接字的接收缓冲区读取数据，存到自己给的 <code>buffer</code> 数组里。</p>
+</li>
+</ul>
+<h2 id="why重新赋值还要传参"><a href="#why重新赋值还要传参" class="headerlink" title="why重新赋值还要传参"></a>why重新赋值还要传参</h2><p>函数里确实给 <code>response</code> 重新赋值了，那为什么还要通过参数传进去呢？其实这里用 <strong>引用参数</strong> （<code>string&amp; response</code>）是为了让函数<strong>能够把收到的数据“传回”给调用者</strong>，也就是主程序。</p>
+<hr>
+<p>详细说说为什么需要这样设计：</p>
+<ul>
+<li><p>C++ 函数参数分三种传法：值传递、指针传递、引用传递。</p>
+</li>
+<li><p>如果用值传递（<code>string response</code>），函数里面对 <code>response</code> 的修改只在函数内部有效，函数外的变量不变。</p>
+</li>
+<li><p>如果用指针或者引用传递，函数里面对参数的修改会直接影响到调用处传入的变量。</p>
+</li>
+</ul>
+<hr>
+<p>所以，这个函数的目的是：</p>
+<blockquote>
+<p><strong>从网络socket里接收数据后，把数据放进调用者的<code>response</code>变量里，让调用者可以用这个结果继续处理。</strong></p>
+</blockquote>
+<h3 id="个人总结"><a href="#个人总结" class="headerlink" title="个人总结"></a>个人总结</h3><p>如果你在函数里改了一个量,想要保留修改<br>1.函数外&#x2F;全局<br>2.一般来说，我们更推荐传参的方式，原因主要有几点：</p>
+<ol>
+<li><p><strong>代码复用性更好</strong><br> 传参的函数更加灵活，可以用在不同的地方和不同的字符串变量上，不依赖全局状态。</p>
+</li>
+<li><p><strong>避免全局变量带来的副作用和难以维护</strong><br> 全局变量可能会被程序的其他部分无意修改，调试和维护更复杂。</p>
+</li>
+<li><p><strong>函数接口更清晰</strong><br> 通过参数明确告诉&#x3D;&#x3D;调用者函数会写入哪个变量&#x3D;&#x3D;，更符合函数设计原则。</p>
+</li>
+</ol>
+<h2 id="send不用显示创建buf"><a href="#send不用显示创建buf" class="headerlink" title="send不用显示创建buf"></a>send不用显示创建buf</h2><p>因为这次我们 <strong>不是接收数据，而是发送数据</strong>，而且我们用的是 <code>C++ 的 string</code>，已经自动帮你准备好了一块内存。</p>
+<h3 id="举个对比-🌰："><a href="#举个对比-🌰：" class="headerlink" title="举个对比 🌰："></a>举个对比 🌰：</h3><h4 id="✅-接收数据："><a href="#✅-接收数据：" class="headerlink" title="✅ 接收数据："></a>✅ <strong>接收数据：</strong></h4><p><code>char buffer[1024]; int n = recv(..., buffer, ...); // 你要先准备一块“空”内存装东西</code></p>
+<h4 id="✅-发送数据："><a href="#✅-发送数据：" class="headerlink" title="✅ 发送数据："></a>✅ <strong>发送数据：</strong></h4><p><code>string msg = &quot;USER anonymous\r\n&quot;; send(sockfd, msg.c_str(), msg.size(), 0); // msg.c_str() 就是 char* 类型的内容</code></p>
+<p>你只要通过 <code>.c_str()</code> 把 <code>string</code> 转成 <code>const char*</code>，再告诉 <code>send</code> 一共发多少个字节，它就可以从你提供的地址开始发送数据了！</p>
+<h2 id="r-n"><a href="#r-n" class="headerlink" title="\r\n"></a>\r\n</h2><p><code>\r\n</code> 连在一起：就表示 “<strong>回车换行</strong>“，<strong>即下一行行首</strong>！<br>在网络通信中，比如 <strong>FTP 协议</strong>，客户端发送的每条命令都必须以 <code>\r\n</code> 结尾（叫做 CRLF）。</p>
+<p>这是服务器的规定，它看到 <code>\r\n</code> 才知道：</p>
+<blockquote>
+<p>“哦，这条命令结束了，我可以开始处理了。”</p>
+</blockquote>
+<h2 id="解析pasv"><a href="#解析pasv" class="headerlink" title="解析pasv"></a>解析pasv</h2><ol>
+<li></li>
+</ol>
+<p>服务器就会回应你一句：<br><code>227 Entering Passive Mode (192,168,1,10,205,131)</code></p>
+<p>这句的意思是：</p>
+<blockquote>
+<p>“好的，我在 IP <code>192.168.1.10</code> 的端口 <code>(205*256 + 131) = 52611</code> 上等你。”</p>
+</blockquote>
+<hr>
+<p> 所以我们要干嘛？<br>你收到了这句字符串，但它是用 FTP 格式写的，不能直接拿来用！<br>👉 你得“<strong>解析</strong>”这句，把真正的 IP 和端口提取出来：<br><code>data_ip = &quot;192.168.1.10&quot; data_port = 205 * 256 + 131 = 52611</code></p>
+<p>227 Entering Passive Mode (h1,h2,h3,h4,p1,p2)<br>解释：<br>&#x3D;&#x3D;h1~h4：服务器的 IP 地址&#x3D;&#x3D;（如 192.168.1.2）。<br>p1,p2：服务器打开的端口号，用公式计算：</p>
+<p>2.<br>stoi()函数,把字符串转换为数字,”192”–&gt;192<br>先都初始化,then再用find函数改变pos</p>
+<ul>
+<li><code>data</code> 是从 <code>response</code> 中提取出来的 <strong>括号内的内容字符串</strong>。</li>
+<li><code>data.substr(...)</code> 是为了<strong>按逗号分隔出每个数字字符串</strong>。</li>
+</ul>
+<p>prev &#x3D; pos + 1; 很好,直接越到pos后</p>
+<p>他是一个一个push进去的,所以像数组一样,他是一个可以容纳xxxx数字,跟数字长度无关的</p>
+<h2 id="端口号计算"><a href="#端口号计算" class="headerlink" title="端口号计算"></a>端口号计算</h2><h3 id="为什么端口号是-p1-256-p2？"><a href="#为什么端口号是-p1-256-p2？" class="headerlink" title="为什么端口号是 p1 * 256 + p2？"></a>为什么端口号是 <code>p1 * 256 + p2</code>？</h3><p>这是因为 <strong>FTP 协议规定</strong>，服务器返回的这两个数（在你的例子中是 <code>204</code> 和 <code>173</code>）是将 <strong>16 位端口号分成两个 8 位整数组成的</strong>，而 8 位最多只能表示 <code>0~255</code> 的数。</p>
+<h3 id="✳️-具体换算如下："><a href="#✳️-具体换算如下：" class="headerlink" title="✳️ 具体换算如下："></a>✳️ 具体换算如下：</h3><p><code>p1 = 204 p2 = 173  端口号 = p1 × 256 + p2        = 204 × 256 + 173        = 52224 + 173        = 52397</code></p>
+<p>这是一种将两个字节拼接成一个完整的 16 位端口号的做法。这个计算方式是为了兼容 FTP 使用的控制连接格式，该格式只能用文本方式返回这些数字。</p>
+<h1 id="字符-数字-字符"><a href="#字符-数字-字符" class="headerlink" title="字符-数字-字符"></a>字符-数字-字符</h1><p>如果你<strong>只需要输出 IP 地址</strong>，而不是计算端口号、验证范围，那你<strong>确实可以不转成数字</strong>，直接使用字符串拼接即可。</p>
+<p>计算端口号,需要*256</p>
+<h2 id="函数参数"><a href="#函数参数" class="headerlink" title="函数参数"></a>函数参数</h2><p><code>int connect_control_socket(const std::string&amp; ip, int port = 21)</code><br>上面这个函数的意思是：</p>
+<p>“这个函数有两个参数：IP 是必须的，port 可以不传，不传的话就默认用 21。”</p>
+<p><code>int port = 21</code> 是一个“默认参数值”，它只在<strong>调用方没传入参数时才生效</strong>。  </p>
+<h2 id="发送连接请求打印端口号"><a href="#发送连接请求打印端口号" class="headerlink" title="发送连接请求打印端口号"></a>发送连接请求打印端口号</h2><p>控制连接的端口号是固定的,一般是21<br>而数据连接的端口号是不固定的,要打印出</p>
+<ul>
+<li><strong>控制连接端口</strong>：通常是<strong>已知的配置</strong>，不是调试重点。</li>
+<li><strong>数据连接端口</strong>：是<strong>协议协商的结果</strong>，常常是调试和排查问题的关键（比如NAT、防火墙、端口映射等问题经常出在这里）。</li>
+</ul>
+<h2 id="先后关socket-cfd-dfd"><a href="#先后关socket-cfd-dfd" class="headerlink" title="先后关socket cfd dfd"></a>先后关socket cfd dfd</h2><p><img src="/images/Pasted_image_20250602222628.png"></p>
+<h2 id="要先接受-才能解析-才能打印"><a href="#要先接受-才能解析-才能打印" class="headerlink" title="要先接受,才能解析,才能打印"></a>要先接受,才能解析,才能打印</h2><p>接受,会更新response<br>发命令就是用send_command函数发即可</p>
+<h1 id="stor"><a href="#stor" class="headerlink" title="stor"></a>stor</h1><p>进入被动模式<br>连接数据端口<br>发送命令(带filename)</p>
+<h1 id="4096"><a href="#4096" class="headerlink" title="4096"></a>4096</h1><h3 id="一、常见原因：4096-是内存分页的标准大小"><a href="#一、常见原因：4096-是内存分页的标准大小" class="headerlink" title="一、常见原因：4096 是内存分页的标准大小"></a>一、常见原因：4096 是内存分页的标准大小</h3><p>大多数操作系统的<strong>页大小（page size）是 4096 字节</strong>，也就是 4KB。</p>
+<ul>
+<li><p><code>buffer[4096]</code> 这样的大小在内存分配和管理上更<strong>对齐（aligned）</strong>，访问起来效率更高。</p>
+</li>
+<li><p>如果你用 <code>malloc</code> 来动态分配，4096 字节的内存刚好是一页内存；CPU 缓存访问、内核缓冲区读取时效率也更高。</p>
+</li>
+</ul>
+<hr>
+<h3 id="💡-二、读取效率：4096-是常见的“块”大小"><a href="#💡-二、读取效率：4096-是常见的“块”大小" class="headerlink" title="💡 二、读取效率：4096 是常见的“块”大小"></a>💡 二、读取效率：4096 是常见的“块”大小</h3><p>网络数据传输、文件读取等，很多地方都习惯用 4KB 一块：</p>
+<ul>
+<li><p>现代硬盘、文件系统的默认块大小就是 4096 字节。</p>
+</li>
+<li><p>Socket 缓冲区默认也是几 KB（可能是 8K 或更大），一次性读 4096 字节，效率较高，避免频繁调用 <code>read</code>。</p>
+</li>
+</ul>
+<h1 id="发数据连接"><a href="#发数据连接" class="headerlink" title="发数据连接"></a>发数据连接</h1><h3 id="每次数据传输（如-LIST、RETR、STOR）都需要一个新的数据连接。"><a href="#每次数据传输（如-LIST、RETR、STOR）都需要一个新的数据连接。" class="headerlink" title="每次数据传输（如 LIST、RETR、STOR）都需要一个新的数据连接。"></a><strong>每次数据传输（如 LIST、RETR、STOR）都需要一个</strong>新的数据连接。</h3><p>FTP 的工作机制是：</p>
+<ul>
+<li><p>控制连接：用来发送命令（如 <code>PASV</code>, <code>LIST</code>, <code>RETR</code> 等）</p>
+</li>
+<li><p>数据连接：专门用来传输数据（目录、文件等）</p>
+</li>
+</ul>
+<p>👉 但是 <strong>数据连接在每次传输后就会关闭</strong>（这是 FTP 协议设计的一部分！）</p>
+<h2 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h2><table>
+<thead>
+<tr>
+<th>来源</th>
+<th>读取函数</th>
+<th>数据来源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户键盘输入</td>
+<td><code>cin</code> &#x2F; <code>getline</code></td>
+<td>标准输入</td>
+</tr>
+<tr>
+<td>服务器返回数据</td>
+<td><code>recv(sockfd)</code></td>
+<td>网络套接字缓冲区</td>
+</tr>
+</tbody></table>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Qiu Yinlan</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://qiuyinlan.github.io/2025/06/04/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/">https://qiuyinlan.github.io/2025/06/04/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Qiu Yinlan</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/recvfrom/">
+                                    <span class="chip bg-color">recvfrom</span>
+                                </a>
+                            
+                                <a href="/tags/include/">
+                                    <span class="chip bg-color">include</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
+            <div class="card">
+                <a href="/2025/06/04/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ftp协议介绍及代码">
+                        
+                        <span class="card-title">ftp协议介绍及代码</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-06-04
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/blog/" class="post-category">
+                                    blog
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/recvfrom/">
+                        <span class="chip bg-color">recvfrom</span>
+                    </a>
+                    
+                    <a href="/tags/include/">
+                        <span class="chip bg-color">include</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2025/06/02/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="5.26-6.1周复盘">
+                        
+                        <span class="card-title">5.26-6.1周复盘</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-06-02
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/blog/" class="post-category">
+                                    blog
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2025</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Qiu Yinlan</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/qiuyinlan" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
