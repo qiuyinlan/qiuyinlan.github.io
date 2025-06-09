@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="GPIO, hi,it&#39;s Qiu Yinlan!">
+    <meta name="keywords" content="5.26-6.1周复盘, hi,it&#39;s Qiu Yinlan!">
     <meta name="description" content="分享技术、生活和学习笔记">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>GPIO | hi,it&#39;s Qiu Yinlan!</title>
+    <title>5.26-6.1周复盘 | hi,it&#39;s Qiu Yinlan!</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -310,12 +310,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/15.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/18.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">GPIO</h1>
+                    <h1 class="description center-align post-title">5.26-6.1周复盘</h1>
                 </div>
             </div>
         </div>
@@ -452,7 +452,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2025-06-02
+                    2025-06-07
                 </div>
                 
 
@@ -473,60 +473,59 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>[[myblog&#x2F;source&#x2F;_posts&#x2F;GPIO]]</p>
-<p>cpu动脑子,但是无法执行任务</p>
-<ul>
-<li>偏上外设:类似器官<ul>
-<li>gpio就是其中的器官之一<br>&#x3D;&#x3D;gpio可以控制芯片的io引脚&#x3D;&#x3D;</li>
-</ul>
-</li>
-</ul>
-<p>功能类似的引脚,命名前先编组—&gt;分为gpioa gpiob等等</p>
-<h1 id="八种工作模式"><a href="#八种工作模式" class="headerlink" title="八种工作模式"></a>八种工作模式</h1><blockquote>
-<p>通用输出推挽&#x2F;开漏<br>   复用输出推挽&#x2F;开漏</p>
-</blockquote>
-<p>横线加方块表示一个io引脚</p>
-<h2 id="输入输出"><a href="#输入输出" class="headerlink" title="输入输出"></a>输入输出</h2><p><img src="/images/Pasted_image_20250601221448.png"></p>
-<ul>
-<li>&#x3D;&#x3D;输出&#x3D;&#x3D;:信号由单片机内部流向外部<br>可以通过编程向寄存器写0&#x2F;1控制led的熄灭和点亮</li>
-<li>&#x3D;&#x3D;输入&#x3D;&#x3D;:由外到单片机里面<br>通过读取,知道io引脚的电压<br>一般是加一个开关,if开的时候是低,那么就可以推断开关状态了<br><img src="/images/Pasted_image_20250601222325.png">–&gt;io引脚的内部电路图</li>
-</ul>
-<h2 id="推挽-开漏"><a href="#推挽-开漏" class="headerlink" title="推挽,开漏"></a>推挽,开漏</h2><blockquote>
-<p>&#x3D;&#x3D;推挽&#x3D;&#x3D;(一对mos管交替导通,写0&#x2F;1)<br>   推:向外推电流<br>   挽:从外向里拉电流<br>   推挽和开漏,与mos管有关.两个mos管是交替工作的,不同时导通</p>
-</blockquote>
-<ul>
-<li>上面对应写1–&gt;上面的mos管导通–&gt;输出高电压  ,所以电流向外流–&gt;推</li>
-</ul>
-<p><img src="/images/Pasted_image_20250601223314.png"><br>–&gt;mos管的组成</p>
-<blockquote>
-<p>&#x3D;&#x3D;开漏&#x3D;&#x3D;(断开,写0&#x2F;1)<br>开漏–&gt;漏极断开<br>在io内部的那个电路图中,开漏指的是在任何情况下p-mos保持一直断开<br><img src="/images/Pasted_image_20250601223719.png"></p>
-</blockquote>
-<pre><code>因为pmos管上端是漏极,它开关断开,那漏极就开路了--&gt;开漏
-</code></pre>
-<p>如果处于开漏模式,给io引脚写1,那么两边都是断开的(因为开漏模式下无论写什么上端都是断开)<br>–&gt;&#x3D;&#x3D;io引脚悬空&#x3D;&#x3D;,电流等于0<br>io引脚的电阻&#x3D;u&#x2F;I等于无穷大–&gt;&#x3D;&#x3D;高阻抗</p>
-<h2 id="通用复用"><a href="#通用复用" class="headerlink" title="通用复用"></a>通用复用</h2><ul>
-<li>通用:通过cpu,直接向寄存器写值,去控制</li>
-<li>复用:通过其他的偏上外设,控制.把引脚当“开关”或“按钮”用，控制电平高低,点亮 LED、读取按键<ul>
-<li>把引脚“借给”STM32内部的功能，比如串口、PWM 等,发串口数据、输出 PWM 控制</li>
-</ul>
-</li>
-</ul>
-<h1 id="io的最大输出速度"><a href="#io的最大输出速度" class="headerlink" title="io的最大输出速度"></a>io的最大输出速度</h1><ul>
-<li>IO 引脚从 0V 变到 3.3V，需要<strong>一点点时间</strong>（比如几纳秒 ns）<br>而你写得太快，<strong>它还没变完你又改了</strong>，就造成了“波形失真”<br>电路中的“电容、电感、布线长度”都会影响这个速度</li>
-</ul>
-<p>所以就像你老师说的：<strong>你一直写 0、1，速度越来越快，当波形开始不正常，这就是你IO口的极限输出速度。</strong></p>
-<ul>
-<li>上升时间,保持时间(输出有效电压的时间),下降时间<br>上升时间和下降时间影响了io的最大输出速度</li>
-</ul>
-<p>选取:<br><img src="/images/Pasted_image_20250601230632.png"></p>
-<p>人眼睛的可视频率是45.8hz,选2m驱动led</p>
-<h1 id="led闪灯实验"><a href="#led闪灯实验" class="headerlink" title="led闪灯实验"></a>led闪灯实验</h1><h2 id="控制led亮灭的两种方式"><a href="#控制led亮灭的两种方式" class="headerlink" title="控制led亮灭的两种方式"></a>控制led亮灭的两种方式</h2><p><img src="/images/Pasted_image_20250601235003.png"></p>
-<p>把控制的放到阳极,推挽模式(都通,只是高低电压的区别)<br>放到阴极,开漏模式,(类似实现开关的闭合and断开)  (一个通,一个断)</p>
-<ul>
-<li>开启时钟,类似给器官供血</li>
-</ul>
-<h2 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h2><p><img src="/images/Pasted_image_20250601235912.png"></p>
-<p>1.初始化<br>对一个引脚进行初始化–&gt;选取好对应的输入输出模式,io速度</p>
+                <p>[[myblog&#x2F;source&#x2F;_posts&#x2F;5.26-6.1周复盘]]</p>
+<p>[[5.26-6.1周复盘 1]]</p>
+<h1 id="关于收获"><a href="#关于收获" class="headerlink" title="关于收获:"></a>关于收获:</h1><h2 id="1、你的todolist完成了吗"><a href="#1、你的todolist完成了吗" class="headerlink" title="1、你的todolist完成了吗?"></a>1、你的todolist完成了吗?</h2><p>上周没列周计划,但是日计划每天都没有完成<br>日计划待改进:不自觉地会给自己布置很多任务,一般一天的上午加下午表现好,晚上就疲惫了,且没有好的放松</p>
+<h2 id="2、你这周做了什么-收获了什么"><a href="#2、你这周做了什么-收获了什么" class="headerlink" title="2、你这周做了什么,收获了什么?"></a>2、你这周做了什么,收获了什么?</h2><p>1.用uptimer记录时间,很有用<br>下周一整周都用它记录,我就不需要日复盘的表,手动输入计算总的主线执行时间了(又实现记录,又省下时间)<br>2.对obsidian的工作,慢慢熟悉,双链与pdf++的方便.也探索了ob的dataview显示,完善了日复盘和周复盘模板<br>3.建立了博客,搭配obsidian的markdown形式<br>4.坚持每天写复盘,定好了模板后,发现就是填进去,非常轻松,也有正反馈<br>5.收获了自动化这个思路<br>6.环境的力量很大,要好好利用<br>7.某天洗澡的时候,听了杜甫的故事,挺有意思<br>8.六月一号沉迷手机后,写了日复盘,又开始做事学习了,需要表扬一下<br>9.写失败日记</p>
+<h3 id="事项收获-反思"><a href="#事项收获-反思" class="headerlink" title="事项收获&amp;反思"></a>事项收获&amp;反思</h3><table>
+<thead>
+<tr>
+<th>事项</th>
+<th>总时间</th>
+<th>收获</th>
+<th>反思</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>linux</td>
+<td>6h</td>
+<td>学完了socket相关函数,每天对ai一点点解析代码<br>但是有两天,没有做<br>看这个其实没有显示器也没关系,不应该给自己找借口</td>
+<td>计算了才知道,一周总共只花在linux上6h,多么惊人的数字,我以为我花了挺久的,他可是大主线任务啊<br>通过这个记录,我坚定了要记录时间的观念,可视化数据太重要了!!!!</td>
+</tr>
+<tr>
+<td>stm</td>
+<td>1h34min</td>
+<td>gpio,推挽和开漏</td>
+<td>自己在执行过程中,产生了畏难情绪,后面发现根本没事,看着视频,不会就一点点做笔记即可</td>
+</tr>
+<tr>
+<td>老友记</td>
+<td>5h26min</td>
+<td>可以倍速播放双语,调整了看的模式–&gt;先双语,再双语&#x2F;无字幕<br>用了anki记录,对于复习很有效果</td>
+<td></td>
+</tr>
+<tr>
+<td>m</td>
+<td>2h24min</td>
+<td></td>
+<td>感觉学的特别没有效率,可能是一直盲听,没做任何笔记</td>
+</tr>
+<tr>
+<td>数据结构</td>
+<td>20min</td>
+<td>知道了随想录讲得好</td>
+<td>没想到自己很差的项目,一周只投入了一点时间,想追</td>
+</tr>
+</tbody></table>
+<h3 id="最大的收获"><a href="#最大的收获" class="headerlink" title="最大的收获"></a>最大的收获</h3><p>周五周六搞博客搭建搞了特别久,浪费了很多很多时间<br>我学到了:<br>1.千万要保持冷静做事,要有自己的思考<br>每一步,多一点点思考,可以为自己节省很多很多的时间–&gt;做项目啥的,尝试新东西,千万不能盲从AI(在消耗一定时间的时候,就要警觉了)<br>2.多安排一些被动动起来的事情,比如和别人提前约好了出去<br>那样就会防止自己沉浸在一件事情中,一直停不下来<br>3.写失败日记特别有用,让我更关注过程而非结果</p>
+<h1 id="关于做事"><a href="#关于做事" class="headerlink" title="关于做事:"></a>关于做事:</h1><h2 id="1、这周有什么事情是想做-但没做成功的-怎么改进"><a href="#1、这周有什么事情是想做-但没做成功的-怎么改进" class="headerlink" title="1、这周有什么事情是想做,但没做成功的?怎么改进"></a>1、这周有什么事情是想做,但没做成功的?怎么改进</h2><p>想自己学了,收获了拍个视频总结,但是发现启动成本太高了<br>不妨按分钟定目标<br>及时总结非常重要,但是自己一直没做成</p>
+<h2 id="2、你这周有做哪些重复的基础性工作-有哪些可以优化的"><a href="#2、你这周有做哪些重复的基础性工作-有哪些可以优化的" class="headerlink" title="2、你这周有做哪些重复的基础性工作,有哪些可以优化的?"></a>2、你这周有做哪些重复的基础性工作,有哪些可以优化的?</h2><p>基金导入</p>
+<h1 id="关于规划"><a href="#关于规划" class="headerlink" title="关于规划:"></a>关于规划:</h1><h2 id="针对这周复盘-下周要做出怎样的keep-improve"><a href="#针对这周复盘-下周要做出怎样的keep-improve" class="headerlink" title="针对这周复盘,下周要做出怎样的keep &amp;&amp; improve?"></a>针对这周复盘,下周要做出怎样的keep &amp;&amp; improve?</h2><h4 id="keep"><a href="#keep" class="headerlink" title="keep"></a>keep</h4><p>1.继续使用uptimer记录,坚持记录时间<br>2.每天列计划,要列主线和分支任务,不要让我在主线做累的时候,感觉无事可做<br>刻意练习有空就做杂事库的习惯,要每天更新杂事库</p>
+<h4 id="improve"><a href="#improve" class="headerlink" title="improve"></a>improve</h4><p>1.重要的事情优先做,先吃掉”三个青蛙”<br>2.m一定要做笔记<br>3.记录刷视频的时间,这周末发现我刷视频停不下来!!!除了主线,还要额外记录这个时间!!</p>
+<h2 id="你下周要做哪些事-调整后的预计时间分配是"><a href="#你下周要做哪些事-调整后的预计时间分配是" class="headerlink" title="你下周要做哪些事,调整后的预计时间分配是?"></a>你下周要做哪些事,调整后的预计时间分配是?</h2><p>补:(6月要写月复盘)<br>刷到了一个人用公众号写的5月复盘,感觉写的很好</p>
+<p>下周:<br>1.每天看一看上周周复盘的改进部分,这周不要犯和上周一样的错误<br>2.拍5次m,5次p,每次五分钟,突破自己<br>3.计划12.15睡觉,7点起床–&gt;立刻linux主线–&gt;一周10h–&gt;每天1.5h以上<br>数据结构–&gt;2h–&gt;每天20min以上<br>p–&gt;6h<br>m–&gt;5h</p>
+<p>杂事:<br>基金导入优化一下<br>了解一下ipad能否当显示器<br>ob隔着选中<br>探索follow rss订阅<br>看一下脚本逻辑,是否每次都重新生成</p>
+<h1 id="本周看书"><a href="#本周看书" class="headerlink" title="本周看书"></a>本周看书</h1><p>&lt;&lt;如何拯救糟糕的情绪&gt;&gt;<br>关注how 而非what</p>
 
                 
             </div>
@@ -553,7 +552,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://qiuyinlan.github.io/2025/06/02/GPIO/">https://qiuyinlan.github.io/2025/06/02/GPIO/</a>
+                    <a href="https://qiuyinlan.github.io/2025/06/07/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/">https://qiuyinlan.github.io/2025/06/07/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -636,13 +635,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2025/06/06/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/">
+                <a href="/2025/06/09/GPIO/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/18.jpg" class="responsive-img" alt="5.26-6.1周复盘">
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="GPIO">
                         
-                        <span class="card-title">5.26-6.1周复盘</span>
+                        <span class="card-title">GPIO</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -653,7 +652,7 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2025-06-06
+                            <i class="far fa-clock fa-fw icon-date"></i>2025-06-09
                         </span>
                         <span class="publish-author">
                             
@@ -677,13 +676,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2025/06/01/%E5%8D%9A%E5%AE%A2%E5%A4%B1%E8%B4%A5%E6%97%A5%E8%AE%B0/">
+                <a href="/2025/06/07/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="博客失败日记">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="ftp协议介绍及代码">
                         
-                        <span class="card-title">博客失败日记</span>
+                        <span class="card-title">ftp协议介绍及代码</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -694,7 +693,7 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2025-06-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2025-06-07
                             </span>
                         <span class="publish-author">
                             
@@ -711,12 +710,12 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/publish%E6%A0%87%E7%AD%BE%E5%B9%B6%E8%87%AA%E5%8A%A8%E4%B8%8A%E4%BC%A0%E5%88%B0%E5%8D%9A%E5%AE%A2%E7%BD%91%E7%AB%99%E4%B8%8A/">
-                        <span class="chip bg-color">publish标签并自动上传到博客网站上</span>
+                    <a href="/tags/include/">
+                        <span class="chip bg-color">include</span>
                     </a>
                     
-                    <a href="/tags/publish%E7%9A%84%E6%96%87%E7%AB%A0/">
-                        <span class="chip bg-color">publish的文章</span>
+                    <a href="/tags/recvfrom/">
+                        <span class="chip bg-color">recvfrom</span>
                     </a>
                     
                 </div>
