@@ -22,11 +22,7 @@
             
             <tag> go </tag>
             
-            <tag> pilot </tag>
-            
-            <tag> aiops </tag>
-            
-            <tag> prometheus </tag>
+            <tag> 可观测性 </tag>
             
         </tags>
       
@@ -53,11 +49,7 @@
             
             <tag> agent </tag>
             
-            <tag> eino </tag>
-            
             <tag> go </tag>
-            
-            <tag> ai </tag>
             
         </tags>
       
@@ -84,11 +76,7 @@
             
             <tag> agent </tag>
             
-            <tag> go </tag>
-            
             <tag> llm </tag>
-            
-            <tag> jsonl </tag>
             
         </tags>
       
@@ -113,13 +101,7 @@
       
         <tags>
             
-            <tag> ai </tag>
-            
-            <tag> rag </tag>
-            
-            <tag> es </tag>
-            
-            <tag> vector </tag>
+            <tag> 检索 </tag>
             
         </tags>
       
@@ -143,10 +125,6 @@
       
       
         <tags>
-            
-            <tag> https </tag>
-            
-            <tag> tls </tag>
             
             <tag> 计网 </tag>
             
@@ -172,10 +150,6 @@
       
       
         <tags>
-            
-            <tag> https </tag>
-            
-            <tag> tls </tag>
             
             <tag> 计网 </tag>
             
@@ -254,8 +228,6 @@
             
             <tag> 计网 </tag>
             
-            <tag> ftp </tag>
-            
             <tag> cpp </tag>
             
         </tags>
@@ -281,8 +253,6 @@
       
         <tags>
             
-            <tag> hexo </tag>
-            
             <tag> 博客 </tag>
             
         </tags>
@@ -307,8 +277,6 @@
       
       
         <tags>
-            
-            <tag> hexo </tag>
             
             <tag> 博客 </tag>
             
