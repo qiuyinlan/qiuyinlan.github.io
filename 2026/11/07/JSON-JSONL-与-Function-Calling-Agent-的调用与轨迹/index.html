@@ -1,0 +1,1435 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹, hi,it&#39;s Qiu Yinlan!">
+    <meta name="description" content="分享技术、生活和学习笔记">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹 | hi,it&#39;s Qiu Yinlan!</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 8.1.2"></head>
+
+
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">hi,it&#39;s Qiu Yinlan!</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">hi,it&#39;s Qiu Yinlan!</div>
+        <div class="logo-desc">
+            
+            分享技术、生活和学习笔记
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/16.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        padding: 35px 0 15px 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        padding-bottom: 30px;
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/agent/">
+                                <span class="chip bg-color">agent</span>
+                            </a>
+                        
+                            <a href="/tags/go/">
+                                <span class="chip bg-color">go</span>
+                            </a>
+                        
+                            <a href="/tags/llm/">
+                                <span class="chip bg-color">llm</span>
+                            </a>
+                        
+                            <a href="/tags/jsonl/">
+                                <span class="chip bg-color">jsonl</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
+                                技术
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2026-11-07
+                </div>
+                
+
+                
+
+                
+
+                
+
+                
+            </div>
+        </div>
+        <hr class="clearfix">
+
+        
+
+        
+
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <blockquote>
+<p>承接第一份 <code>2026-11-06-浮点向量ES与Agent评测.md</code>。<br>这一份聚焦三件事：数据格式怎么选、function calling 到底是什么、以及「落盘」具体怎么落地。<br>涉及 Pilot 的地方都标 <code>文件名:行号</code>。</p>
+</blockquote>
+<hr>
+<h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><p><strong>这份文档的主线是「谁发起、谁接收、谁执行、数据落在哪」，概念细节都是附属。</strong></p>
+<h3 id="流程-A：一次-function-calling-往返"><a href="#流程-A：一次-function-calling-往返" class="headerlink" title="流程 A：一次 function calling 往返"></a>流程 A：一次 function calling 往返</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）</span><br><span class="line">        ↓</span><br><span class="line">② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西</span><br><span class="line">        ↓</span><br><span class="line">③ Go 进程内 Eino ReAct 收到响应 → 解析成 schema.Message</span><br><span class="line">        ↓</span><br><span class="line">④ ToolsNode 按 name 查索引（compose/tool_node.go:399），查不到直接报错</span><br><span class="line">        ↓</span><br><span class="line">⑤ 执行你写的 Go 闭包 → 真去查 ES / Prometheus / Redis（副作用只在这发生）</span><br><span class="line">        ↓</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id，塞回 messages</span><br><span class="line">        ↓</span><br><span class="line">⑦ 回到 ①，循环，直到模型不再返回 tool_calls 或撞 MaxStep=25</span><br></pre></td></tr></table></figure>
+
+<p><strong>记住三句：</strong> 模型只点菜、你炒菜；模型无状态，不回灌它永远不知道执行结果；接收方永远是客户端。</p>
+<h3 id="流程-B：知识库入库（写一次）"><a href="#流程-B：知识库入库（写一次）" class="headerlink" title="流程 B：知识库入库（写一次）"></a>流程 B：知识库入库（写一次）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Upload → 算内容哈希 ID → DocumentExists 查重（命中就 return，不算向量）</span><br><span class="line">      → Embedder 生成向量 → 挂回 doc.Vector</span><br><span class="line">      → json.Marshal 整个 struct → 一次 HTTP PUT 进 ES</span><br><span class="line">      → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部进 _source</span><br></pre></td></tr></table></figure>
+
+<h3 id="流程-C：检索（读一次）"><a href="#流程-C：检索（读一次）" class="headerlink" title="流程 C：检索（读一次）"></a>流程 C：检索（读一次）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排 → 取 content 原文拼 prompt → 发给 LLM（向量到此为止，永不进 prompt）</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>三条流程对应的代码细节分别在本文件 Q6、第一份文档 Q5、第一份文档 Q13。</p>
+</blockquote>
+<hr>
+<h2 id="一、JSON-与-JSONL"><a href="#一、JSON-与-JSONL" class="headerlink" title="一、JSON 与 JSONL"></a>一、JSON 与 JSONL</h2><h3 id="Q1-JSON-和-JSONL-有什么区别？"><a href="#Q1-JSON-和-JSONL-有什么区别？" class="headerlink" title="Q1. JSON 和 JSONL 有什么区别？"></a>Q1. JSON 和 JSONL 有什么区别？</h3><p><strong>JSON 是一个完整的值</strong>，可以是对象也可以是数组，语法上必须括号闭合、能被整体解析。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">&quot;tool&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">2</span><span class="punctuation">,</span><span class="attr">&quot;tool&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_metrics&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>JSONL（JSON Lines &#x2F; NDJSON）是一行一个独立 JSON</strong>，行间用 <code>\n</code> 分隔。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;id&quot;:1,&quot;tool&quot;:&quot;query_logs&quot;,&quot;ok&quot;:true&#125;</span><br><span class="line">&#123;&quot;id&quot;:2,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;ok&quot;:true&#125;</span><br></pre></td></tr></table></figure>
+
+<p>三个必须记住的语法点：</p>
+<ul>
+<li><strong>没有外层数组</strong></li>
+<li><strong>行间没有逗号</strong></li>
+<li><strong>每行末尾一个 <code>\n</code></strong></li>
+</ul>
+<p>所以整份 JSONL 文件<strong>不是合法 JSON</strong>，<code>json.Unmarshal</code> 整个文件会报错；反过来每行单独拿出来都合法。</p>
+<p><strong>内存差异：</strong> 用 <code>json.Unmarshal</code> 解析 1GB 的 JSON 数组，内存里同时存在原始字节 + 解析结果，约 2 倍；JSONL 可以一行一行读，只留一行在内存里。</p>
+<h3 id="Q2-为什么日志-trace-评测结果都用-JSONL？"><a href="#Q2-为什么日志-trace-评测结果都用-JSONL？" class="headerlink" title="Q2. 为什么日志 &#x2F; trace &#x2F; 评测结果都用 JSONL？"></a>Q2. 为什么日志 &#x2F; trace &#x2F; 评测结果都用 JSONL？</h3><p>四条，从强到弱：</p>
+<ol>
+<li><strong>追加友好。</strong> JSON 数组要往 <code>]</code> 前塞逗号，得 seek 到文件尾改，并发写直接打架。JSONL 就是 <code>append</code>，一行写完就完事。</li>
+<li><strong>损坏隔离。</strong> 写到一半断电，JSON 整个文件废；JSONL 只有最后一行残，前面全部有效，跳过坏行继续跑。<strong>这条对日志和 trace 是决定性的。</strong></li>
+<li><strong>流式处理。</strong> 一行一行来，1GB 文件也能在小内存机器上处理完。</li>
+<li><strong>命令行直接能玩。</strong> <code>grep</code>、<code>tail -f</code>、<code>wc -l</code>、<code>jq -c</code> 全部开箱可用。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&#x27;&quot;ok&quot;:false&#x27;</span> trace.jsonl | <span class="built_in">wc</span> -l    <span class="comment"># 统计失败用例</span></span><br><span class="line"><span class="built_in">tail</span> -f trace.jsonl                       <span class="comment"># 实时盯工具调用</span></span><br></pre></td></tr></table></figure>
+
+<p>JSON 数组得先 <code>jq &#39;.[]&#39;</code> 拆开，而且 <code>tail -f</code> 看到一个没闭合的数组啥也干不了。</p>
+<h3 id="Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？"><a href="#Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？" class="headerlink" title="Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？"></a>Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？</h3><p><strong>写</strong>——<code>json.Encoder</code> 最省事，<code>Encode</code> 会自动在末尾补 <code>\n</code>，正好就是 JSONL 格式：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">enc := json.NewEncoder(f)</span><br><span class="line"><span class="keyword">for</span> _, call := <span class="keyword">range</span> calls &#123;</span><br><span class="line">    <span class="keyword">if</span> err := enc.Encode(call); err != <span class="literal">nil</span> &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>读</strong>——<code>bufio.Scanner</code>：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sc := bufio.NewScanner(f)</span><br><span class="line">buf := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">0</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>)</span><br><span class="line">sc.Buffer(buf, <span class="number">8</span>&lt;&lt;<span class="number">20</span>)   <span class="comment">// 单行上限，默认只有 64KB</span></span><br><span class="line"><span class="keyword">for</span> sc.Scan() &#123;</span><br><span class="line">    <span class="keyword">var</span> call ToolCall</span><br><span class="line">    <span class="keyword">if</span> err := json.Unmarshal(sc.Bytes(), &amp;call); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">continue</span>        <span class="comment">// 坏行跳过，不影响后面</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>五个坑：</strong></p>
+<ul>
+<li><strong><code>Scanner</code> 默认单行上限 64KB</strong>，工具返回一大段日志塞进 trace 就爆，必须手动 <code>Buffer()</code> 放大</li>
+<li><strong>一行内不能有裸换行</strong>，字符串里的换行必须转义成 <code>\n</code>（<code>encoding/json</code> 会自动处理，手拼字符串会出事）</li>
+<li><strong>不能有行尾逗号</strong>，<code>{&quot;a&quot;:1,}</code> 非法</li>
+<li><strong>不要在外面包数组</strong>，否则退化成 JSON，按行处理全废</li>
+<li><strong>UTF-8 无 BOM</strong>，带 BOM 会让只有第一行解析失败，是那种最诡异的 bug</li>
+</ul>
+<h3 id="Q4-怎么选-JSON-还是-JSONL？"><a href="#Q4-怎么选-JSON-还是-JSONL？" class="headerlink" title="Q4. 怎么选 JSON 还是 JSONL？"></a>Q4. 怎么选 JSON 还是 JSONL？</h3><p>判断标准一条：<strong>这份数据是「一次性整体读」还是「一条条追加、一条条读」？</strong> 后者一律 JSONL。</p>
+<ul>
+<li><strong>JSON</strong>：配置文件、API 请求&#x2F;响应、需要整体结构的（ES 的 mapping、<code>esapi.IndexRequest</code> 的 body）</li>
+<li><strong>JSONL</strong>：日志、trace、评测结果、训练数据、批处理中间产物</li>
+</ul>
+<p>落到 Pilot：</p>
+<ul>
+<li>Redis 短期记忆存<strong>单个 JSON 字符串</strong>（一次取整个会话，用 JSON 合理）</li>
+<li>ES 写入 body 是 <strong>JSON</strong>（一次请求一个文档）</li>
+<li>但 tool trace 落盘必须是 <strong>JSONL</strong>（每步追加一行，跑完几万行，还要被脚本批量读）</li>
+</ul>
+<p>一句话：<strong>JSON 是一份文档，JSONL 是一叠同样的纸条——文档要好读，纸条要能一张张抽出来用。</strong></p>
+<hr>
+<h2 id="二、Function-Calling"><a href="#二、Function-Calling" class="headerlink" title="二、Function Calling"></a>二、Function Calling</h2><h3 id="Q5-Pilot-用-function-calling-了吗？"><a href="#Q5-Pilot-用-function-calling-了吗？" class="headerlink" title="Q5. Pilot 用 function calling 了吗？"></a>Q5. Pilot 用 function calling 了吗？</h3><p><strong>用了，但一行相关代码都没手写——Eino 的 ReAct 全包了。</strong></p>
+<p><strong>证据链四条：</strong></p>
+<p><strong>① 模型是 OpenAI 兼容协议</strong>（<code>internal/ai/models/chat_model.go:37</code>）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chatModel, err := openai.NewChatModel(ctx, config)</span><br></pre></td></tr></table></figure>
+
+<p>function calling 不是厂商私货，就是 OpenAI 协议里的 <code>tools</code> 字段，DashScope &#x2F; DeepSeek 都支持。</p>
+<p><strong>② 字段名直接写了 ToolCalling</strong>（<code>full_agent.go:130</code>）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.ToolCallingModel = chatModel.GetModel()</span><br></pre></td></tr></table></figure>
+
+<p><code>react.AgentConfig</code> 里这个字段类型是 <code>model.ToolCallingChatModel</code>（eino v0.7.14 <code>flow/agent/react/react.go:50</code>），<strong>要求模型必须能发起工具调用</strong>。</p>
+<p><strong>③ 注册了 11 个工具</strong>（<code>full_agent.go:138-148</code>）：<code>query_alerts</code>、<code>query_metrics</code>、<code>query_logs</code>、<code>search_knowledge</code>…</p>
+<p><strong>④ 工具的 JSON Schema 自动生成</strong>（<code>tools/knowledge_tools_impl.go:36</code>）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t, err := utils.InferOptionableTool(</span><br><span class="line">	<span class="string">&quot;search_knowledge&quot;</span>,</span><br><span class="line">	<span class="string">&quot;搜索知识库，获取相关文档和最佳实践...&quot;</span>,</span><br><span class="line">	<span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br></pre></td></tr></table></figure>
+
+<p>配套的 struct tag：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SearchKnowledgeInput <span class="keyword">struct</span> &#123;</span><br><span class="line">	Query <span class="type">string</span> <span class="string">`json:&quot;query&quot; jsonschema:&quot;description=搜索关键词或问题描述,required&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>InferOptionableTool</code> 反射这个 struct，把 tag 转成 JSON Schema——<strong>这个 schema 就是 function calling 里 <code>parameters</code> 的内容</strong>。</p>
+<h3 id="Q6-Schema-是什么？是标准吗？"><a href="#Q6-Schema-是什么？是标准吗？" class="headerlink" title="Q6. Schema 是什么？是标准吗？"></a>Q6. Schema 是什么？是标准吗？</h3><p><strong>Schema &#x3D; 结构说明书</strong>：用一份结构化描述，说明另一份数据长什么样。</p>
+<p>数据库的 <code>CREATE TABLE</code>、Protobuf 的 <code>.proto</code>、JSON 的 <strong>JSON Schema</strong>，都是同一类东西。</p>
+<p><strong>JSON Schema 是公开标准</strong>，规范在 <code>json-schema.org</code>，有 IETF 草案版本（draft-07、2020-12），<strong>不是 OpenAI 私有格式</strong>。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;服务名，如 payment&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;window&quot;</span><span class="punctuation">:</span>  <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;enum&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;5m&quot;</span><span class="punctuation">,</span> <span class="string">&quot;15m&quot;</span><span class="punctuation">,</span> <span class="string">&quot;1h&quot;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span>   <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;enum&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;error&quot;</span><span class="punctuation">,</span> <span class="string">&quot;warn&quot;</span><span class="punctuation">,</span> <span class="string">&quot;info&quot;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;service&quot;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>用处有两个：<strong>给机器校验</strong>（不符就报错）+ <strong>给人&#x2F;AI 看</strong>（知道该填什么）。所以 function calling 拿它定义参数。</p>
+<h3 id="Q7-function-calling-的定义是什么？"><a href="#Q7-function-calling-的定义是什么？" class="headerlink" title="Q7. function calling 的定义是什么？"></a>Q7. function calling 的定义是什么？</h3><p><strong>让模型不直接说人话，而是输出「要调哪个函数 + 参数是什么」这种结构化数据。</strong></p>
+<p>对比：</p>
+<ul>
+<li><strong>传统</strong>：「你可以试试查看 payment 服务的日志，重点关注 error 级别……」→ 这是<strong>建议</strong>，还得自己解析，而且说法千变万化（查看日志&#x2F;看看 log&#x2F;检查一下日志），没法可靠解析</li>
+<li><strong>function calling</strong>：<code>{&quot;tool_calls&quot;:[{&quot;function&quot;:{&quot;name&quot;:&quot;query_logs&quot;,&quot;arguments&quot;:&quot;{\&quot;service\&quot;:\&quot;payment\&quot;,\&quot;level\&quot;:\&quot;error\&quot;}&quot;}}]}</code> → 这是<strong>指令</strong>，<code>json.Unmarshal</code> 直接能用</li>
+</ul>
+<p><strong>三个必须理解的点：</strong></p>
+<ol>
+<li><strong>模型不执行任何东西。</strong> 它只输出 JSON 说「我想调 query_logs」，真正查 Prometheus&#x2F;ES 的是你的 Go 代码。<strong>模型只点菜，你炒菜。</strong></li>
+<li><strong>模型的「知识」来自你给的 <code>tools</code> 列表。</strong> 不注册的工具它永远不可能调，它只看得到这次请求里塞进去的那份 schema。</li>
+<li><strong>结果必须回灌。</strong> 执行完包成 <code>role:&quot;tool&quot;</code> + <code>tool_call_id</code> 塞回消息列表，再调一次模型，它才知道查到了什么。</li>
+</ol>
+<p><strong>名字演化：</strong> OpenAI 2023-06 叫 <code>functions</code> &#x2F; function calling，2023-11 改名 <code>tools</code> &#x2F; tool calling。新名字支持一次返回多个调用（并行），也不限于函数。现在两者基本同义，前者是历史叫法。Eino 用的 <code>ToolCallingModel</code> &#x2F; <code>ToolsConfig</code> 就是新叫法。</p>
+<h3 id="Q8-一次请求里，function-calling-到底怎么走的？"><a href="#Q8-一次请求里，function-calling-到底怎么走的？" class="headerlink" title="Q8. 一次请求里，function calling 到底怎么走的？"></a>Q8. 一次请求里，function calling 到底怎么走的？</h3><p>用户问「payment 最近为什么报错」。</p>
+<p><strong>第 1 步 请求发出去</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;model&quot;</span><span class="punctuation">:</span><span class="string">&quot;qwen-max&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;system&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;你是运维助手...&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;user&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;payment 最近为什么报错&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;tools&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;function&quot;</span><span class="punctuation">,</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">,</span><span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span>...<span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span> ... 共 <span class="number">11</span> 个<span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>数据在 HTTP 请求里，模型看完就没了。</p>
+<p><strong>第 2 步 模型返回 tool_calls</strong>（数据在内存的 <code>schema.Message</code> 里）</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span><span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_1&quot;</span><span class="punctuation">,</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">,</span><span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;service\&quot;:\&quot;payment\&quot;,\&quot;level\&quot;:\&quot;error\&quot;,\&quot;window\&quot;:\&quot;15m\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>两个细节：<code>arguments</code> 是<strong>字符串</strong>，里面还有一层 JSON，要再 <code>Unmarshal</code> 一次；模型可以<strong>一次返回多个</strong> tool_calls（并行调用）。</p>
+<p><strong>第 3 步 Eino 找到 Go 函数执行</strong>——ReAct 按 name 从 <code>ToolsConfig.Tools</code> 匹配，把 arguments 反序列化成 <code>SearchKnowledgeInput</code>，然后 <code>InvokableRun</code>。</p>
+<p><strong>这一步是唯一能同时看到「工具名 + 参数 + 结果 + 耗时」的时刻。</strong></p>
+<p><strong>第 4 步 结果回灌再调模型</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;tool&quot;</span><span class="punctuation">,</span><span class="attr">&quot;tool_call_id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_1&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;status\&quot;:\&quot;ok\&quot;,\&quot;logs\&quot;:[...]&#125;&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>循环直到模型不再返回 tool_calls，或撞上 <code>MaxStep: 25</code>（<code>full_agent.go:121</code>）。</p>
+<p><strong>第 5 步 结束，只存了两条消息</strong>（<code>full_agent.go:339-346</code>）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage&#123;Role: <span class="string">&quot;user&quot;</span>, Content: query&#125;)</span><br><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage&#123;Role: <span class="string">&quot;assistant&quot;</span>, Content: result.Content&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>而 <code>types.ChatMessage</code> 只有三个字段（<code>pkg/types/types.go:110</code>）：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ChatMessage <span class="keyword">struct</span> &#123;</span><br><span class="line">	Role      <span class="type">string</span>    <span class="string">`json:&quot;role&quot;`</span></span><br><span class="line">	Content   <span class="type">string</span>    <span class="string">`json:&quot;content&quot;`</span></span><br><span class="line">	Timestamp time.Time <span class="string">`json:&quot;timestamp&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>第 1~4 步里发生的一切全部随函数返回被 GC 掉了。</strong></p>
+<hr>
+<h3 id="Q9-tool-calls-回给谁？谁去执行？"><a href="#Q9-tool-calls-回给谁？谁去执行？" class="headerlink" title="Q9. tool_calls 回给谁？谁去执行？"></a>Q9. tool_calls 回给谁？谁去执行？</h3><p><strong>回给「发起请求的那个人」——在 Pilot 里就是跑在你自己服务器上的 Go 进程，具体是 Eino 的 ReAct 循环。模型只负责说，执行永远在你这边。</strong></p>
+<h3 id="数据流向"><a href="#数据流向" class="headerlink" title="数据流向"></a>数据流向</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">你的 Go 进程 ──HTTP 请求(messages + tools)──▶ 模型（DashScope 远端）</span><br><span class="line">你的 Go 进程 ◀──HTTP 响应(tool_calls)─────── 模型</span><br><span class="line">       │</span><br><span class="line">       └─▶ Eino ReAct → ToolsNode → 你写的 Go 函数 → 查 ES/Prometheus → 结果再回灌</span><br></pre></td></tr></table></figure>
+
+<p>模型那端从头到尾只是<strong>算出一段文本给你</strong>，它没有能力执行任何东西。</p>
+<h3 id="按执行顺序走一遍"><a href="#按执行顺序走一遍" class="headerlink" title="按执行顺序走一遍"></a>按执行顺序走一遍</h3><p><strong>第 1 步 模型返回 HTTP 响应。</strong> 远端返回 200，body 里有 <code>tool_calls</code>。这个响应回到的是<strong>发起请求的客户端</strong>——eino-ext 的 <code>openai.ChatModel</code>。</p>
+<p><strong>第 2 步 解析成 <code>*schema.Message</code>。</strong> <code>ToolCalls</code> 字段带上 name、arguments、id。</p>
+<p><strong>第 3 步 ReAct 循环判断要不要调工具。</strong> <code>ToolCalls</code> 为空 → 直接返回 <code>Content</code>（结束）；非空 → 交给 ToolsNode。</p>
+<p><strong>第 4 步 ToolsNode 按名字找工具</strong>（<code>compose/tool_node.go:399</code>）</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">index, ok := tuple.indexes[toolCall.Function.Name]</span><br><span class="line"><span class="keyword">if</span> !ok &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;tool %s not found in toolsNode indexes&quot;</span>, toolCall.Function.Name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这个报错就是「模型编了一个不存在的工具名」</strong>——它只看到你给的 schema，但偶尔还是会拼错或幻觉出一个不存在的工具。找不到就直接报错，不会瞎执行。</p>
+<p><strong>第 5 步 执行你写的那个 Go 闭包</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    docs, err := kr.SearchDetailed(ctx, input.Query)   <span class="comment">// 真的去查 ES</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这一步才真正产生副作用</strong>——发 HTTP 到 ES、查 Prometheus、读 Redis。全是你的代码在干。</p>
+<p><strong>第 6 步 结果包成 tool 消息回灌</strong>，再发一次请求给模型，它才知道下一步。</p>
+<h3 id="三个必须澄清的点"><a href="#三个必须澄清的点" class="headerlink" title="三个必须澄清的点"></a>三个必须澄清的点</h3><ol>
+<li><strong>模型没有任何执行能力。</strong> 它不能读你的文件、不能访问网络、不能查数据库，唯一输出就是 token 流。</li>
+<li><strong>它也不知道你到底执行没执行。</strong> 模型是<strong>无状态</strong>的，每轮都是独立请求。不回灌结果，它只能瞎猜或重复调用。<strong>回灌不是可选项，是协议的一部分。</strong></li>
+<li><strong>谁发请求谁收结果。</strong> curl 手测就是 shell 脚本收，用 Eino 就是 Eino 收，用 LangChain 就是 LangChain 收。<strong>接收方永远是客户端。</strong></li>
+</ol>
+<h3 id="不用框架的话，你自己就是执行者"><a href="#不用框架的话，你自己就是执行者" class="headerlink" title="不用框架的话，你自己就是执行者"></a>不用框架的话，你自己就是执行者</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    resp := callModel(msgs, tools)          <span class="comment">// 你发请求，你收 tool_calls</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(resp.ToolCalls) == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> resp.Content                  <span class="comment">// 没工具要调了，收工</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> _, tc := <span class="keyword">range</span> resp.ToolCalls &#123;</span><br><span class="line">        fn := registry[tc.Name]              <span class="comment">// 按名字查你注册的函数</span></span><br><span class="line">        out, err := fn(tc.Arguments)         <span class="comment">// 你执行</span></span><br><span class="line">        msgs = <span class="built_in">append</span>(msgs, toolMsg(tc.ID, out))   <span class="comment">// 你回灌</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Eino 的 <code>react.NewAgent</code> 就是把这个 for 循环、工具索引、结果拼接全封装了。</p>
+<h3 id="安全边界"><a href="#安全边界" class="headerlink" title="安全边界"></a>安全边界</h3><p>既然模型能决定调什么函数、传什么参数，<strong>参数校验必须在工具里做</strong>。Pilot 每个工具都有 <code>if query == &quot;&quot;</code> 这类检查——不能因为「是模型传的」就默认合法。</p>
+<p>一句话：<strong>模型的输出是「请求」，你的代码是「服务端」——它提议，你执行，结果再喂回去。</strong></p>
+<hr>
+<h2 id="三、trace-落盘"><a href="#三、trace-落盘" class="headerlink" title="三、trace 落盘"></a>三、trace 落盘</h2><h3 id="Q10-「落盘」是什么意思？"><a href="#Q10-「落盘」是什么意思？" class="headerlink" title="Q10. 「落盘」是什么意思？"></a>Q10. 「落盘」是什么意思？</h3><p><strong>在第 3 步前后各插一个钩子，把当时看到的事实写成一行 JSON，追加到文件末尾。</strong></p>
+<p>不写数据库、不建表，就是文件——因为目标只是「事后能查、能统计」，文件最省事。</p>
+<p>文件长这样（JSONL）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_start&quot;,&quot;tool&quot;:&quot;query_logs&quot;,&quot;args&quot;:&#123;&quot;service&quot;:&quot;payment&quot;,&quot;level&quot;:&quot;error&quot;,&quot;window&quot;:&quot;15m&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_end&quot;,&quot;tool&quot;:&quot;query_logs&quot;,&quot;elapsed_ms&quot;:312,&quot;resp_bytes&quot;:4821&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_start&quot;,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;args&quot;:&#123;&quot;service&quot;:&quot;payment&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_end&quot;,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;elapsed_ms&quot;:188,&quot;resp_bytes&quot;:1203&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有了这四行就能回答：调了几个工具、参数对不对、哪步慢、有没有空转。<strong>而这些信息现在系统里一条都查不到。</strong></p>
+<h3 id="Q11-具体怎么实现？"><a href="#Q11-具体怎么实现？" class="headerlink" title="Q11. 具体怎么实现？"></a>Q11. 具体怎么实现？</h3><p>Eino 自带回调入口（<code>flow/agent/react/callback.go:30</code>）：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildAgentCallback</span><span class="params">(modelHandler *template.ModelCallbackHandler,</span></span></span><br><span class="line"><span class="params"><span class="function">	toolHandler *template.ToolCallbackHandler)</span></span> callbacks.Handler</span><br></pre></td></tr></table></figure>
+
+<p><code>ToolCallbackHandler</code> 四个钩子（<code>utils/callbacks/template.go:501</code>）：<code>OnStart</code> &#x2F; <code>OnEnd</code> &#x2F; <code>OnError</code> &#x2F; <code>OnEndWithStreamOutput</code>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal/observability/trace.go</span></span><br><span class="line"><span class="keyword">type</span> ToolTracer <span class="keyword">struct</span> &#123;</span><br><span class="line">	mu  sync.Mutex</span><br><span class="line">	enc *json.Encoder   <span class="comment">// Encode 自动补 \n，天然 JSONL</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *ToolTracer)</span></span> Handler() callbacks.Handler &#123;</span><br><span class="line">	toolHandler := &amp;template.ToolCallbackHandler&#123;</span><br><span class="line">		OnStart: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, input *tool.CallbackInput)</span></span> context.Context &#123;</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;</span><br><span class="line">				<span class="string">&quot;ev&quot;</span>:   <span class="string">&quot;tool_start&quot;</span>,</span><br><span class="line">				<span class="string">&quot;tool&quot;</span>: info.Name,</span><br><span class="line">				<span class="string">&quot;args&quot;</span>: json.RawMessage(input.ArgumentsInJSON),</span><br><span class="line">			&#125;)</span><br><span class="line">			<span class="keyword">return</span> context.WithValue(ctx, startKey&#123;&#125;, time.Now())</span><br><span class="line">		&#125;,</span><br><span class="line">		OnEnd: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, output *tool.CallbackOutput)</span></span> context.Context &#123;</span><br><span class="line">			start, _ := ctx.Value(startKey&#123;&#125;).(time.Time)</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;</span><br><span class="line">				<span class="string">&quot;ev&quot;</span>: <span class="string">&quot;tool_end&quot;</span>, <span class="string">&quot;tool&quot;</span>: info.Name,</span><br><span class="line">				<span class="string">&quot;elapsed_ms&quot;</span>: time.Since(start).Milliseconds(),</span><br><span class="line">				<span class="string">&quot;resp_bytes&quot;</span>: <span class="built_in">len</span>(output.Response),</span><br><span class="line">			&#125;)</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		&#125;,</span><br><span class="line">		OnError: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, err <span class="type">error</span>)</span></span> context.Context &#123;</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;<span class="string">&quot;ev&quot;</span>: <span class="string">&quot;tool_error&quot;</span>, <span class="string">&quot;tool&quot;</span>: info.Name, <span class="string">&quot;err&quot;</span>: err.Error()&#125;)</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> react.BuildAgentCallback(<span class="literal">nil</span>, toolHandler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>挂上去（改 <code>full_agent.go:333</code>，<code>Stream</code> 那条路径同理）：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result, err := a.graph.Invoke(ctx, userMsg, compose.WithCallbacks(a.tracer.Handler()))</span><br></pre></td></tr></table></figure>
+
+<p><code>info.Name</code> 是工具名——<code>compose/tool_node.go:481</code> 传的就是 <code>task.name</code>，不是节点名。</p>
+<h3 id="Q12-实现时要注意什么？"><a href="#Q12-实现时要注意什么？" class="headerlink" title="Q12. 实现时要注意什么？"></a>Q12. 实现时要注意什么？</h3><ul>
+<li><strong>别在回调里做慢 IO。</strong> 这台机器是 40G 小盘，<code>OnEnd</code> 里直接 <code>f.Write</code> + <code>fsync</code> 会拖慢每次工具调用。用缓冲 writer + 定期 flush，或攒够 N 行再落。</li>
+<li><strong><code>resp_bytes</code> 只记长度别记全文。</strong> 工具返回的日志动辄几十 KB，全存文件很快爆。要全文另存，trace 里放引用。</li>
+<li><strong>这是评测的前置条件，但不只是为了评测。</strong> 线上排查「用户说答错了」时，能直接看到这一步调了什么、参数对不对，比看最终回答有用得多。</li>
+</ul>
+<p>一句话：<strong>function calling 已经在用了（协议层），但工具调用的事实只活在内存里那几秒——落盘就是在它消失前多写一行。</strong></p>
+<hr>
+<h2 id="四、串起来的因果链"><a href="#四、串起来的因果链" class="headerlink" title="四、串起来的因果链"></a>四、串起来的因果链</h2><ol>
+<li>模型协议里 tool_calls 是结构化 JSON → 所以<strong>能</strong>被机器比对（评测可行的前提）</li>
+<li>但结构化数据只活在内存里，Pilot 的 <code>ChatMessage</code> 只存 role&#x2F;content → <strong>所以现在做不到工具级审计</strong></li>
+<li>要补 → 用 Eino 回调在工具执行前后各写一行 JSONL</li>
+<li>JSONL 而不是 JSON → 因为这是「一条条追加、一条条读」的数据，且要求断电只坏最后一行</li>
+<li>有了这些行 → 才能算工具选择准确率、参数正确率、耗时分布，才能做 Agent 评测</li>
+</ol>
+
+                
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <div class="reprint__author">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-user">
+                        文章作者:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="/about" rel="external nofollow noreferrer">Qiu Yinlan</a>
+                </span>
+            </div>
+            <div class="reprint__type">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-link">
+                        文章链接:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    <a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/">https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/</a>
+                </span>
+            </div>
+            <div class="reprint__notice">
+                <span class="reprint-meta" style="font-weight: bold;">
+                    <i class="fas fa-copyright">
+                        版权声明:
+                    </i>
+                </span>
+                <span class="reprint-info">
+                    本博客所有文章除特別声明外，均采用
+                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
+                    许可协议。转载请注明来源
+                    <a href="/about" target="_blank">Qiu Yinlan</a>
+                    !
+                </span>
+            </div>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/agent/">
+                                    <span class="chip bg-color">agent</span>
+                                </a>
+                            
+                                <a href="/tags/go/">
+                                    <span class="chip bg-color">go</span>
+                                </a>
+                            
+                                <a href="/tags/llm/">
+                                    <span class="chip bg-color">llm</span>
+                                </a>
+                            
+                                <a href="/tags/jsonl/">
+                                    <span class="chip bg-color">jsonl</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="Agent 架构、Eino 内部机制与多 Agent 编排">
+                        
+                        <span class="card-title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2026-11-08
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/agent/">
+                        <span class="chip bg-color">agent</span>
+                    </a>
+                    
+                    <a href="/tags/eino/">
+                        <span class="chip bg-color">eino</span>
+                    </a>
+                    
+                    <a href="/tags/go/">
+                        <span class="chip bg-color">go</span>
+                    </a>
+                    
+                    <a href="/tags/ai/">
+                        <span class="chip bg-color">ai</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="从浮点数到向量检索：ES、BM25 与 Agent 评测">
+                        
+                        <span class="card-title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2026-11-06
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
+                                    技术
+                                </a>
+                            
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/ai/">
+                        <span class="chip bg-color">ai</span>
+                    </a>
+                    
+                    <a href="/tags/rag/">
+                        <span class="chip bg-color">rag</span>
+                    </a>
+                    
+                    <a href="/tags/es/">
+                        <span class="chip bg-color">es</span>
+                    </a>
+                    
+                    <a href="/tags/vector/">
+                        <span class="chip bg-color">vector</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget card" style="background-color: white;">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        
+        display: none;
+        
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        
+        display: none;
+        
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="netease"
+                   type="playlist"
+                   id="503838841"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='all'
+                   order='random'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            
+                <span id="year">2019-2026</span>
+            
+            <span id="year">2019</span>
+            <a href="/about" target="_blank">Qiu Yinlan</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/qiuyinlan" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    var searchFunc = function (path, search_id, content_id) {
+        'use strict';
+        $.ajax({
+            url: path,
+            dataType: "xml",
+            success: function (xmlResponse) {
+                // get the contents from search data
+                var datas = $("entry", xmlResponse).map(function () {
+                    return {
+                        title: $("title", this).text(),
+                        content: $("content", this).text(),
+                        url: $("url", this).text()
+                    };
+                }).get();
+                var $input = document.getElementById(search_id);
+                var $resultContent = document.getElementById(content_id);
+                $input.addEventListener('input', function () {
+                    var str = '<ul class=\"search-result-list\">';
+                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                    $resultContent.innerHTML = "";
+                    if (this.value.trim().length <= 0) {
+                        return;
+                    }
+                    // perform local searching
+                    datas.forEach(function (data) {
+                        var isMatch = true;
+                        var data_title = data.title.trim().toLowerCase();
+                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
+                        var data_url = data.url;
+                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
+                        var index_title = -1;
+                        var index_content = -1;
+                        var first_occur = -1;
+                        // only match artiles with not empty titles and contents
+                        if (data_title !== '' && data_content !== '') {
+                            keywords.forEach(function (keyword, i) {
+                                index_title = data_title.indexOf(keyword);
+                                index_content = data_content.indexOf(keyword);
+                                if (index_title < 0 && index_content < 0) {
+                                    isMatch = false;
+                                } else {
+                                    if (index_content < 0) {
+                                        index_content = 0;
+                                    }
+                                    if (i === 0) {
+                                        first_occur = index_content;
+                                    }
+                                }
+                            });
+                        }
+                        // show search results
+                        if (isMatch) {
+                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                            var content = data.content.trim().replace(/<[^>]+>/g, "");
+                            if (first_occur >= 0) {
+                                // cut out 100 characters
+                                var start = first_occur - 20;
+                                var end = first_occur + 80;
+                                if (start < 0) {
+                                    start = 0;
+                                }
+                                if (start === 0) {
+                                    end = 100;
+                                }
+                                if (end > content.length) {
+                                    end = content.length;
+                                }
+                                var match_content = content.substr(start, end);
+                                // highlight all keywords
+                                keywords.forEach(function (keyword) {
+                                    var regS = new RegExp(keyword, "gi");
+                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
+                                });
+
+                                str += "<p class=\"search-result\">" + match_content + "...</p>"
+                            }
+                            str += "</li>";
+                        }
+                    });
+                    str += "</ul>";
+                    $resultContent.innerHTML = str;
+                });
+            }
+        });
+    };
+
+    searchFunc('/search.xml', 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+	
+    
+
+    
+
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
