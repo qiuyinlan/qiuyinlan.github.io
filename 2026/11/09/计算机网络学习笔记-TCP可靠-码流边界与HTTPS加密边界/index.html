@@ -33,16 +33,16 @@
     })();
   </script>
 
-  <meta name="description" content="零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：  TCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。 TLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，自己只额外暴露「送货必需的元信息」（IP、端口、SNI）。 HTTP 管「报文语义」：方法、路径、头、体，三代演进只是" data-stellar-page-meta="">
+  <meta name="description" content="零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：  TCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。 TLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。 HTTP 管「报文语义」：方法、路径、头、体，三代演进只是在解决「" data-stellar-page-meta="">
 <meta property="og:type" content="article" data-stellar-page-meta="">
 <meta property="og:title" content="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界" data-stellar-page-meta="">
 <meta property="og:url" content="https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/" data-stellar-page-meta="">
 <meta property="og:site_name" content="hi,it's Qiu Yinlan!" data-stellar-page-meta="">
-<meta property="og:description" content="零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：  TCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。 TLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，自己只额外暴露「送货必需的元信息」（IP、端口、SNI）。 HTTP 管「报文语义」：方法、路径、头、体，三代演进只是" data-stellar-page-meta="">
+<meta property="og:description" content="零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：  TCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。 TLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。 HTTP 管「报文语义」：方法、路径、头、体，三代演进只是在解决「" data-stellar-page-meta="">
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-09T14:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T03:20:21.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T05:02:08.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="计网" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界" data-stellar-page-meta="">
   
@@ -61,7 +61,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T22:00:00+08:00","dateModified":"2026-11-09T11:20:21+08:00","datePublished":"2026-11-09T22:00:00+08:00","description":"零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：\n\nTCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。\nTLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，自己只额外暴露「送货必需的元信息」（IP、端口、SNI）。\nHTTP 管「报文语义」：方法、路径、头、体，三代演...","headline":"计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"计网","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T22:00:00+08:00","dateModified":"2026-11-09T13:02:08+08:00","datePublished":"2026-11-09T22:00:00+08:00","description":"零、主干速查一次 HTTPS 请求里，三个协议各管一件事，别混着说：\n\nTCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。\nTLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。\nHTTP 管「报文语义」：方法、路径、头、体，三代演进只是在...","headline":"计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"计网","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css">
 
 
@@ -234,14 +234,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88&#x2F;" title="HTTPS 到底加密了什么？">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82&#x2F;" title="HTTPS 的路由转发，发生在哪一层？">
   
   
   <span class="ui-collection__initial" aria-hidden="true">H</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
       
       
     </span>
@@ -252,14 +252,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82&#x2F;" title="HTTPS 的路由转发，发生在哪一层？">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88&#x2F;" title="HTTPS 到底加密了什么？">
   
   
   <span class="ui-collection__initial" aria-hidden="true">H</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
       
       
     </span>
@@ -288,14 +288,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
   
   
-  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  <span class="ui-collection__initial" aria-hidden="true">计</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
       
       
     </span>
@@ -306,14 +306,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
   
   
-  <span class="ui-collection__initial" aria-hidden="true">计</span>
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
       
       
     </span>
@@ -406,8 +406,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">4601 字 · 预计阅读 16 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T14:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:20:21.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">3991 字 · 预计阅读 14 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T14:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T05:02:08.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -423,10 +423,9 @@
 <article class="md-text content slide-up"><h2 id="零、主干速查"><a href="#零、主干速查" class="headerlink" title="零、主干速查"></a>零、主干速查</h2><p>一次 HTTPS 请求里，三个协议各管一件事，别混着说：</p>
 <ul>
 <li><strong>TCP 管「字节可靠送达」</strong>：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。</li>
-<li><strong>TLS 管「这串字节不给别人看」</strong>：它把整个 HTTP 报文当载荷装进记录里加密，自己只额外暴露「送货必需的元信息」（IP、端口、SNI）。</li>
+<li><strong>TLS 管「这串字节不给别人看」</strong>：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。</li>
 <li><strong>HTTP 管「报文语义」</strong>：方法、路径、头、体，三代演进只是在解决「一个慢请求会不会堵住后面的请求」。</li>
 </ul>
-<p>三个问题的标准落点：</p>
 <div class="md-table-scroll"><table>
 <thead>
 <tr>
@@ -448,142 +447,66 @@
 </tr>
 </tbody></table></div>
 <hr>
-<h2 id="一、TCP-怎么保证可靠（四步是一条因果链，不是四个名词）"><a href="#一、TCP-怎么保证可靠（四步是一条因果链，不是四个名词）" class="headerlink" title="一、TCP 怎么保证可靠（四步是一条因果链，不是四个名词）"></a>一、TCP 怎么保证可靠（四步是一条因果链，不是四个名词）</h2><p><strong>一句话本质</strong>：让发送方一直知道两件事——「对方收到了多少」和「对方还能收多少」。</p>
-<p><strong>因果链</strong>（每一步都是被上一步的缺陷逼出来的）：</p>
+<h2 id="一、TCP-怎么保证可靠"><a href="#一、TCP-怎么保证可靠" class="headerlink" title="一、TCP 怎么保证可靠"></a>一、TCP 怎么保证可靠</h2><p><strong>一句话本质</strong>：让发送方一直知道两件事——「对方收到了多少」和「对方还能收多少」。</p>
+<p><strong>你的说法（已经改对，就是你自己那套「收和发」）</strong>：</p>
+<p>TCP 的可靠传输先分两头看，收和发。</p>
+<p>收这边要保证内容对、顺序对、不重复，靠两样东西：<strong>序列号</strong>和<strong>校验和</strong>。序列号不只是保证顺序——它更像每个字节的身份证，丢了靠它发现缺的是哪一段，乱了靠它重排，重复了靠它去重，重传也靠它定位，顺序只是其中一件事；校验和管的是内容有没有在路上坏掉。</p>
+<p>发这边要保证「知道对方收到没」。靠<strong>确认号</strong>：对方回 ACK，说明它确实收到了这么多字节。</p>
+<p>但 ACK 本身也会丢，所以还得有机制兜底，这就是<strong>重传</strong>，两种：</p>
 <ul>
-<li>IP 层会丢、会乱、会重复、会坏 → 所以要<strong>编号 + 校验和</strong>，让问题可见。</li>
-<li>但编号只能发现问题，发送方不知道对方到底收没收到 → 所以要 <strong>ACK</strong>。</li>
-<li>ACK 自己也会丢，发送方不能无限等 → 所以要<strong>重传</strong>（超时重传 + 快重传）。</li>
-<li>拼命发、拼命重传会压垮接收方和网络 → 所以要<strong>窗口</strong>（rwnd + cwnd）。</li>
+<li><strong>快重传</strong>：连续收到 3 个重复 ACK 就触发。接着的快恢复是把 <code>cwnd</code> 降到 <code>ssthresh</code>，然后直接进拥塞避免——不是把窗口顶到拥塞窗口。</li>
+<li><strong>超时重传</strong>：完整动作是 <code>ssthresh = cwnd / 2</code>、<code>cwnd = 1</code>、重新慢启动。所以不只是「速度从 1 开始」，阈值要先减半。</li>
 </ul>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>我是这么理解的，嗯，tcp可靠首先就是。收和发。</p>
-<p>收的话，要保证东西正确，那你得保证正确，你首先要有东西，怎么样确定你这个东西是有的呢？那就要靠序列号，序列号是保证顺序，那怎么样保证这个东西是正确的呢？就靠。校验和。</p>
-<p>那发怎么保证可以呢，就是，靠确认号。如果对方给我发了，就说明对方真的有收到这么多的序列号。aCK向对方传达，我收到了。</p>
-<p>因为各种不确定因素很多，如果没收到，那又需要继续有机制处理。所以如果丢了的话，对应有超时重传和快重传，快重传是到拥塞窗口，超时就是速度从1开始了。</p>
-<p>超时解决了，最后一个就是。接和收的平衡。就是窗口的机制。</p>
-</blockquote>
-<p><strong>【补充】三处要修正</strong>：</p>
-<ol>
-<li><strong>序列号不只是保证顺序</strong>。它更像每个字节的身份证：丢了靠它发现缺哪段，乱了靠它重排，重复了靠它去重，重传也靠它定位。顺序只是其中一件事。</li>
-<li><strong>快重传不是「到拥塞窗口」</strong>。触发条件是连续收到 3 个重复 ACK；快恢复是把 <code>cwnd</code> 降到 <code>ssthresh</code>，然后进拥塞避免。</li>
-<li><strong>超时重传不只是「速度从 1 开始」</strong>。完整动作是 <code>ssthresh = cwnd / 2</code>、<code>cwnd = 1</code>、重新慢启动。漏了「阈值先减半」。</li>
-</ol>
-<p><strong>「收和发」这个框架比背五个名词好记</strong>：</p>
+<p>最后是发和收之间的平衡，也就是<strong>窗口</strong>：接收方用 rwnd 告诉发送方「我缓冲区还剩多少」，发送方用 cwnd 自己估「网络现在能扛多少」，实际能发的取两者的小值。</p>
+<p><strong>为什么按「收和发」拆比背五个名词强</strong>：</p>
 <ul>
 <li>收的一方：保证内容对、顺序对、不重复 → 序列号 + 校验和</li>
 <li>发的一方：知道对方收到没、丢了补、别发太快 → ACK + 重传 + 窗口</li>
 </ul>
 <hr>
 <h2 id="二、TCP-与-UDP：边界归谁管"><a href="#二、TCP-与-UDP：边界归谁管" class="headerlink" title="二、TCP 与 UDP：边界归谁管"></a>二、TCP 与 UDP：边界归谁管</h2><p><strong>一句话本质</strong>：差别不在「可靠 / 不可靠」，在<strong>应用层交出的消息边界，传输层认不认</strong>。</p>
-<p><strong>因果链</strong>：</p>
-<ul>
-<li>UDP 不干预应用数据 → 应用说这是一条完整消息，它就原样包一个数据报发出去，不拆、不合、不重排 → <strong>边界被保留</strong>，代价是丢了没人管。</li>
-<li>TCP 要管可靠性就必须对字节流动手：按 MSS / 窗口切段、按序交付、丢了重传 → 它眼里只有字节流，<strong>应用写了几次它不关心</strong> → 边界丢失。</li>
-<li>边界丢了的后果叫「粘包」——本质不是 TCP 粘了，是你没告诉它怎么切 → 所以要自己加长度字段或分隔符做协议帧。</li>
-</ul>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>UDP 的”一个一个”不是它”主动拆”的，而是它不干预应用层的数据。应用层说”这是一个完整的消息”，UDP 就原封不动包起来发出去。它不做合并、不做拆分、不做重排——它把控制权全部交给应用层。</p>
-<p>而 TCP 的”字节流”是它主动干预了：它会根据网络状况决定怎么拆、怎么合、怎么重传、怎么排序。应用层交出来的数据边界，TCP 根本不关心。</p>
-</blockquote>
-<p><strong>【补充】</strong> UDP 自己不拆，但单个数据报超过 MTU 时 <strong>IP 层会分片</strong>，所以应用通常把单个数据报控制在 1200–1400B 以内。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>UDP 的「一个一个」不是它主动拆的，而是它不干预应用层的数据。应用层说「这是一条完整消息」，UDP 就原封不动包成一个数据报发出去，不合、不拆、不重排——它把控制权全交给应用层，所以边界被保留，代价是丢了没人管。</p>
+<p>TCP 的「字节流」正好相反，它是主动干预的：按 MSS 和窗口在字节流上切段、按序交付、丢了重传。它眼里只有字节流，应用层 write 了几次它根本不关心，所以<strong>应用层的消息边界丢了</strong>。</p>
+<p>边界一丢，后果叫「粘包」——本质不是 TCP 粘了你，是你没告诉它怎么切。所以用 TCP 必须自己做协议帧：加长度字段，或者加分隔符。</p>
+<p>还有一个细节：UDP 自己不拆，但单个数据报超过 MTU 时 <strong>IP 层会分片</strong>，所以应用通常把单个数据报控制在 1200–1400 字节以内，避开 IP 分片。</p>
 <hr>
 <h2 id="三、rwnd-与-cwnd：谁能决定发多少"><a href="#三、rwnd-与-cwnd：谁能决定发多少" class="headerlink" title="三、rwnd 与 cwnd：谁能决定发多少"></a>三、rwnd 与 cwnd：谁能决定发多少</h2><p><strong>一句话本质</strong>：一个看接收方的杯子还剩多少，一个看网络管道现在能跑多少，实际能发的是两者取小。</p>
-<div class="md-table-scroll"><table>
-<thead>
-<tr>
-<th>维度</th>
-<th>rwnd（接收窗口）</th>
-<th>cwnd（拥塞窗口）</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>谁决定</td>
-<td>接收方</td>
-<td>发送方自己</td>
-</tr>
-<tr>
-<td>依据</td>
-<td>自己缓冲区剩余空间</td>
-<td>丢包、ACK 返回速度等间接推断</td>
-</tr>
-<tr>
-<td>存在哪</td>
-<td>TCP 报文头的 Window 字段，随 ACK 回来</td>
-<td>只在发送方本地，报文里没有</td>
-</tr>
-</tbody></table></div>
-<p><strong>用户原话（2026-11-07，确认版）</strong>：</p>
-<blockquote>
-<p>rwnd 是 Receiver Window，接收窗口；cwnd 是 Congestion Window，拥塞窗口。</p>
-<p>rwnd = Receiver Window：接收方告诉发送方”我还能接多少”。它由接收方决定，会写在 TCP 报文的 Window 字段里，随 ACK 一起发回给发送方。</p>
-<p>cwnd = Congestion Window：发送方自己估算”网络现在能扛多少”。它只存在于发送方本地，不会出现在报文头里，是根据丢包、ACK 返回速度等间接推断出来的。</p>
-</blockquote>
-<p><strong>【补充】</strong> 收口一句：<strong>实际发送窗口 = min(rwnd, cwnd)</strong>。另外慢启动、线性递增、超时更新 <code>ssthresh</code> 这些动作，全部属于<strong>拥塞控制</strong>，是发送方在自己那一侧做的事，别和流量控制混。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>rwnd 是 Receiver Window，接收窗口，由<strong>接收方</strong>决定，表示「我还能接多少」。它会写在 TCP 报文的 Window 字段里，随 ACK 一起发回给发送方。</p>
+<p>cwnd 是 Congestion Window，拥塞窗口，由<strong>发送方</strong>自己估算「网络现在能扛多少」。它只存在于发送方本地，报文头里没有，是发送方根据丢包、ACK 返回速度这些间接推断出来的。</p>
+<p>所以发送方实际能发多少 = <code>min(rwnd, cwnd)</code>：一个看接收方的杯子，一个看网络的管道。</p>
+<p>顺带分清两件事：慢启动、线性递增、超时后更新 <code>ssthresh</code>，这些动作全属于<strong>拥塞控制</strong>，是发送方在自己那边做的事；rwnd 属于<strong>流量控制</strong>，是接收方告诉发送方的。两个不是一回事。</p>
 <hr>
-<h2 id="四、HTTP-三代：堵在哪一层"><a href="#四、HTTP-三代：堵在哪一层" class="headerlink" title="四、HTTP 三代：堵在哪一层"></a>四、HTTP 三代：堵在哪一层</h2><p><strong>一句话本质</strong>：三代都在解决同一个问题——<strong>一个慢请求 / 一个丢包，会不会把后面的请求全堵住</strong>。</p>
-<p><strong>因果链</strong>：</p>
-<ul>
-<li>HTTP/1.1：一条 TCP 上响应必须按序回来，前一个慢，后面的排队 → <strong>堵在 HTTP 层</strong>。浏览器只能多开连接绕过，所以 1.1 时代的优化都是「减少请求、多开连接」（雪碧图、多子域）。</li>
-<li>HTTP/2：二进制分帧 + stream ID，让不同请求的帧可以交错发送、乱序到达，接收端按 ID 装回去 → <strong>修好了应用层排队</strong>。但它仍然挤在一条 TCP 上，TCP 眼里只有一条连续字节流，丢一个包整条连接等重传 → <strong>堵在 TCP 层</strong>。</li>
-<li>HTTP/3：换成 QUIC（跑在 UDP 上），每条 stream 独立排序、独立重传，Connection ID 标识连接 → <strong>才取消连坐</strong>，顺便带上 0-RTT/1-RTT、连接迁移、用户态实现的拥塞控制与 TLS 1.3。</li>
-</ul>
+<h2 id="四、HTTP-三代：堵在哪一层"><a href="#四、HTTP-三代：堵在哪一层" class="headerlink" title="四、HTTP 三代：堵在哪一层"></a>四、HTTP 三代：堵在哪一层</h2><p><strong>一句话本质</strong>：三代都在解决同一个问题——<strong>一个慢请求、一个丢包，会不会把后面的请求全堵住</strong>。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>HTTP/1.1 上，一个请求发出去要等回应回来才能发下一个，中间堵了后面就全卡住。浏览器还会限制同域名的连接数，所以 1.1 时代的优化思路都是减少请求、多开连接：多张图合成一张雪碧图再切回页面各处，或者用多个子域名，等于多几条连接同时下载。顺带说清，1.1 不是第一版——0.9 起头、1.0 是第一个正式标准，1.1 是 1997 年的修订，它真正加的是 keep-alive 默认开、<code>Host</code> 头、chunked 分块、缓存控制。规范里还有 pipelining（连发不等），但响应必须按序、代理容易出错，浏览器默认关掉，所以准确说法是「实践上串行」，不是「规范上串行」。</p>
+<p>后来大家都要加密，TCP 本来就要握手，TLS 还要再握手一轮。</p>
+<p>HTTP/2 加了二进制分帧和 stream ID，又用 HPACK 压缩了头，所以能多路复用。注意帧不是「让东西有顺序」，是「让东西不需要顺序」——帧带 stream ID，可以和其他流的帧交错发送、乱序到达，接收端按 ID 装回去，这才叫多路复用。但它仍然挤在一条 TCP 上：TCP 眼里只有一条连续字节流，丢一个包整条连接都得等重传，所以<strong>它修好了 HTTP 层的排队，没修好 TCP 层的连坐</strong>。</p>
+<p>HTTP/3 换成 QUIC（跑在 UDP 上），每条 stream 独立排序、独立重传，才把连坐取消掉。因为 TCP 是字节流，它不知道上面有几个请求几条流，必须按顺序交付；而 QUIC 把 stream 当成传输层的一等公民，每条流独立管理。换 UDP 的真收益是绕开内核 TCP 栈的连坐 + 用 Connection ID 标识连接（WiFi 切 4G 不断，连接迁移）。别把 UDP 理解成「更可靠的传输」，它是不设门禁，重传、拥塞控制、TLS 1.3 都是 QUIC 在用户态自己实现的。</p>
 <p>一句话记：<strong>TCP 是连坐制，QUIC 是责任到人。</strong></p>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>HTTP/1.1：一个请求发出去，要等回应回来才能发下一个，中间堵了后面就全卡住。浏览器还会限制同域名的 TCP 连接数（不是限制浏览器总数），所以优化思路就是减少请求、多开连接：多张图片合成一张雪碧图再切回页面各处、或者用多个子域名，等于多几条连接同时下载。</p>
-<p>后来大家都要 TLS 加密，TCP 本来就要握手，TLS 还要再握手一轮。</p>
-<p>HTTP/2 增加了帧，压缩了头，基本都搭配 TLS。</p>
-<p>HTTP/3 把 TCP 和 TLS 握手整合，换成 UDP，解决队头阻塞。因为 TCP 是字节流，它不知道上面有几个请求、几条流，眼里只有一条连续管道，必须按顺序交付；而 QUIC 把 Stream 当成传输层的一等公民，每条流独立管理。</p>
-</blockquote>
-<p><strong>【补充】五处要修正</strong>：</p>
-<ol>
-<li><strong>1.1 不是第一版</strong>：0.9 起头、1.0 是第一个正式标准，1.1 是 1997 年修订。1.1 真正加的是 keep-alive 默认开、<code>Host</code> 头、chunked、缓存控制。规范里有 pipelining，但响应必须按序 + 代理易出错，浏览器默认关掉——所以准确说法是「实践上串行」，不是「规范上串行」。</li>
-<li><strong>队头阻塞必须分两层讲</strong>，这是这题的核心：1.1 堵在 HTTP 层；2 剥开了应用层排队但仍堵在 TCP 层；3 才让每条流独立重传。</li>
-<li><strong>帧不是「让东西有顺序」，是「让东西不需要顺序」</strong>：帧带 stream ID，可以和其他流的帧交错发送，接收端按 ID 装回去——这才叫多路复用。</li>
-<li><strong>UDP 不是更可靠的传输，是不设门禁</strong>：不保序、不重传、不加密，重传 / 拥塞控制 / TLS 1.3 全是 QUIC 在用户态自己实现的。换 UDP 的真收益是绕开内核 TCP 栈的连坐 + Connection ID 做连接迁移（WiFi 切 4G 不断）。</li>
-<li><strong>HTTP/2 的「更安全」不是 2 给的，是 TLS 给的</strong>；浏览器只在 TLS 上跑 h2，才让人误以为绑定。</li>
-</ol>
+<p>另外 HTTP/2 的「更安全」不是 2 给的，是 TLS 给的；浏览器只在 TLS 上跑 h2，才让人误以为两者绑定。</p>
 <hr>
-<h2 id="五、HTTP-请求报文的四段"><a href="#五、HTTP-请求报文的四段" class="headerlink" title="五、HTTP 请求报文的四段"></a>五、HTTP 请求报文的四段</h2><p><strong>一句话本质</strong>：请求行决定「去哪儿、干什么」，头决定「我是谁、我要什么格式」，空行是分界线，体才是业务数据。</p>
-<p><strong>四段与顺序</strong>：</p>
-<ol>
-<li><strong>请求行</strong>：方法 + 请求目标（路径 + 查询串）+ 版本，如 <code>POST /api/v1/chat HTTP/1.1</code>。放在最前面，因为服务端只看方法和路径就能驳回请求（404 / 405 / 413），连「你是谁」都不必知道。</li>
-<li><strong>请求头</strong>：<code>Host</code>、<code>User-Agent</code>、<code>Accept</code>、<code>Content-Type</code>、<code>Content-Length</code>、<code>Cookie</code>、<code>Authorization</code>。身份在这一段。</li>
-<li><strong>空行</strong>：报文行和每个 header 各自以 <code>\r\n</code> 结尾，<strong>再多一个 <code>\r\n</code> 就是空行</strong>，它是头和体的分界线。<strong>没有 body 也必须有空行</strong>（GET 就是「报文行 + 头 + 空行」结束）。</li>
-<li><strong>请求体</strong>：JSON / 表单 / 文件；GET 通常没有。</li>
-</ol>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>报文分成请求行、请求头、空行、请求体。为什么请求行要在最前面？因为服务端拿到方法 + 路径就知道他那边根本没有你要的东西，可以直接驳回，甚至不需要知道你是谁。</p>
-<p>想象一个人站着：头顶上是天空，天空就是请求行；去取快递要说你是取还是存（方法）、取的是哪个包裹（路径）、以及你选的哪个驿站（版本）。请求头是一系列说明信息，空行就是脖子，告诉对方这块结束了，请求体是真正的业务数据。</p>
-</blockquote>
-<p><strong>【补充】</strong> 三个必记点：</p>
-<ol>
-<li><strong>域名 / 协议 / 端口不在请求行，在 <code>Host</code> 头</strong>（HTTP/1.1 强制）——这是后面 SNI 明文的伏笔。</li>
-<li>header 必背五个：<code>Host</code>、<code>Content-Type</code>、<code>Content-Length</code>（与 <code>Transfer-Encoding: chunked</code> 互斥）、<code>Connection</code>、<code>Cookie / Authorization</code>。</li>
-<li>预判追问：HTTP/2 没有请求行了，变成伪头部 <code>:method</code> <code>:path</code> <code>:authority</code> <code>:scheme</code>。</li>
-</ol>
+<h2 id="五、HTTP-请求报文的四段"><a href="#五、HTTP-请求报文的四段" class="headerlink" title="五、HTTP 请求报文的四段"></a>五、HTTP 请求报文的四段</h2><p><strong>一句话本质</strong>：请求行决定去哪儿、干什么，头决定我是谁、要什么格式，空行是分界线，体才是业务数据。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>报文分成请求行、请求头、空行、请求体四段。</p>
+<p>请求行放在最前面，因为服务端拿到方法加路径就知道自己那边有没有你要的东西，可以直接驳回，甚至不需要知道你是谁。请求行三个字段的顺序是：方法 + 请求目标（路径带查询串）+ 版本。注意<strong>域名、协议、端口不在请求行，在 <code>Host</code> 头里</strong>（HTTP/1.1 强制要求），这一点正好是后面 SNI 明文的伏笔。</p>
+<p>请求头是一串说明信息：<code>Host</code>、<code>User-Agent</code>、<code>Accept</code>、<code>Content-Type</code>、<code>Content-Length</code>、<code>Cookie</code>、<code>Authorization</code>。身份也在这一段，所以服务端能在读身份之前就先拒（404 / 405 / 413）。</p>
+<p>空行就是脖子，告诉对方这一块结束了：报文行和每个头各自以 <code>\r\n</code> 结尾，再多一个 <code>\r\n</code> 就是空行。关键是——<strong>没有 body 也必须有空行</strong>，GET 就是「报文行 + 头 + 空行」直接结束，这是经典考点。</p>
+<p>请求体才是真正的业务数据：JSON、表单、文件；GET 通常没有。</p>
+<p>预判追问：HTTP/2 没有请求行了，变成伪头部 <code>:method</code>、<code>:path</code>、<code>:authority</code>、<code>:scheme</code>。</p>
 <hr>
 <h2 id="六、HTTPS-到底加密了什么"><a href="#六、HTTPS-到底加密了什么" class="headerlink" title="六、HTTPS 到底加密了什么"></a>六、HTTPS 到底加密了什么</h2><p><strong>一句话本质</strong>：分界线只有一条——<strong>TLS 记录里的 Application Data 是密文，记录之外的一切都是明文</strong>。</p>
-<ul>
-<li><strong>密文</strong>：整个 HTTP 报文——请求行、请求头、请求体、状态行、响应头、响应体。一个字节都不露。</li>
-<li><strong>明文</strong>：IP 头（每跳路由都要读）、TCP 头（端口）、TLS 记录头（类型 / 版本 / 长度）、ClientHello（SNI、套件、随机数）、TLS 1.2 的证书（含域名与公钥）。</li>
-<li>反直觉点：<strong>TLS 1.3 把 ServerHello 之后（含证书）都加密了，明文只剩 SNI</strong>；用 ECH 连 SNI 也能藏。</li>
-<li>IP 藏不住的原因：加密发生在传输层之上，每一跳都要读 IP 头。想藏 IP 只能再套一层（VPN / Tor）。</li>
-</ul>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>从请求头一直到响应体都被加密了，不加密的就是域名、公钥那些。</p>
-<p>SNI = 客户端在 TLS 握手时告诉服务器「我要访问哪个域名」，让服务器能返回正确的证书。但它本身是明文的，所以域名会暴露。</p>
-<p>IP 和端口没法加密，这是最底层的限制。路由器转发数据包靠的就是 IP 地址和端口，如果把 IP 加密了，路由器根本不知道往哪送，整个互联网就没法工作了。</p>
-</blockquote>
-<p><strong>【补充】</strong> 加密范围比「请求头到响应体」更靠前：<strong>请求行也在密文里</strong>，没有「头加密、行不加密」这种切法。「公钥明文」只对 TLS 1.2 成立，TLS 1.3 里证书已进加密握手流量。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>从请求头一直到响应体都被加密了，而且比这个范围还要靠前——<strong>请求行也在密文里</strong>。HTTP 报文是整块塞进 TLS 记录当载荷的，没有「头加密、行不加密」这种切法。所以密文是：请求行、请求头、请求体、状态行、响应头、响应体，一个字节都不露。</p>
+<p>不加密的是域名、公钥那些：IP 头、TCP 头里的端口、TLS 记录头、ClientHello 里的 SNI。其中「公钥明文」只对 TLS 1.2 成立——TLS 1.3 里证书已经进到 ServerHello 之后的加密握手流量，明文只剩 SNI（用 ECH 连 SNI 也能藏）。</p>
+<p>SNI 是客户端在 TLS 握手时告诉服务器「我要访问哪个域名」，让服务器返回正确的证书。它本身是明文，所以域名会暴露。</p>
+<p>IP 和端口没法加密，这是最底层的限制：路由器转发数据包靠的就是 IP 和端口，把 IP 加密了路由器根本不知道往哪送。更硬的说法是——加密发生在传输层之上，IP 头每一跳都要被读取；想藏 IP 只能再套一层（VPN / Tor）。</p>
 <hr>
-<h2 id="七、HTTPS-比-HTTP-多了什么（三个目标，不是七样清单）"><a href="#七、HTTPS-比-HTTP-多了什么（三个目标，不是七样清单）" class="headerlink" title="七、HTTPS 比 HTTP 多了什么（三个目标，不是七样清单）"></a>七、HTTPS 比 HTTP 多了什么（三个目标，不是七样清单）</h2><p><strong>一句话本质</strong>：HTTP 是明文文本协议，谁都能看、能改、能冒充；HTTPS 在它下面垫了一层 TLS，把这三件事补上，<strong>HTTP 报文本身一个字没改</strong>。</p>
-<p><strong>三个目标各配一套机制</strong>：</p>
+<h2 id="七、HTTPS-比-HTTP-多了什么"><a href="#七、HTTPS-比-HTTP-多了什么" class="headerlink" title="七、HTTPS 比 HTTP 多了什么"></a>七、HTTPS 比 HTTP 多了什么</h2><p><strong>一句话本质</strong>：HTTP 是明文文本协议，谁都能看、能改、能冒充；HTTPS 在它下面垫了一层 TLS 把这三件事补上，<strong>HTTP 报文本身一个字没改</strong>。</p>
+<p><strong>你的说法（已经改对，但顺序要对）</strong>：</p>
+<p>HTTPS 相比 HTTP，多了 TLS 协议层、TLS 握手、数字证书与 CA 信任体系、密钥协商、完整性校验，还有 HSTS、OCSP 这些。数据最终是用同一把<strong>会话密钥</strong>做对称加解密。</p>
+<p>这个覆盖范围是对的，但<strong>不要答成清单</strong>——面试官要听的是「为什么会多出这些东西」。按三个目标去装：</p>
 <div class="md-table-scroll"><table>
 <thead>
 <tr>
@@ -595,7 +518,7 @@
 <tbody><tr>
 <td>防偷看（机密性）</td>
 <td>抓包读内容</td>
-<td>对称加密（AES-GCM / ChaCha20）跑数据，密钥由非对称/ECDHE 协商</td>
+<td>对称加密（AES-GCM / ChaCha20）跑数据，密钥由非对称 / ECDHE 协商出来</td>
 </tr>
 <tr>
 <td>防篡改（完整性）</td>
@@ -605,58 +528,34 @@
 <tr>
 <td>防冒充（身份）</td>
 <td>假站点、中间人</td>
-<td>服务器出示证书，由 CA 私钥签名，客户端用内置根证书逐级验到可信</td>
+<td>服务器出示证书，CA 私钥签名，客户端用内置根证书逐级验到可信</td>
 </tr>
 </tbody></table></div>
-<p>外围补丁别和核心并列：<strong>HSTS</strong>（防 SSL stripping 降级）、<strong>OCSP / stapling</strong>（查吊销）、端口 443 + <code>https://</code> scheme。</p>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>HTTPS 相比 HTTP，多了 TLS 协议层、TLS 握手、数字证书与 CA 信任体系、密钥协商、完整性校验、HSTS 和 OCSP 等机制，共用一把密钥加解密。</p>
-</blockquote>
-<p><strong>【补充】</strong> 覆盖范围对，但<strong>答成了清单</strong>，这是这题最大的失分点。面试官要听的是「为什么会多出这些东西」。另外「共用一把密钥」只说了结果没说来源：会话密钥是协商出来的，之后数据全走对称（因为快），TLS 1.3 严格说收发各一把。</p>
+<p>「共用一把密钥」只说了结果，没说来源，必须补一句：这把会话密钥是协商出来的，之后数据全走对称（因为快），TLS 1.3 严格说收发方向各一把。</p>
+<p>HSTS 和 OCSP 的定位要摆正：核心是加密、完整性、身份认证这三件，HSTS 防的是 SSL stripping 降级、OCSP 查的是证书吊销状态，都属于外围，别和 TLS 并列说，那样显得分不清主次。</p>
 <hr>
-<h2 id="八、为什么对称和非对称必须搭配"><a href="#八、为什么对称和非对称必须搭配" class="headerlink" title="八、为什么对称和非对称必须搭配"></a>八、为什么对称和非对称必须搭配</h2><p><strong>一句话本质</strong>：非对称负责<strong>递钥匙</strong>，对称负责<strong>干活</strong>，证书负责<strong>证明这把钥匙是谁的</strong>。</p>
-<p><strong>因果链</strong>：</p>
-<ul>
-<li>只用对称 → 密钥怎么安全送到对方？网上传就被截获，后面全白搭（密钥分发难题）。</li>
-<li>只用非对称 → <strong>物理上装不下数据</strong>：RSA 2048 一次最多约 245 字节，而且慢几个数量级。它天生只能装一把密钥。</li>
-<li>所以分工：非对称只做一件事——把会话密钥安全递过去；其余数据全交给对称。</li>
-<li>现代做法更进一步：TLS 1.3 用 <strong>ECDHE</strong>，不是「用公钥加密密钥」，而是双方各出一对<strong>临时</strong>密钥、交换公钥、各自算出同一个共享密钥（密钥交换，不是密钥传输）。</li>
-<li>ECDHE 的 E = ephemeral：临时私钥用完即弃 → <strong>前向安全</strong>，服务器长期私钥日后泄露也解不开历史流量。</li>
-<li>闭环：非对称解决了「密钥怎么安全到对方」，没解决「这个公钥是谁的」→ 交给证书 + CA。</li>
-</ul>
-<p><strong>用户原话（2026-11-07，QQ）</strong>：</p>
-<blockquote>
-<p>曲线、基点、公钥都可以公开，私钥是从私钥算公钥，不是从公钥算私钥，公钥是私钥的单向函数结果。</p>
-<p>对称加密：一把钥匙，既能锁也能开，加密和解密用同一把密钥。优点速度极快，适合加密大量数据；缺点这把密钥怎么安全交给对方。代表算法 AES、ChaCha20。</p>
-<p>非对称：一对密钥，公钥加密的数据只有私钥能解，私钥签名的数据公钥可以验证。就像邮筒，谁都能投信，只有主人能打开取信。</p>
-<p>只用对称：密钥分发难题，直接传密钥被中间人截获，后续加密全白搭。只用非对称：慢了 1000 倍以上，没法用。</p>
-<p>TLS 用非对称协商出对称密钥，再用对称传数据，这就是混合加密。</p>
-</blockquote>
-<p><strong>【补充】</strong> 三点：</p>
-<ol>
-<li>「私钥推不出公钥」就是 ECDH 的地基，只差点破一句：<strong>所以不需要传密钥，双方各自算出同一把</strong>。「协商」和「传输」的区别，是这题从及格到高分的那一步。</li>
-<li>「慢 1000 倍」换成更硬的约束：<strong>RSA 2048 一次最多约 245 字节</strong>，物理上装不下业务数据。</li>
-<li><strong>加密用对方公钥，签名用自己私钥</strong>；验签用对方公钥。</li>
-</ol>
+<h2 id="八、为什么对称和非对称必须搭配"><a href="#八、为什么对称和非对称必须搭配" class="headerlink" title="八、为什么对称和非对称必须搭配"></a>八、为什么对称和非对称必须搭配</h2><p><strong>一句话本质</strong>：非对称负责递钥匙，对称负责干活，证书负责证明这把钥匙是谁的。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>椭圆曲线上的曲线、基点、公钥都可以公开，私钥不可逆推——私钥能算出公钥，公钥算不出私钥，所以公钥是私钥的单向函数结果。这一点就是 ECDH 的地基，正因为它成立，双方<strong>不需要传密钥，各自就能算出同一把</strong>；「协商」和「传输」的区别，是这道题从及格到高分的那一步。</p>
+<p>对称加密：一把钥匙既能锁也能开，加密解密用同一个密钥。优点是速度极快，适合加密大量数据；缺点是这把密钥怎么安全交给对方。代表算法 AES、ChaCha20。</p>
+<p>非对称加密：一对密钥，公钥加密的数据只有私钥能解，私钥签名的数据公钥可以验证。就像邮筒，谁都能投信，只有主人能打开。</p>
+<p>只用对称会卡在密钥分发上——密钥直接在网络上传，被中间人截获就全白搭。只用非对称则根本用不了：不只是「慢 1000 倍」，更硬的约束是 <strong>RSA 2048 一次最多加密约 245 字节</strong>，物理上装不下业务数据，天生只能装一把密钥。</p>
+<p>所以 TLS 的分工是：非对称只干一件事——把会话密钥安全递过去；其余数据全交给对称。这就是混合加密。现代做法更进一步：TLS 1.3 用 ECDHE，双方各出一对<strong>临时</strong>密钥、交换公钥、各自算出共享密钥；临时私钥用完即弃，所以有<strong>前向安全</strong>，服务器长期私钥日后泄露也解不开历史流量。</p>
+<p>闭环：非对称解决了「密钥怎么安全到对方」，但没解决「这个公钥到底是谁的」，这一步交给证书加 CA。</p>
+<p>顺带一个易混点：<strong>加密用对方公钥，签名用自己私钥</strong>；验签用对方公钥。</p>
 <hr>
-<h2 id="九、URL-与-SNI：域名有两份副本"><a href="#九、URL-与-SNI：域名有两份副本" class="headerlink" title="九、URL 与 SNI：域名有两份副本"></a>九、URL 与 SNI：域名有两份副本</h2><p><strong>一句话本质</strong>：加密的是 <strong>HTTP 的语义</strong>，不加密的是 <strong>把包送到目的地必需的元信息</strong>。</p>
+<h2 id="九、URL-与-SNI：域名有两份副本"><a href="#九、URL-与-SNI：域名有两份副本" class="headerlink" title="九、URL 与 SNI：域名有两份副本"></a>九、URL 与 SNI：域名有两份副本</h2><p><strong>一句话本质</strong>：加密的是 HTTP 的语义，不加密的是把包送到目的地必需的元信息。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>一开始我说「一部分，url 不加密，方法加密」。方法加密是对的——请求行整个在密文里。但「URL 不加密」是错的，这个错很有价值，因为它其实指向了 SNI。</p>
 <p>把 URL 拆开看 <code>scheme://host:port/path?query</code>：</p>
 <ul>
-<li><code>path</code> + <code>query</code>：只存在于报文里 → <strong>加密</strong>。所以 path 里的 token、订单号别人看不见。</li>
-<li><code>host</code>：报文里那份加密了，但 <strong>SNI 明文泄漏</strong>（DNS 查询也能泄漏）→ 域名不保密。</li>
-<li><code>port</code>：443 在 TCP 头里，明文，能推断你在走 HTTPS。</li>
+<li><code>path</code> 和 <code>query</code> 只存在于报文里，所以<strong>加密</strong>，path 里的 token、订单号别人看不见；</li>
+<li><code>host</code> 在报文里那份也加密了，但<strong>SNI 明文泄漏</strong>（DNS 查询同样泄漏），所以域名不保密；</li>
+<li><code>port</code> 的 443 在 TCP 头里，明文，能推断出你在走 HTTPS。</li>
 </ul>
-<p><strong>为什么 SNI 必须明文</strong>：一台服务器（一个 IP:443）挂多个网站，TLS 握手在 HTTP 之前，服务器还没看到 <code>Host</code>，不知道该给哪张证书 → 客户端必须在握手第一步先报域名。<strong>选证书发生在密钥协商完成之前</strong>，加密还没谈好，它只能明文。</p>
-<p><strong>域名两份副本</strong>：<code>Host</code> 头那份在报文里（加密）；SNI 那份在握手时（明文）。抓包的人是<strong>从 SNI 拿到域名，不是从 URL 解出来的</strong>。</p>
-<p><strong>用户原话（2026-11-07，18:19 与 18:40）</strong>：</p>
-<blockquote>
-<p>一部分，url 不加密，方法加密。</p>
-</blockquote>
-<blockquote>
-<p>别人抓包，不能知道你访问了 shop.com 的哪个页面。</p>
-</blockquote>
-<p><strong>【补充】</strong> 「URL 不加密」<strong>错，但错得有价值</strong>——它其实指向了 SNI。准确说法是两句：<strong>知道你去哪个站点（SNI），不知道你访问哪个页面、带什么参数、用什么方法、传了什么 body</strong>。只答前半句会被追问「那他知道什么？」。</p>
+<p>为什么 SNI 必须明文：一台服务器（一个 IP:443）挂多个网站，TLS 握手发生在 HTTP 之前，服务器还没看到 <code>Host</code>，不知道该给哪张证书，所以客户端必须在握手第一步先报域名。而<strong>选证书发生在密钥协商完成之前</strong>，加密还没谈好，这个字段只能明文。</p>
+<p>所以域名有两份副本：<code>Host</code> 头里那份在报文里（加密）；SNI 那份在握手时（明文）。抓包的人是<strong>从 SNI 拿到域名，不是从 URL 解出来的</strong>。</p>
+<p>收口要说两句才严谨：<strong>别人知道你去的是哪个站点（SNI），但不知道你访问了 shop.com 的哪个页面（path）、带了什么参数（query）、用什么方法、传了什么 body</strong>。只答前半句，一定会被追问「那他知道什么」。</p>
 <hr>
 <h2 id="十、HTTPS-的路由转发在哪一层"><a href="#十、HTTPS-的路由转发在哪一层" class="headerlink" title="十、HTTPS 的路由转发在哪一层"></a>十、HTTPS 的路由转发在哪一层</h2><p>一句话：<strong>三层转发看 IP，跟加密无关；四层负载均衡看 IP + 端口；七层路由看 path，必须先 TLS 终止解密</strong>。唯一例外是按 SNI 明文做域名级 passthrough（不终止 TLS）。</p>
 <p>这段单独成文了：<a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 的路由转发发生在哪一层</a>。</p>
