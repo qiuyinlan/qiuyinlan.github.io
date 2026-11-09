@@ -42,7 +42,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-09T14:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T05:12:33.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T05:25:15.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="计网" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界" data-stellar-page-meta="">
   
@@ -61,7 +61,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T22:00:00+08:00","dateModified":"2026-11-09T13:12:33+08:00","datePublished":"2026-11-09T22:00:00+08:00","description":"零、主干速查一次 HTTPS 请求里，三个协议各管一件事：\n\nTCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。\nTLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。\nHTTP 管「报文语义」：方法、路径、头、体。三代演进解决的都是「一个...","headline":"计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"计网","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T22:00:00+08:00","dateModified":"2026-11-09T13:25:15+08:00","datePublished":"2026-11-09T22:00:00+08:00","description":"零、主干速查一次 HTTPS 请求里，三个协议各管一件事：\n\nTCP 管「字节可靠送达」：它看不见消息，只看见一串字节流。编号、ACK、重传、窗口，全是围绕「这串字节有没有完整、按序到达」。\nTLS 管「这串字节不给别人看」：它把整个 HTTP 报文当载荷装进记录里加密，只额外暴露送货必需的元信息（IP、端口、SNI）。\nHTTP 管「报文语义」：方法、路径、头、体。三代演进解决的都是「一个...","headline":"计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"计网","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css">
 
 
@@ -234,32 +234,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88&#x2F;" title="HTTPS 到底加密了什么？">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C%E4%B8%8E%E8%BD%AC%E5%8F%91%E8%B7%AF%E5%BE%84&#x2F;" title="HTTPS 的加密边界与转发路径">
   
   
   <span class="ui-collection__initial" aria-hidden="true">H</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;05&#x2F;HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82&#x2F;" title="HTTPS 的路由转发，发生在哪一层？">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      <span class="ui-collection__title">HTTPS 的加密边界与转发路径</span>
       
       
     </span>
@@ -377,6 +359,24 @@
 </a>
 
   
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2025&#x2F;06&#x2F;07&#x2F;ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81&#x2F;" title="ftp协议介绍及代码">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">F</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">ftp协议介绍及代码</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
 </div></div>
   
 </widget>
@@ -406,8 +406,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">3279 字 · 预计阅读 11 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T14:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T05:12:33.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">2842 字 · 预计阅读 10 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T14:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T05:25:15.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -486,14 +486,12 @@
 <p>请求体是业务数据：JSON、表单、文件；GET 通常没有。</p>
 <p>HTTP/2 没有请求行了，变成伪头部 <code>:method</code>、<code>:path</code>、<code>:authority</code>、<code>:scheme</code>。</p>
 <hr>
-<h2 id="六、HTTPS-到底加密了什么"><a href="#六、HTTPS-到底加密了什么" class="headerlink" title="六、HTTPS 到底加密了什么"></a>六、HTTPS 到底加密了什么</h2><p><strong>一句话本质</strong>：分界线只有一条——TLS 记录里的 Application Data 是密文，记录之外的一切都是明文。</p>
-<p>密文是：请求行、请求头、请求体、状态行、响应头、响应体，一个字节都不露。HTTP 报文整块塞进 TLS 记录当载荷，没有「头加密、行不加密」这种切法。</p>
-<p>明文是：IP 头、TCP 头里的端口、TLS 记录头、ClientHello 里的 SNI，以及 TLS 1.2 的证书。「公钥明文」只对 TLS 1.2 成立，TLS 1.3 把 ServerHello 之后（含证书）都加密了，明文只剩 SNI；用 ECH 连 SNI 也能藏。</p>
-<p>SNI 是客户端在 TLS 握手时告诉服务器「我要访问哪个域名」，让服务器返回正确的证书。它本身明文，所以域名会暴露。</p>
-<p>IP 和端口没法加密，这是最底层的限制：路由器转发靠的就是 IP 和端口，把 IP 加密了路由器不知道往哪送。更硬的说法是加密发生在传输层之上，IP 头每一跳都要被读取；想藏 IP 只能再套一层（VPN / Tor）。</p>
+<h2 id="六、HTTPS-到底加密了什么"><a href="#六、HTTPS-到底加密了什么" class="headerlink" title="六、HTTPS 到底加密了什么"></a>六、HTTPS 到底加密了什么</h2><p><strong>一句话本质</strong>：TLS 记录里的 Application Data 是密文，记录之外的一切都是明文。</p>
+<p>密文：请求行、请求头、请求体、状态行、响应头、响应体，整个 HTTP 语义，一个字节都不露。</p>
+<p>明文：IP 头（每跳路由都要读）、TCP 头的端口、TLS 记录头、ClientHello 的 SNI、TLS 1.2 的证书。TLS 1.3 把 ServerHello 之后（含证书）都加密了，明文只剩 SNI；ECH 能连 SNI 一起藏。</p>
+<p>想藏 IP 只能再套一层（VPN / Tor），因为加密发生在传输层之上，IP 头每一跳都要被读。</p>
 <hr>
 <h2 id="七、HTTPS-比-HTTP-多了什么"><a href="#七、HTTPS-比-HTTP-多了什么" class="headerlink" title="七、HTTPS 比 HTTP 多了什么"></a>七、HTTPS 比 HTTP 多了什么</h2><p><strong>一句话本质</strong>：HTTP 是明文文本协议，谁都能看、能改、能冒充；HTTPS 在它下面垫了一层 TLS 把这三件事补上，HTTP 报文本身一个字没改。</p>
-<p>三个目标各配一套机制：</p>
 <div class="md-table-scroll"><table>
 <thead>
 <tr>
@@ -505,7 +503,7 @@
 <tbody><tr>
 <td>防偷看（机密性）</td>
 <td>抓包读内容</td>
-<td>对称加密（AES-GCM / ChaCha20）跑数据，密钥由非对称 / ECDHE 协商出来</td>
+<td>对称加密跑数据，密钥由非对称 / ECDHE 协商</td>
 </tr>
 <tr>
 <td>防篡改（完整性）</td>
@@ -515,38 +513,29 @@
 <tr>
 <td>防冒充（身份）</td>
 <td>假站点、中间人</td>
-<td>服务器出示证书，CA 私钥签名，客户端用内置根证书逐级验到可信</td>
+<td>服务器出示证书，CA 签名，客户端用根证书逐级验到可信</td>
 </tr>
 </tbody></table></div>
-<p>会话密钥是协商出来的，之后数据全走对称（因为快），TLS 1.3 收发方向各一把。</p>
-<p>HSTS 防的是 SSL stripping 降级，OCSP 查的是证书吊销状态，都属于外围，不属于 TLS 核心的三件事。</p>
+<p>会话密钥是协商出来的，之后数据全走对称；TLS 1.3 收发方向各一把。HSTS 防 SSL stripping 降级、OCSP 查吊销，属于外围，不属于核心三件事。</p>
 <hr>
 <h2 id="八、为什么对称和非对称必须搭配"><a href="#八、为什么对称和非对称必须搭配" class="headerlink" title="八、为什么对称和非对称必须搭配"></a>八、为什么对称和非对称必须搭配</h2><p><strong>一句话本质</strong>：非对称负责递钥匙，对称负责干活，证书负责证明这把钥匙是谁的。</p>
-<p>椭圆曲线上的曲线、基点、公钥都可以公开：私钥能算出公钥，公钥算不出私钥，公钥是私钥的单向函数结果。正因为它成立，双方不需要传密钥，各自就能算出同一把——这是「协商」而不是「传输」。</p>
-<p>对称加密：一把钥匙既能锁也能开，加密解密用同一个密钥。速度极快，适合加密大量数据；缺点是这把密钥怎么安全交给对方。代表算法 AES、ChaCha20。</p>
-<p>非对称加密：一对密钥，公钥加密的只有私钥能解，私钥签名的公钥可以验证。像邮筒，谁都能投信，只有主人能打开。</p>
-<p>只用对称会卡在密钥分发上，密钥在网上传被截获就全白搭。只用非对称根本用不了：不只是慢，RSA 2048 一次最多加密约 245 字节，物理上装不下业务数据，天生只能装一把密钥。</p>
-<p>所以分工是：非对称只干一件事——把会话密钥安全递过去；其余数据全交给对称，这就是混合加密。TLS 1.3 用的是 ECDHE：双方各出一对临时密钥、交换公钥、各自算出共享密钥。临时私钥用完即弃，所以有前向安全，服务器长期私钥日后泄露也解不开历史流量。</p>
-<p>非对称解决了「密钥怎么安全到对方」，没解决「这个公钥到底是谁的」，这一步交给证书加 CA。</p>
+<p>只用对称卡在密钥分发：密钥在网上传，被截获就全白搭。</p>
+<p>只用非对称根本用不了：RSA 2048 一次最多加密约 245 字节，物理上装不下业务数据，只能装一把密钥。</p>
+<p>所以分工：非对称把会话密钥递过去，其余全交给对称。TLS 1.3 用 ECDHE——双方各出一对临时密钥、交换公钥、各自算出同一把，是协商不是传输；临时私钥用完即弃，所以有前向安全。</p>
+<p>非对称解决了「密钥怎么安全到对方」，没解决「这个公钥是谁的」，这一步交给证书加 CA。</p>
 <p>加密用对方公钥，签名用自己私钥；验签用对方公钥。</p>
 <hr>
 <h2 id="九、URL-与-SNI：域名有两份副本"><a href="#九、URL-与-SNI：域名有两份副本" class="headerlink" title="九、URL 与 SNI：域名有两份副本"></a>九、URL 与 SNI：域名有两份副本</h2><p><strong>一句话本质</strong>：加密的是 HTTP 的语义，不加密的是把包送到目的地必需的元信息。</p>
-<p>URL 拆开看 <code>scheme://host:port/path?query</code>：</p>
-<ul>
-<li><code>path</code> 和 <code>query</code> 只存在于报文里，所以加密，path 里的 token、订单号别人看不见；</li>
-<li><code>host</code> 在报文里那份也加密了，但 SNI 明文泄漏（DNS 查询同样泄漏），所以域名不保密；</li>
-<li><code>port</code> 的 443 在 TCP 头里，明文，能推断出你在走 HTTPS。</li>
-</ul>
-<p>SNI 必须明文的原因：一台服务器（一个 IP:443）挂多个网站，TLS 握手发生在 HTTP 之前，服务器还没看到 <code>Host</code>，不知道该给哪张证书，所以客户端必须在握手第一步先报域名。而选证书发生在密钥协商完成之前，加密还没谈好，这个字段只能明文。</p>
-<p>域名有两份副本：<code>Host</code> 头里那份在报文里（加密）；SNI 那份在握手时（明文）。抓包的人是从 SNI 拿到域名，不是从 URL 解出来的。</p>
-<p>结论是两句：知道你去哪个站点（SNI），不知道你访问哪个页面（path）、带什么参数（query）、用什么方法、传了什么 body。</p>
+<p><code>path</code> 和 <code>query</code> 只在报文里，所以加密，path 里的 token、订单号别人看不见。<code>host</code> 在报文里那份也加密了，但 SNI 明文泄漏（DNS 查询同样泄漏），所以域名不保密。<code>port</code> 的 443 在 TCP 头里，明文。</p>
+<p>SNI 必须明文的原因：一台服务器一个 IP:443 挂多个站，TLS 握手在 HTTP 之前，服务器还没看到 <code>Host</code>，不知道该给哪张证书，客户端必须在握手第一步报域名；而选证书发生在密钥协商完成之前，加密还没谈好。</p>
+<p>域名两份副本：<code>Host</code> 头那份加密，SNI 那份明文，抓包的人拿到的是 SNI。</p>
+<p>结论两句：知道你去哪个站点（SNI），不知道你访问哪个页面、带什么参数、用什么方法、传了什么 body。</p>
 <hr>
-<h2 id="十、HTTPS-的路由转发在哪一层"><a href="#十、HTTPS-的路由转发在哪一层" class="headerlink" title="十、HTTPS 的路由转发在哪一层"></a>十、HTTPS 的路由转发在哪一层</h2><p><strong>一句话本质</strong>：三层转发看 IP，跟加密无关；四层负载均衡看 IP + 端口；七层路由看 path，必须先 TLS 终止解密。</p>
-<p>唯一例外是按 SNI 明文做域名级 passthrough，不终止 TLS。</p>
-<p>展开见：<a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 的路由转发发生在哪一层</a>，加密范围见：<a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 到底加密了什么</a>。</p>
+<h2 id="十、HTTPS-的路由转发在哪一层"><a href="#十、HTTPS-的路由转发在哪一层" class="headerlink" title="十、HTTPS 的路由转发在哪一层"></a>十、HTTPS 的路由转发在哪一层</h2><p><strong>一句话本质</strong>：三层看 IP（和加密无关），四层看 IP + 端口（只知道 443），七层看 path（必须先 TLS 终止解密）。</p>
+<p>唯一例外是按 SNI 明文做域名级 passthrough（<code>ssl_preread</code>），证书放后端，网关只搬 TCP，天花板是到不了 path。</p>
+<p>握手时序、抓包验证、Nginx 配置、URL 逐段拆解：见 <a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C%E4%B8%8E%E8%BD%AC%E5%8F%91%E8%B7%AF%E5%BE%84/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 的加密边界与转发路径</a>。</p>
 <h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章"></a>相关文章</h2><ul>
-<li><a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 到底加密了什么</a></li>
-<li><a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 的路由转发发生在哪一层</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/05/HTTPS-%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C%E4%B8%8E%E8%BD%AC%E5%8F%91%E8%B7%AF%E5%BE%84/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>HTTPS 的加密边界与转发路径</a></li>
 </ul>
 </article>
 <div class="article-tags slide-up"><a class="tag" href="/tags/%E8%AE%A1%E7%BD%91/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>计网</a></div>
