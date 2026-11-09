@@ -1,4 +1,4 @@
-/* 文章右上方浮动目录（一级标题），可点跳转；收起后是右上角一个图标圆钮。2026-11-09 */
+/* 文章浮动目录（一级标题）：右上角图标圆钮 ⇄ 玻璃面板。2026-11-09 */
 (function () {
   'use strict';
 
@@ -49,6 +49,12 @@
       var top = h.getBoundingClientRect().top + window.pageYOffset - 88;
       window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
       history.replaceState(null, '', '#' + h.id);
+      // 手机上点完自动收起，别挡着正文
+      if (window.innerWidth < 1100) {
+        collapsed = true;
+        save();
+        render();
+      }
     });
     li.appendChild(a);
     list.appendChild(li);
@@ -58,7 +64,7 @@
   panel.appendChild(head);
   panel.appendChild(list);
 
-  /* ---------- 右上角的图标圆钮（收起态） ---------- */
+  /* ---------- 右上角图标圆钮 ---------- */
   var circle = document.createElement('button');
   circle.type = 'button';
   circle.className = 'toc-circle';
@@ -71,9 +77,11 @@
   document.body.appendChild(panel);
   document.body.appendChild(circle);
 
-  var collapsed = false;
+  /* 默认收起（右上角就是那个圆钮）；用户点开过就记住 */
+  var collapsed = true;
   try {
-    collapsed = window.localStorage.getItem(STORE_KEY) === '1';
+    var saved = window.localStorage.getItem(STORE_KEY);
+    if (saved !== null) collapsed = saved === '1';
   } catch (e) {}
 
   function save() {
@@ -93,16 +101,6 @@
     closeBtn.setAttribute('aria-expanded', String(!collapsed));
   }
 
-  /* 桌面才浮出来；手机屏幕太小会挡正文，直接不显示 */
-  function fit() {
-    if (window.innerWidth < 1100) {
-      panel.style.display = 'none';
-      circle.style.display = 'none';
-      return;
-    }
-    render();
-  }
-
   closeBtn.addEventListener('click', function () {
     collapsed = true;
     save();
@@ -115,9 +113,8 @@
     render();
   });
 
-  fit();
-  window.addEventListener('resize', fit, { passive: true });
-  window.addEventListener('orientationchange', fit, { passive: true });
+  render();
+  window.addEventListener('resize', render, { passive: true });
 
   /* 滚动高亮当前小节 */
   var ticking = false;
