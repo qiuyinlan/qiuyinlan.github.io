@@ -1,4 +1,4 @@
-/* 文章右上方浮动目录（一级标题），可点跳转；点 ➖ 收起为一行标题栏。2026-11-09 */
+/* 文章右上方浮动目录（一级标题），可点跳转；收起后是右上角一个图标圆钮。2026-11-09 */
 (function () {
   'use strict';
 
@@ -14,6 +14,7 @@
 
   var STORE_KEY = 'toc-float:collapsed';
 
+  /* ---------- 目录面板 ---------- */
   var panel = document.createElement('nav');
   panel.className = 'toc-float';
   panel.setAttribute('aria-label', '文章目录');
@@ -25,12 +26,14 @@
   title.className = 'toc-float__title';
   title.textContent = '本文目录';
 
-  var btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'toc-float__btn';
+  var closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'toc-float__btn';
+  closeBtn.setAttribute('aria-label', '收起目录');
+  closeBtn.textContent = '➖';
 
   head.appendChild(title);
-  head.appendChild(btn);
+  head.appendChild(closeBtn);
 
   var list = document.createElement('ol');
   list.className = 'toc-float__list';
@@ -54,35 +57,63 @@
 
   panel.appendChild(head);
   panel.appendChild(list);
-  document.body.appendChild(panel);
 
-  /* 收起 / 展开：只收起列表，标题栏留在右上角 */
+  /* ---------- 右上角的图标圆钮（收起态） ---------- */
+  var circle = document.createElement('button');
+  circle.type = 'button';
+  circle.className = 'toc-circle';
+  circle.setAttribute('aria-label', '展开目录');
+  circle.innerHTML =
+    '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">' +
+    '<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h9"/>' +
+    '</svg>';
+
+  document.body.appendChild(panel);
+  document.body.appendChild(circle);
+
   var collapsed = false;
   try {
     collapsed = window.localStorage.getItem(STORE_KEY) === '1';
   } catch (e) {}
 
-  function render() {
-    panel.classList.toggle('is-collapsed', collapsed);
-    btn.textContent = collapsed ? '＋' : '➖';
-    btn.setAttribute('aria-expanded', String(!collapsed));
-    btn.setAttribute('aria-label', collapsed ? '展开目录' : '收起目录');
-  }
-
-  render();
-
-  btn.addEventListener('click', function () {
-    collapsed = !collapsed;
-    render();
+  function save() {
     try {
       window.localStorage.setItem(STORE_KEY, collapsed ? '1' : '0');
     } catch (e) {}
+  }
+
+  function render() {
+    if (collapsed) {
+      panel.style.display = 'none';
+      circle.style.display = 'flex';
+    } else {
+      panel.style.display = '';
+      circle.style.display = 'none';
+    }
+    closeBtn.setAttribute('aria-expanded', String(!collapsed));
+  }
+
+  /* 桌面才浮出来；手机屏幕太小会挡正文，直接不显示 */
+  function fit() {
+    if (window.innerWidth < 1100) {
+      panel.style.display = 'none';
+      circle.style.display = 'none';
+      return;
+    }
+    render();
+  }
+
+  closeBtn.addEventListener('click', function () {
+    collapsed = true;
+    save();
+    render();
   });
 
-  /* 桌面才浮出来；手机上会挡住正文，直接不显示 */
-  function fit() {
-    panel.style.display = window.innerWidth >= 1100 ? '' : 'none';
-  }
+  circle.addEventListener('click', function () {
+    collapsed = false;
+    save();
+    render();
+  });
 
   fit();
   window.addEventListener('resize', fit, { passive: true });
