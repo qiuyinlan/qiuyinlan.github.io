@@ -88,61 +88,24 @@
   font-weight: 600;
 }
 
+/* 收起时只留标题栏，宽度也跟着收窄 */
+.toc-float.is-collapsed {
+  width: auto;
+  min-width: 104px;
+  padding: 8px 10px;
+  overflow: visible;
+}
+
+.toc-float.is-collapsed .toc-float__head {
+  margin-bottom: 0;
+}
+
 .toc-float.is-collapsed .toc-float__list {
   display: none;
 }
 
-/* 圆形按钮：宽屏贴右上角，窄屏贴右下角 */
-.toc-circle {
-  position: fixed;
-  right: 20px;
-  bottom: 28px;
-  z-index: 41;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid var(--text-p3, rgba(0, 0, 0, 0.08));
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--text-p1, #333);
-  background: var(--bg-a50, rgba(255, 255, 255, 0.85));
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-.toc-circle:hover {
-  transform: scale(1.06);
-  color: var(--theme, #1bcdfc);
-}
-
-.toc-circle--top {
-  top: 96px;
-  bottom: auto;
-  right: 24px;
-}
-
-.toc-float--overlay {
-  display: block !important;
-}
-
-@media (max-width: 1100px) {
-  .toc-float--overlay {
-    top: auto;
-    bottom: 84px;
-    right: 16px;
-    width: min(260px, calc(100vw - 32px));
-    max-height: 60vh;
-  }
-}
-
 @media print {
-  .toc-float,
-  .toc-circle {
+  .toc-float {
     display: none !important;
   }
 }
