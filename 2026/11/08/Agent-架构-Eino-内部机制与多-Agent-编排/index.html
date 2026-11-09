@@ -42,7 +42,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-08T13:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T05:02:08.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T05:09:14.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="agent" data-stellar-page-meta="">
 <meta property="article:tag" content="go" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-page-meta="">
@@ -62,7 +62,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-08T21:00:00+08:00","dateModified":"2026-11-09T13:02:08+08:00","datePublished":"2026-11-08T21:00:00+08:00","description":"零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行...","headline":"Agent 架构、Eino 内部机制与多 Agent 编排","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-08T21:00:00+08:00","dateModified":"2026-11-09T13:09:14+08:00","datePublished":"2026-11-08T21:00:00+08:00","description":"零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行...","headline":"Agent 架构、Eino 内部机制与多 Agent 编排","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css">
 
 
@@ -289,14 +289,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
   
   
-  <span class="ui-collection__initial" aria-hidden="true">计</span>
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
       
       
     </span>
@@ -307,14 +307,14 @@
 
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%E5%8F%AF%E9%9D%A0-%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8EHTTPS%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
   
   
-  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  <span class="ui-collection__initial" aria-hidden="true">计</span>
   
     <span class="ui-collection__content">
       
-      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
       
       
     </span>
@@ -407,8 +407,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">9143 字 · 预计阅读 31 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T05:02:08.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">8798 字 · 预计阅读 30 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T05:09:14.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -843,82 +843,26 @@
 <li>工作流复用 collector 而不是工具，因为工具层是专门为”给模型看”服务的</li>
 <li>判据：能不能穷举”查什么”，能穷举就别加壳</li>
 </ul>
-<h2 id="八、Agent-由哪几部分组成（六件-编排器）"><a href="#八、Agent-由哪几部分组成（六件-编排器）" class="headerlink" title="八、Agent 由哪几部分组成（六件 + 编排器）"></a>八、Agent 由哪几部分组成（六件 + 编排器）</h2><p><strong>一句话本质</strong>：Agent 没有唯一固定架构，不同框架拆法不同；但按「角色职责」拆，能拆出六个部件，再加一个把它们串起来的编排器。真正的分水岭不是有几件，而是<strong>它能不能根据执行结果决定下一步</strong>。</p>
-<p><strong>六件与职责</strong>：</p>
-<div class="md-table-scroll"><table>
-<thead>
-<tr>
-<th>部件</th>
-<th>作用</th>
-<th>在 pilot 里的落点</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Model 模型</td>
-<td>理解、推理、决策</td>
-<td><code>models.NewMainChatModel</code>（qwen-plus）；quick_model 是 qwen-flash，管轻任务</td>
-</tr>
-<tr>
-<td>Prompt 提示词</td>
-<td>定义身份、规则、行为边界</td>
-<td><code>newChatTemplate</code> 的三段模板（system + history 占位 + user），system 里塞 <code>{documents}</code> 与当前时间</td>
-</tr>
-<tr>
-<td>Memory 记忆</td>
-<td>保存单轮上下文与跨会话历史</td>
-<td>三层：单轮 messages 数组 / Redis 短期会话窗口 / MySQL 历史与画像</td>
-</tr>
-<tr>
-<td>Tools 工具</td>
-<td>与外部世界交互的能力清单</td>
-<td><code>buildGraph</code> 注册 11 个：可观测 6 / 知识 1 / 代码 2 / 通用 2</td>
-</tr>
-<tr>
-<td>Planning 规划</td>
-<td>把目标拆成可执行步骤</td>
-<td>单 Agent 是 ReAct 每步现想（弱规划）；多 Agent 的 <code>Planner</code> 是关键词表 + 正则（规则，不调模型）</td>
-</tr>
-<tr>
-<td>Action 执行</td>
-<td>真正发起调用并拿到结果</td>
-<td><code>ToolsNode</code> 按 name 查索引 → 执行 Go 闭包 → 结果包成 <code>role:"tool"</code> 塞回 messages</td>
-</tr>
-</tbody></table></div>
-<p><strong>两处层级要交代清楚</strong>（面试被追问时最容易被抓）：</p>
-<ol>
-<li><strong>Prompt 不是和 Model 并列的「组件」，它是模型的输入</strong>。它属于上下文装配这一侧——和 Memory 取出的历史、RAG 取出的文档一起，构成这一次调用的输入。放在「六件」里讲没问题，但要能一句话说明它是横切在输入侧的。</li>
-<li><strong>Action 也不是独立模块，它是 Tools 的执行侧</strong>。Tools 是能力清单（schema），Action 是「选中其中一个 → 执行 → 观察结果」。ReAct 里这两者是一对：选（选择工具）和做（执行并观察）。</li>
-</ol>
+<h2 id="八、Agent-由哪几部分组成（六件-编排器）"><a href="#八、Agent-由哪几部分组成（六件-编排器）" class="headerlink" title="八、Agent 由哪几部分组成（六件 + 编排器）"></a>八、Agent 由哪几部分组成（六件 + 编排器）</h2><p><strong>一句话本质</strong>：Agent 没有唯一固定的架构，不同框架拆法不一样；按「角色职责」拆，能拆出六个部件，再加一个把它们串起来的编排器。真正的分水岭不是有几件，而是<strong>它能不能根据执行结果决定下一步</strong>。</p>
+<p><strong>你的说法（已经改对）</strong>：</p>
+<p>Agent 通常可以拆成 6 个核心部分，但要注意，Agent 没有唯一固定的架构，不同框架的划分会有所不同。</p>
+<p>一、Model 模型，负责理解、推理和决策。pilot 里是 <code>models.NewMainChatModel</code> 的 qwen-plus，另有一个 quick_model qwen-flash 管轻任务。</p>
+<p>二、Prompt 提示词，定义 Agent 的身份、规则和行为边界。pilot 里是 <code>newChatTemplate</code> 的三段模板：system、history 占位、user，system 里还塞了 <code>{documents}</code> 和当前时间。这里要交代一句层级——<strong>Prompt 不是和 Model 并列的组件，它是模型的输入</strong>，和 Memory 取出的历史、RAG 取出的文档一起，构成这一次调用的输入，它是横切在输入侧的。</p>
+<p>三、Memory 记忆，保存历史对话和长期信息。pilot 里是三层：单轮内是不断变长的 messages 数组，跨轮是 Redis 的短期会话窗口，跨会话是 MySQL 的历史与画像。别说「有记忆」就完了，要能说出这三层。</p>
+<p>四、Tools 工具，让 Agent 能与外部世界交互。pilot 里 <code>buildGraph</code> 注册了 11 个：可观测 6、知识 1、代码 2、通用 2。</p>
+<p>五、Planning 规划，把复杂目标拆成多个步骤。这里要老实交代：pilot 的 <code>FullPilotAgent</code> 里<strong>没有独立 planner</strong>，规划是 ReAct 每一步现想，属于弱规划；真正显式的规划只在多 Agent 链路的 <code>Planner</code> 里，而那个 Planner 是关键词表加正则，是规则，不是模型。</p>
+<p>六、Action 执行，根据规划调用工具、执行任务。它不是独立模块，而是 Tools 的执行侧：Tools 是能力清单（schema），Action 是「选中其中一个 → 执行 → 观察结果」。ReAct 里这两者是一对，选和做。</p>
 <p><strong>运行流程（按真实顺序）</strong>：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">用户输入</span><br><span class="line">  → 取记忆（Redis / messages）</span><br><span class="line">  → 拼 Prompt（system + 历史 + 文档）</span><br><span class="line">  → 模型一次调用：理解 + 决定下一步（tool_calls）</span><br><span class="line">  → 工具执行 → 观察结果</span><br><span class="line">  → 结果塞回 messages，再判断是否完成</span><br><span class="line">      ├─ 没完成 → 再调一次模型（回到「决定下一步」）</span><br><span class="line">      └─ 完成   → 输出</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>这里有个必须纠正的常见说法</strong>：不要把「Model 理解问题」和「Planning 制定计划」当成两次独立调用。在 ReAct 里，<strong>理解、规划、选工具是同一个模型在同一次调用里完成的</strong>——它输出的 <code>tool_calls</code> 里就同时含着「我理解了什么」和「我下一步要调谁、传什么参数」。只有 Plan-and-Execute 那种架构，才是先单独调一次模型出计划、再逐步执行。</p>
-<p><strong>Orchestrator（编排器）</strong>：负责接收任务、决定调哪个 Agent、管理执行顺序、控制工具调用、处理异常、判断任务是否完成。</p>
-<p>在 pilot 里对应 <code>internal/ai/multiagent</code> 的 <code>Orchestrator</code>，但它有一个关键特征要主动说：<strong>它是代码编排，不是模型编排</strong>——<code>Planner</code> 用关键词表和正则把 query 分诊成 <code>Plan</code>，然后固定两路 goroutine 并发（Evidence / Knowledge），按 <code>roleOrder</code> 稳定排序，最后 <code>Synthesizer</code> 做唯一一次模型调用。也就是说「决定调哪个 Agent」这件事，pilot 交给规则，不交给模型。好处是可预测、可测、有硬上限；代价是覆盖面受关键词表限制。</p>
-<p><strong>Agent 与 Agent 系统的区分</strong>：</p>
-<ul>
-<li>Agent：能感知、能决策、能行动的个体。</li>
-<li>Agent 系统：多个 Agent + 工具 + 记忆 + 编排机制组成的整体。</li>
-<li>判据（比定义更有用）：<strong>有没有「观察结果 → 调整下一步」的闭环</strong>。有一次这个闭环，就是 Agent；只有一次 prompt → answer，那是 chain，不是 Agent。有没有多 Agent 反而不是判据。</li>
-</ul>
-<p><strong>和 harness 六层的关系</strong>：harness 是「壳」的视角（谁进来、看到什么、能做什么、什么时候停、怎么查），六件是「角色」的视角。两套说法能一一对上：契约层↔无、上下文装配↔Prompt+Memory、循环控制↔Planning+Model、工具执行↔Tools+Action、护栏↔Prompt、观测↔无。</p>
-<p><strong>用户原话/补充（2026-11-09，粘贴）</strong>：</p>
-<blockquote>
-<p>明明是一个 Agent 通常可以拆成 6 个核心部分。不过要注意，Agent 没有唯一固定的架构，不同框架的划分会有所不同。</p>
-<ol>
-<li>Model（模型）负责理解、推理和决策；2. Prompt（提示词）定义 Agent 的身份、规则和行为；3. Memory（记忆）保存历史对话和长期信息；4. Tools（工具）让 Agent 能够与外部世界交互；5. Planning（规划）把复杂目标拆解成多个步骤；6. Action（执行）根据规划调用工具、执行任务。</li>
-</ol>
-<p>运行流程：用户输入 → Agent 接收任务 → Model 理解问题 → Memory 获取记忆 → Planning 制定计划 → Tools 选择工具 → Action 执行操作 → Model 观察结果 → 是否完成任务 → 否则继续规划 / 是则返回结果。</p>
-<p>Orchestrator（编排器）负责协调整个 Agent 的运行：接收用户任务、决定调用哪个 Agent、管理任务执行顺序、控制工具调用、处理异常、判断任务是否完成。</p>
-<p>Agent：能够感知环境、进行决策并采取行动的智能体。Agent 系统：由多个 Agent、工具、记忆和编排机制组成的完整系统。不要把 Agent 简单理解成「大模型 + Prompt」。真正让它具有 Agent 特征的，是它能够根据目标自主决定下一步做什么，并根据执行结果调整行动。</p>
-<p>学习顺序：LLM → Prompt → Tools / Function Calling → Memory → Planning → Agent Loop → Multi-Agent。</p>
-</blockquote>
-<p><strong>【补充】三点</strong>：</p>
-<ol>
-<li>六件这个拆法比「四件」完整，我按「缺了就不转」拆成四件（模型/工具/记忆/规划），你按「角色职责」拆成六件，两者不冲突——多出来的 Prompt 属于输入侧、Action 属于执行侧，是两处横切。</li>
-<li>流程图上「Model 理解问题」和「Planning 制定计划」在两处出现，容易被追问「你到底调了几次模型」。ReAct 是<strong>一次调用里同时完成理解和决策</strong>，答案必须是「一轮工具调用 = 两次模型请求（一次出 tool_calls，一次出总结）」。</li>
-<li>「不要让 Agent 退化成大模型 + Prompt」这个判断对，但要给可判定的判据：<strong>有没有观察结果再调整的闭环</strong>，而不是有没有多 Agent。</li>
-</ol>
+<p>常见的画法是「Model 理解问题 → Memory 获取记忆 → Planning 制定计划 → Tools 选择工具 → Action 执行 → Model 观察结果」，这么画会把 Model 和 Planning 画成两段，面试官立刻会问「那你一轮到底调了几次模型」。答案必须是：<strong>ReAct 里理解和规划是同一次调用完成的</strong>，模型输出的 <code>tool_calls</code> 里同时含着「我理解了什么」和「下一步调谁、传什么参数」；一轮工具调用 = 两次模型请求，一次出 <code>tool_calls</code>，一次在拿到结果后出正文。只有 Plan-and-Execute 那种架构，才是先单独调一次模型出计划再执行。</p>
+<p><strong>Orchestrator（编排器）</strong>：负责协调整个 Agent 的运行——接收用户任务、决定调用哪个 Agent、管理任务执行顺序、控制工具调用、处理异常、判断任务是否完成。</p>
+<p>在 pilot 里它对应 <code>internal/ai/multiagent</code> 的 <code>Orchestrator</code>，但有个关键特征要主动说：<strong>它是代码编排，不是模型编排</strong>。<code>Planner</code> 用关键词表和正则把 query 分诊成 <code>Plan</code>，然后固定两路 goroutine 并发（Evidence / Knowledge），按 <code>roleOrder</code> 稳定排序，最后 <code>Synthesizer</code> 做唯一一次模型调用。「决定调哪个 Agent」这件事，pilot 交给规则，不交给模型。好处是可预测、可测、有硬上限；代价是覆盖面受关键词表限制。</p>
+<p><strong>Agent 与 Agent 系统</strong>：</p>
+<p>Agent 是能感知环境、进行决策并采取行动的智能体；Agent 系统是由多个 Agent、工具、记忆和编排机制组成的完整系统。</p>
+<p>所以不要把 Agent 简单理解成「大模型 + Prompt」。真正让它具备 Agent 特征的，是它能根据目标自主决定下一步做什么，并根据执行结果调整行动。这句话可以再落成一个更硬的判据：<strong>有没有「观察结果 → 调整下一步」的闭环</strong>——有一次这个闭环就是 Agent，只有一次 prompt → answer 那是 chain。注意，<strong>有没有多个 Agent 不是判据</strong>：单个 Agent 带工具循环照样是 Agent，五个 Agent 串成固定流水线本质还是 workflow。</p>
+<p><strong>和 harness 六层的关系</strong>：harness 是「壳」的视角（谁进来、看到什么、能做什么、什么时候停、怎么查），六件是「角色」的视角。两套能对上：上下文装配对应 Prompt + Memory，循环控制对应 Planning + Model，工具执行对应 Tools + Action，护栏落在 Prompt 上。</p>
+<p><strong>学习顺序</strong>：LLM → Prompt → Tools / Function Calling → Memory → Planning → Agent Loop → Multi-Agent。</p>
 <hr>
 <h2 id="九、Agent-Harness（腾讯一面-15-问）"><a href="#九、Agent-Harness（腾讯一面-15-问）" class="headerlink" title="九、Agent Harness（腾讯一面 15 问）"></a>九、Agent Harness（腾讯一面 15 问）</h2><h3 id="H1-harness-有几层，怎么构成的？"><a href="#H1-harness-有几层，怎么构成的？" class="headerlink" title="H1. harness 有几层，怎么构成的？"></a>H1. harness 有几层，怎么构成的？</h3><p><strong>一句话本质</strong>：harness 就是把裸模型包成「能干活」的那层壳。模型负责想，harness 负责回答五个问题——谁进来、看到什么、能做什么、什么时候停、出了事怎么查。</p>
 <p><strong>因果链</strong>（每一层都在堵模型的一个硬缺陷，不是想分层而分层）：</p>
@@ -965,7 +909,6 @@
 </tbody></table></div>
 <p><strong>边界</strong>：壳在 <code>internal/ai/agent</code> + <code>tools</code> + <code>prompt</code>；芯是 <code>models.NewMainChatModel</code>（qwen-plus）。</p>
 <p><strong>面试口径</strong>：别只答「五层/六层」就停，要接一句「去掉这层会怎样」——那才是踩过坑的证据。</p>
-<p><strong>用户原话/补充</strong>：（待补）</p>
 <h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章"></a>相关文章</h2><ul>
 <li><a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</a></li>
 <li><a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>从浮点数到向量检索：ES、BM25 与 Agent 评测</a></li>
