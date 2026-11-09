@@ -464,7 +464,7 @@
 <h3 id="流程-B：多-Agent-排障编排"><a href="#流程-B：多-Agent-排障编排" class="headerlink" title="流程 B：多 Agent 排障编排"></a>流程 B：多 Agent 排障编排</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">query</span><br><span class="line">  → ① Planner 分诊（规则，不调模型）→ Plan</span><br><span class="line">  → ② 两路 goroutine 并行：Evidence / Knowledge</span><br><span class="line">  → ③ 按 roleOrder 稳定排序</span><br><span class="line">  → ④ Synthesizer（唯一一次模型调用）→ 三段式答案</span><br><span class="line">  → ⑤ Result&#123;Answer, Plan, Steps, Findings, Limitations&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>关键认知：四个角色里只有 Synthesizer 调模型，前三个是普通 Go 代码在查数据。</strong></p>
-<h2 id="一、Agent-框架与架构选型"><a href="#一、Agent-框架与架构选型" class="headerlink" title="一、Agent 框架与架构选型"></a>一、Agent 框架与架构选型</h2><h3 id="1-有哪些-Agent-开发框架？为什么用-LangGraph？"><a href="#1-有哪些-Agent-开发框架？为什么用-LangGraph？" class="headerlink" title="1. 有哪些 Agent 开发框架？为什么用 LangGraph？"></a>1. 有哪些 Agent 开发框架？为什么用 LangGraph？</h3><p><strong>按编排模型分四类：</strong></p>
+<h2 id="一、Agent-框架与架构选型"><a href="#一、Agent-框架与架构选型" class="headerlink" title="一、Agent 框架与架构选型"></a>一、Agent 框架与架构选型</h2><h3 id="Q1-有哪些-Agent-开发框架？为什么用-LangGraph？"><a href="#Q1-有哪些-Agent-开发框架？为什么用-LangGraph？" class="headerlink" title="Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？"></a><span id="q1"></span>Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</h3><p><strong>按编排模型分四类：</strong></p>
 <ul>
 <li><strong>Chain 式</strong>：LangChain（LCEL）、LlamaIndex、Semantic Kernel、Spring AI —— 线性流水线，流程一复杂就打补丁</li>
 <li><strong>Graph 式</strong>：LangGraph、<strong>Eino</strong>（字节）、Temporal —— 节点 + 边 + 分支 + 状态，复杂 Agent 的主流方向</li>
@@ -487,7 +487,7 @@
 <li><strong>运维场景要可预测</strong>：同样输入走同样路径、结论能溯源，比多 Agent 自由对话更合适</li>
 </ol>
 <p><strong>顺带</strong>：Eino 其实也有 checkpoint（<code>compose/checkpoint.go</code>），所以「状态持久化」这块它不比 LangGraph 缺，差的主要是生态和 HITL 的成熟度。</p>
-<h3 id="2-ReAct-和-Plan-Execute-的使用场景？"><a href="#2-ReAct-和-Plan-Execute-的使用场景？" class="headerlink" title="2. ReAct 和 Plan-Execute 的使用场景？"></a>2. ReAct 和 Plan-Execute 的使用场景？</h3><p><strong>核心问题只有一个：「下一步做什么」由谁决定、什么时候决定。</strong></p>
+<h3 id="Q2-ReAct-和-Plan-Execute-的使用场景？"><a href="#Q2-ReAct-和-Plan-Execute-的使用场景？" class="headerlink" title="Q2. ReAct 和 Plan-Execute 的使用场景？"></a><span id="q2"></span>Q2. ReAct 和 Plan-Execute 的使用场景？</h3><p><strong>核心问题只有一个：「下一步做什么」由谁决定、什么时候决定。</strong></p>
 <p><strong>ReAct（边想边做）</strong></p>
 <ul>
 <li>结构：Thought → Action → Observation 循环，每轮重新判断</li>
@@ -509,7 +509,7 @@
 <li>高危操作要审批 → 加 human-in-the-loop</li>
 </ul>
 <p><strong>Pilot 是分层混用</strong>：外层固定 Graph 编排 → 中层 Plan-Execute 排障流水线 → 内层 ReAct 补灵活探索。<strong>「确定性优先，灵活兜底」。</strong></p>
-<h3 id="3-有去中心化的-Agent-框架吗？用在哪？"><a href="#3-有去中心化的-Agent-框架吗？用在哪？" class="headerlink" title="3. 有去中心化的 Agent 框架吗？用在哪？"></a>3. 有去中心化的 Agent 框架吗？用在哪？</h3><p><strong>先拆词，两种含义：</strong></p>
+<h3 id="Q3-有去中心化的-Agent-框架吗？用在哪？"><a href="#Q3-有去中心化的-Agent-框架吗？用在哪？" class="headerlink" title="Q3. 有去中心化的 Agent 框架吗？用在哪？"></a><span id="q3"></span>Q3. 有去中心化的 Agent 框架吗？用在哪？</h3><p><strong>先拆词，两种含义：</strong></p>
 <ul>
 <li><strong>控制层面</strong>：没有中心编排者，Agent 之间对等协商</li>
 <li><strong>所有权层面</strong>：链上身份、自主结算、数据主权</li>
@@ -523,7 +523,7 @@
 <p><strong>真实场景</strong>：跨组织协作（供应链 A 公司采购 Agent 直接和 B 公司库存 Agent 谈判）、调用第三方能力、Agent 市场结算、数据主权（医疗金融不出本地）。</p>
 <p><strong>为什么没普及</strong>：责任归属不清、跨组织 trace 没法透传、prompt injection 会跨 Agent 传播、没有 killer use case、多一轮协商延迟翻倍。</p>
 <p><strong>Pilot 不需要</strong>：单组织内部、数据和工具都在自己基础设施里、有中心编排者、不需要跨组织信任和结算。<strong>去中心化解决的是「信任和所有权」，这些都不存在。</strong></p>
-<h3 id="4-Agent-之间是怎么交流的？"><a href="#4-Agent-之间是怎么交流的？" class="headerlink" title="4. Agent 之间是怎么交流的？"></a>4. Agent 之间是怎么交流的？</h3><p><strong>分三层，从紧到松：</strong></p>
+<h3 id="Q4-Agent-之间是怎么交流的？"><a href="#Q4-Agent-之间是怎么交流的？" class="headerlink" title="Q4. Agent 之间是怎么交流的？"></a><span id="q4"></span>Q4. Agent 之间是怎么交流的？</h3><p><strong>分三层，从紧到松：</strong></p>
 <ol>
 <li><strong>共享状态</strong>（同进程）：往同一个对象写。Eino 里就是 <code>state.Messages</code>，成本最低，Pilot 里 90% 的「交流」是这层</li>
 <li><strong>消息传递</strong>（同系统跨协程&#x2F;服务）：channel、HTTP&#x2F;gRPC、Kafka&#x2F;NATS</li>
@@ -537,7 +537,7 @@
 </ul>
 <p><strong>多 Agent 四种协作模式</strong>：黑板（共享存储）、<strong>Supervisor（主管转派，最可控最常用）</strong>、点对点、辩论。</p>
 <p><strong>真正难的四件事</strong>：上下文裁剪（每传一次复制一份，token 指数涨）、消息格式统一（OpenAI 那套是事实标准，跨框架转换最容易出 bug）、trace 穿透（<code>traceparent</code> 一路带）、超时与幂等（有写操作必须幂等）。</p>
-<h3 id="5-sub-agent-怎么实现？为什么要做？"><a href="#5-sub-agent-怎么实现？为什么要做？" class="headerlink" title="5. sub-agent 怎么实现？为什么要做？"></a>5. sub-agent 怎么实现？为什么要做？</h3><p><strong>本质：把另一个完整的 Agent 包装成一个工具。</strong> 主 Agent 调它跟调 <code>query_logs</code> 没区别。</p>
+<h3 id="Q5-sub-agent-怎么实现？为什么要做？"><a href="#Q5-sub-agent-怎么实现？为什么要做？" class="headerlink" title="Q5. sub-agent 怎么实现？为什么要做？"></a><span id="q5"></span>Q5. sub-agent 怎么实现？为什么要做？</h3><p><strong>本质：把另一个完整的 Agent 包装成一个工具。</strong> 主 Agent 调它跟调 <code>query_logs</code> 没区别。</p>
 <p><strong>实现两个「不」：</strong></p>
 <ul>
 <li><strong>不传主 Agent 的 messages</strong> —— 子 Agent 从零开始，只有任务描述</li>
@@ -559,7 +559,7 @@
 </ul>
 <p><strong>Pilot 的诚实说法</strong>：严格说没有完整 sub-agent，但排障流水线里两个 executor 已经是<strong>简化版</strong>——职责单一、上下文隔离、结果摘要化，<strong>区别只在于它们是确定流程而不是自主 Agent</strong>。</p>
 <p><strong>什么时候不该用</strong>：工具少于 10 个、任务单一、子任务极短。判断标准：<strong>子任务的上下文体积是否显著大于结论体积</strong>。</p>
-<h2 id="二、Eino-内部机制"><a href="#二、Eino-内部机制" class="headerlink" title="二、Eino 内部机制"></a>二、Eino 内部机制</h2><h3 id="1-Chain-不能循环吗？图可以？"><a href="#1-Chain-不能循环吗？图可以？" class="headerlink" title="1. Chain 不能循环吗？图可以？"></a>1. Chain 不能循环吗？图可以？</h3><p><strong>不是「不能」，是「循环在图里是原生表达，在 Chain 里得自己手写」。</strong></p>
+<h2 id="二、Eino-内部机制"><a href="#二、Eino-内部机制" class="headerlink" title="二、Eino 内部机制"></a>二、Eino 内部机制</h2><h3 id="Q6-Chain-不能循环吗？图可以？"><a href="#Q6-Chain-不能循环吗？图可以？" class="headerlink" title="Q6. Chain 不能循环吗？图可以？"></a><span id="q6"></span>Q6. Chain 不能循环吗？图可以？</h3><p><strong>不是「不能」，是「循环在图里是原生表达，在 Chain 里得自己手写」。</strong></p>
 <ul>
 <li><strong>Chain 语义是 DAG</strong>：<code>A → B → C → 结束</code>，进度由<strong>位置</strong>决定，没有回边的概念</li>
 <li>要循环只能自己写 <code>for</code>，然后自己补三样：<strong>状态累积、终止条件、死循环保护</strong></li>
@@ -575,7 +575,7 @@
 </ul>
 <p><strong>所有支持循环的图引擎都必然有这一步保护</strong>，否则模型一句「再查一次」就能让服务卡死。</p>
 <p><strong>真正差别是成本</strong>：Chain 手写循环要两百行 Go（状态、终止、计数、还没有可视化），用图是两个节点加两条边。</p>
-<h3 id="2-「图是状态机」是什么意思？Chain-不是吗？"><a href="#2-「图是状态机」是什么意思？Chain-不是吗？" class="headerlink" title="2. 「图是状态机」是什么意思？Chain 不是吗？"></a>2. 「图是状态机」是什么意思？Chain 不是吗？</h3><p><strong>判据：下一步由「当前状态」决定 → 状态机；由「执行到第几步」决定 → 流水线。</strong></p>
+<h3 id="Q7-「图是状态机」是什么意思？Chain-不是吗？"><a href="#Q7-「图是状态机」是什么意思？Chain-不是吗？" class="headerlink" title="Q7. 「图是状态机」是什么意思？Chain 不是吗？"></a><span id="q7"></span>Q7. 「图是状态机」是什么意思？Chain 不是吗？</h3><p><strong>判据：下一步由「当前状态」决定 → 状态机；由「执行到第几步」决定 → 流水线。</strong></p>
 <ul>
 <li><strong>Chain 是位置驱动</strong>：中间结果只是局部变量，散在栈上，框架看不见拿不到存不了</li>
 <li><strong>图是状态驱动</strong>：节点只负责处理，核心是那份<strong>共享的、显式的 state</strong></li>
@@ -586,7 +586,7 @@
 <li>外层 <code>FullPilotAgent</code> 的图是 <strong>DAG</strong>（无环），只是「带分支的流水线」，强在分支和多前驱汇合（<code>AllPredecessor</code>）</li>
 <li>ReAct 内部的图<strong>才是真正的状态机</strong>：有回边、有状态累积、有终止条件</li>
 </ul>
-<h3 id="3-ReAct-的-state-结构体是什么？"><a href="#3-ReAct-的-state-结构体是什么？" class="headerlink" title="3. ReAct 的 state 结构体是什么？"></a>3. ReAct 的 <code>state</code> 结构体是什么？</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> &#123;</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Q8-ReAct-的-state-结构体是什么？"><a href="#Q8-ReAct-的-state-结构体是什么？" class="headerlink" title="Q8. ReAct 的 state 结构体是什么？"></a><span id="q8"></span>Q8. ReAct 的 <code>state</code> 结构体是什么？</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> &#123;</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong><code>Messages</code> —— 整个 Agent 的记忆</strong></p>
 <ul>
@@ -605,7 +605,7 @@
 <p>读取它的就是 Tools 之后那个分支函数：非空 → <code>direct_return</code> → END，空 → 回 ChatModel。</p>
 <p><strong>Pilot 现状</strong>：<code>ToolReturnDirectly</code> 是空 map，这条路没启用。</p>
 <p><strong>一个细节印证「state 可序列化」</strong>： 的 <code>schema.RegisterName[*state](&quot;_eino_react_state&quot;)</code>，注册类型名就是为了序列化&#x2F;checkpoint。</p>
-<h3 id="4-我现在到底是怎么停的？"><a href="#4-我现在到底是怎么停的？" class="headerlink" title="4. 我现在到底是怎么停的？"></a>4. 我现在到底是怎么停的？</h3><p><strong>三条停止路径，只有一条读 state：</strong></p>
+<h3 id="Q9-我现在到底是怎么停的？"><a href="#Q9-我现在到底是怎么停的？" class="headerlink" title="Q9. 我现在到底是怎么停的？"></a><span id="q9"></span>Q9. 我现在到底是怎么停的？</h3><p><strong>三条停止路径，只有一条读 state：</strong></p>
 <p><strong>路径一（Pilot 走的就是这条，零 state）</strong></p>
 <p><code>modelPostBranchCondition</code>只看<strong>模型输出的消息</strong>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.ToolCalls) &gt; <span class="number">0</span> &#123; <span class="keyword">return</span> <span class="literal">true</span>, <span class="literal">nil</span> &#125;   <span class="comment">// 去 Tools</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.Content) == <span class="number">0</span> &#123; <span class="keyword">continue</span> &#125;            <span class="comment">// 空 chunk 跳过</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>, <span class="literal">nil</span>                                <span class="comment">// 有文字没工具 → END</span></span><br></pre></td></tr></table></figure>
@@ -619,7 +619,7 @@
 <p><code>WithMaxRunSteps(25)</code>，pregel 引擎自己的步数计数，撞到就强制终止。</p>
 <p><strong>所以 Pilot 里 state 实际只承担「记忆」一个职责，「终止」由模型输出 + 步数上限两个外部机制负责。</strong></p>
 <p><strong>一个真坑</strong>：<code>modelPostBranchCondition</code> 先判 <code>ToolCalls</code> 再判 <code>Content</code>。流式输出时如果<strong>带文字的 chunk 先到</strong>，会被判定结束、工具根本没被调用。Eino 的 <code>NewAgent</code> 注释专门提了这点（Claude 这类模型），解法是自定义 <code>StreamToolCallChecker</code>。<strong>Pilot 用非流式 <code>Generate</code>，暂时没踩到；改流式就会遇到。</strong></p>
-<h3 id="5-Eino-为什么是中心化的？"><a href="#5-Eino-为什么是中心化的？" class="headerlink" title="5. Eino 为什么是中心化的？"></a>5. Eino 为什么是中心化的？</h3><p><strong>中心化 ≠ 部署在一台机器。判据是：谁决定下一步、谁持有状态、节点能不能自主发起。</strong></p>
+<h3 id="Q10-Eino-为什么是中心化的？"><a href="#Q10-Eino-为什么是中心化的？" class="headerlink" title="Q10. Eino 为什么是中心化的？"></a><span id="q10"></span>Q10. Eino 为什么是中心化的？</h3><p><strong>中心化 ≠ 部署在一台机器。判据是：谁决定下一步、谁持有状态、节点能不能自主发起。</strong></p>
 <p><strong>五个「中心」：</strong></p>
 <ol>
 <li><strong>编译期中心</strong>：<code>g.Compile()</code> 把图编成一个对象，结构静态固定</li>
@@ -637,7 +637,7 @@
 <li>中心化 ≠ 不能并行（多 tool_calls 并行、两个 executor 并行）</li>
 </ul>
 <p><strong>收益</strong>：可预测、可测试、可观测、有硬上限、责任清晰。<strong>代价</strong>：单点、不支持跨组织、节点能力受限。<strong>这四条代价对「单组织内部排障」全都不构成问题，所以中心化是正解不是妥协。</strong></p>
-<h2 id="三、Go-并发：channel-收结果"><a href="#三、Go-并发：channel-收结果" class="headerlink" title="三、Go 并发：channel 收结果"></a>三、Go 并发：channel 收结果</h2><h3 id="1-为什么要用-WaitGroup？channel-不能替代吗？"><a href="#1-为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="1. 为什么要用 WaitGroup？channel 不能替代吗？"></a>1. 为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
+<h2 id="三、Go-并发：channel-收结果"><a href="#三、Go-并发：channel-收结果" class="headerlink" title="三、Go 并发：channel 收结果"></a>三、Go 并发：channel 收结果</h2><h3 id="Q11-为什么要用-WaitGroup？channel-不能替代吗？"><a href="#Q11-为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="Q11. 为什么要用 WaitGroup？channel 不能替代吗？"></a><span id="q11"></span>Q11. 为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
 <p><strong>close 两条铁律</strong>：只能发送方调；只能在所有发送完成后调。</p>
 <p>多个 goroutine 都在发时，<strong>谁是最后一个？没人知道</strong> → 必须有个外部全局计数器，那就是 WaitGroup。</p>
 <p><strong>三个看起来能替代、其实不行的方案：</strong></p>
@@ -649,7 +649,7 @@
 <p><strong>纯 channel 也能做</strong>（done channel 收 N 次信号），但那是「自己实现一个功能更弱的 WaitGroup」。</p>
 <p><strong>本质分工</strong>：channel &#x3D; 数据通道，WaitGroup &#x3D; 生命周期同步。混在一起就得区分「这是结果还是完成信号」，代码变脏。</p>
 <p><strong>更省事的选项</strong>：<code>errgroup</code>，内部就是 WaitGroup + 错误收集 + ctx 取消。对「两个分支任一失败就该整体失败」的排障流水线更合适。</p>
-<h3 id="2-计数器是-goroutine-跑完自动减一吗？"><a href="#2-计数器是-goroutine-跑完自动减一吗？" class="headerlink" title="2. 计数器是 goroutine 跑完自动减一吗？"></a>2. 计数器是 goroutine 跑完自动减一吗？</h3><p><strong>不是。全靠手动</strong>：<code>wg.Add(1)</code> 加，<code>wg.Done()</code> 减（等价 <code>Add(-1)</code>），<code>wg.Wait()</code> 只是阻塞等归零。</p>
+<h3 id="Q12-计数器是-goroutine-跑完自动减一吗？"><a href="#Q12-计数器是-goroutine-跑完自动减一吗？" class="headerlink" title="Q12. 计数器是 goroutine 跑完自动减一吗？"></a><span id="q12"></span>Q12. 计数器是 goroutine 跑完自动减一吗？</h3><p><strong>不是。全靠手动</strong>：<code>wg.Add(1)</code> 加，<code>wg.Done()</code> 减（等价 <code>Add(-1)</code>），<code>wg.Wait()</code> 只是阻塞等归零。</p>
 <p><strong>goroutine 退出，WaitGroup 一点感觉都没有</strong>——除非你在它退出前手动 <code>Done()</code>。</p>
 <p><strong>为什么写 <code>defer wg.Done()</code></strong>：一定执行（panic 也跑）、不用管几条 return 路径、放第一行读代码的人一眼看到。</p>
 <p><strong>三个经典 bug</strong>：</p>
@@ -659,7 +659,7 @@
 <li>Done 多调一次 → <code>panic: sync: negative WaitGroup counter</code></li>
 </ul>
 <p>Go 1.25 有 <code>wg.Go()</code> 自动 Add + defer Done，但 <strong>Pilot 的 go.mod 是 <code>go 1.24.10</code>，用不了</strong>。</p>
-<h3 id="3-为什么要带缓冲？无缓冲死锁是怎么回事？"><a href="#3-为什么要带缓冲？无缓冲死锁是怎么回事？" class="headerlink" title="3. 为什么要带缓冲？无缓冲死锁是怎么回事？"></a>3. 为什么要带缓冲？无缓冲死锁是怎么回事？</h3><p><strong>死锁本质是循环等待：</strong></p>
+<h3 id="Q13-为什么要带缓冲？无缓冲死锁是怎么回事？"><a href="#Q13-为什么要带缓冲？无缓冲死锁是怎么回事？" class="headerlink" title="Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？"></a><span id="q13"></span>Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</h3><p><strong>死锁本质是循环等待：</strong></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主协程：  wg.Wait() ──▶ 等 Done 归零</span><br><span class="line">                          ↑</span><br><span class="line">goroutine： results &lt;- x（堵住）→ 等接收者 ← 但接收者要等 Wait 返回</span><br></pre></td></tr></table></figure>
 
 <p><strong>主协程等 goroutine 结束，goroutine 等主协程接收，互相等。</strong></p>
@@ -676,7 +676,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">outcomes := <span class="built_in">make</span>(<span class="keyword">chan</span> outcome, <span class="built_in">len</span>(roles))  <span class="comment">// 缓冲=角色数</span></span><br><span class="line"><span class="keyword">var</span> group sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, role := <span class="keyword">range</span> roles &#123;</span><br><span class="line">	group.Add(<span class="number">1</span>)                             <span class="comment">// 在 go 之前</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(role Role, executor Executor)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> group.Done()</span><br><span class="line">		...</span><br><span class="line">		outcomes &lt;- outcome&#123;...&#125;</span><br><span class="line">	&#125;(role, executor)</span><br><span class="line">&#125;</span><br><span class="line">group.Wait()</span><br><span class="line"><span class="built_in">close</span>(outcomes)                              <span class="comment">// Wait 之后才 close</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>两个坑</strong>：channel 不保证顺序（所以要按 <code>roleOrder</code> 排序）；验证方式 <code>go test -race</code>。</p>
-<h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）"></a>四、多 Agent 编排（核心）</h2><h3 id="1-多-Agent-编排是怎么跑的？"><a href="#1-多-Agent-编排是怎么跑的？" class="headerlink" title="1. 多 Agent 编排是怎么跑的？"></a>1. 多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
+<h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）"></a>四、多 Agent 编排（核心）</h2><h3 id="Q14-多-Agent-编排是怎么跑的？"><a href="#Q14-多-Agent-编排是怎么跑的？" class="headerlink" title="Q14. 多 Agent 编排是怎么跑的？"></a><span id="q14"></span>Q14. 多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
 <p><strong>五个阶段：</strong></p>
 <p><strong>① 入口 <code>Orchestrator.Execute</code></strong></p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plan := o.planner.Plan(query)                                        <span class="comment">// :58 分诊</span></span><br><span class="line">findings, branchSteps, limitations := o.executeBranches(...)         <span class="comment">// :71 并行</span></span><br><span class="line">answer, err := o.synthesizer.Synthesize(...)                         <span class="comment">// :75 收敛</span></span><br></pre></td></tr></table></figure>
@@ -724,7 +724,7 @@
 <li>findings 没有跨角色消解（两份证据矛盾时让 Synthesizer 自己权衡，没做冲突检测）</li>
 <li>可观测只到角色级（工具级 span 没接进去）</li>
 </ol>
-<h2 id="五、语言选型"><a href="#五、语言选型" class="headerlink" title="五、语言选型"></a>五、语言选型</h2><h3 id="1-用-Go-写-Agent-有什么好处？"><a href="#1-用-Go-写-Agent-有什么好处？" class="headerlink" title="1. 用 Go 写 Agent 有什么好处？"></a>1. 用 Go 写 Agent 有什么好处？</h3><p><strong>先承认：Go 不是写 Agent 的主流，主流是 Python。</strong></p>
+<h2 id="五、语言选型"><a href="#五、语言选型" class="headerlink" title="五、语言选型"></a>五、语言选型</h2><h3 id="Q15-用-Go-写-Agent-有什么好处？"><a href="#Q15-用-Go-写-Agent-有什么好处？" class="headerlink" title="Q15. 用 Go 写 Agent 有什么好处？"></a><span id="q15"></span>Q15. 用 Go 写 Agent 有什么好处？</h3><p><strong>先承认：Go 不是写 Agent 的主流，主流是 Python。</strong></p>
 <p><strong>Go 赢在：</strong></p>
 <ul>
 <li><strong>部署</strong>：单二进制，无运行时，镜像几十 MB（Python 几百 MB 起，加 CUDA 上 GB）</li>
@@ -743,7 +743,7 @@
 </ul>
 <p><strong>正确判断是分层</strong>：Go 做服务层（网关、并发、工具执行、外部系统对接、可观测），Python 做模型层（训练、微调、评测、本地推理）。</p>
 <p><strong>什么情况别用 Go</strong>：要本地跑模型、要大量 prompt 实验、团队是算法背景。</p>
-<h3 id="2-这个项目有大量请求吗？是网关吗？"><a href="#2-这个项目有大量请求吗？是网关吗？" class="headerlink" title="2. 这个项目有大量请求吗？是网关吗？"></a>2. 这个项目有大量请求吗？是网关吗？</h3><p><strong>不是网关，请求量也不大。</strong> 上一轮我说「高并发 IO 网关」是错的，纠正：</p>
+<h3 id="Q16-这个项目有大量请求吗？是网关吗？"><a href="#Q16-这个项目有大量请求吗？是网关吗？" class="headerlink" title="Q16. 这个项目有大量请求吗？是网关吗？"></a><span id="q16"></span>Q16. 这个项目有大量请求吗？是网关吗？</h3><p><strong>不是网关，请求量也不大。</strong> 上一轮我说「高并发 IO 网关」是错的，纠正：</p>
 <ul>
 <li>网关的职责是<strong>转发</strong>，Pilot 没有下游业务服务可转发，<strong>它自己就是链路终点</strong></li>
 <li>真实场景是一个运维团队，QPS 个位数到几十</li>
@@ -767,7 +767,7 @@
 <h2 id="七、工具调用到底怎么发生的（2026-11-09-补讲）"><a href="#七、工具调用到底怎么发生的（2026-11-09-补讲）" class="headerlink" title="七、工具调用到底怎么发生的（2026-11-09 补讲）"></a>七、工具调用到底怎么发生的（2026-11-09 补讲）</h2><blockquote>
 <p>讲的是「模型说要调工具」到「本地函数真的被执行」之间的<strong>协议层</strong>：消息怎么传、谁解析、工具怎么被找到。</p>
 </blockquote>
-<h3 id="1-模型”决定调工具”这件事，在协议层是什么？"><a href="#1-模型”决定调工具”这件事，在协议层是什么？" class="headerlink" title="1. 模型”决定调工具”这件事，在协议层是什么？"></a>1. 模型”决定调工具”这件事，在协议层是什么？</h3><p><strong>一句话：是一条 <code>role=assistant</code>、<code>tool_calls</code> 非空的普通消息。不是动作，是内容。</strong></p>
+<h3 id="Q17-模型”决定调工具”这件事，在协议层是什么？"><a href="#Q17-模型”决定调工具”这件事，在协议层是什么？" class="headerlink" title="Q17. 模型”决定调工具”这件事，在协议层是什么？"></a><span id="q17"></span>Q17. 模型”决定调工具”这件事，在协议层是什么？</h3><p><strong>一句话：是一条 <code>role=assistant</code>、<code>tool_calls</code> 非空的普通消息。不是动作，是内容。</strong></p>
 <p>chat 接口只有一个请求体、一个数组：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;model&quot;</span><span class="punctuation">:</span> <span class="string">&quot;...&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">&quot;tools&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
@@ -782,7 +782,7 @@
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_abc123&quot;</span><span class="punctuation">,</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_alerts&quot;</span><span class="punctuation">,</span><span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;status\&quot;:\&quot;firing\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>关键：<code>arguments</code> 的值是字符串，字符串里装的才是 JSON。</strong> Eino 的 <code>FunctionCall.Arguments</code> 同样是 <code>string</code>（注释写 “in JSON format”），SDK 这一层<strong>不做解析</strong>。</p>
-<h3 id="2-为什么非要搞成消息？因为-HTTP-是无状态的"><a href="#2-为什么非要搞成消息？因为-HTTP-是无状态的" class="headerlink" title="2. 为什么非要搞成消息？因为 HTTP 是无状态的"></a>2. 为什么非要搞成消息？因为 HTTP 是无状态的</h3><p>服务端不记得上一轮说过什么，所以每次请求必须把全部上下文重发一遍。”我想调函数”和”函数结果回来了”这两件事，也只能变成数组里的元素——否则模型下一轮根本不知道发生过什么。</p>
+<h3 id="Q18-为什么非要搞成消息？因为-HTTP-是无状态的"><a href="#Q18-为什么非要搞成消息？因为-HTTP-是无状态的" class="headerlink" title="Q18. 为什么非要搞成消息？因为 HTTP 是无状态的"></a><span id="q18"></span>Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</h3><p>服务端不记得上一轮说过什么，所以每次请求必须把全部上下文重发一遍。”我想调函数”和”函数结果回来了”这两件事，也只能变成数组里的元素——否则模型下一轮根本不知道发生过什么。</p>
 <p>由此得出一个反直觉但重要的推论：</p>
 <p><strong>所谓 Agent 循环 &#x3D; 往同一个数组里追加消息、反复 POST。</strong></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">① POST（带 tools schema）→ 响应里多一条 assistant(tool_calls)</span><br><span class="line">② 本地执行工具 → 数组里多一条 tool</span><br><span class="line">③ 再 POST（数组变长了）→ 多一条 assistant(文本回答)</span><br></pre></td></tr></table></figure>
@@ -791,7 +791,7 @@
 <p>Eino 的 <code>schema.Message</code> 就是照这个协议设计的，一个 struct 通吃四种角色：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Message <span class="keyword">struct</span> &#123;</span><br><span class="line">    Role       RoleType    <span class="comment">// system / user / assistant / tool</span></span><br><span class="line">    Content    <span class="type">string</span></span><br><span class="line">    ToolCalls  []ToolCall  <span class="comment">// 只有 assistant 会有</span></span><br><span class="line">    ToolCallID <span class="type">string</span>      <span class="comment">// 只有 tool 会有，指回是哪次调用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="3-工具怎么被找到？参数放在哪？"><a href="#3-工具怎么被找到？参数放在哪？" class="headerlink" title="3. 工具怎么被找到？参数放在哪？"></a>3. 工具怎么被找到？参数放在哪？</h3><p><strong>先点破：没有任何全局变量或注册表存参数。参数只在栈上活一瞬间。</strong></p>
+<h3 id="Q19-工具怎么被找到？参数放在哪？"><a href="#Q19-工具怎么被找到？参数放在哪？" class="headerlink" title="Q19. 工具怎么被找到？参数放在哪？"></a><span id="q19"></span>Q19. 工具怎么被找到？参数放在哪？</h3><p><strong>先点破：没有任何全局变量或注册表存参数。参数只在栈上活一瞬间。</strong></p>
 <p>执行顺序：</p>
 <ol>
 <li><strong>建表（启动时）</strong>：ToolsNode 把每个工具的名字和下标存进 map（<code>indexes[toolName] = idx</code>）</li>
@@ -806,7 +806,7 @@
 <li><strong>结果包装</strong>：返回的 string 被包成 <code>ToolMessage(content, toolCallID)</code>。<code>toolCallID</code> 是<strong>配对钥匙</strong>——一次可能并发调多个工具，模型靠这个 id 对上结果是哪次调用的。</li>
 </ol>
 <p><strong><code>QueryAlertsInput</code> 这个 struct 被用了两次</strong>：启动时反射成 JSONSchema 发给模型（告诉它有哪些字段），运行时承接模型给的参数（反序列化的目标）。这是 <code>jsonschema:&quot;description=...&quot;</code> 这类 tag 的真正作用。</p>
-<h3 id="4-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？"><a href="#4-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？" class="headerlink" title="4. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？"></a>4. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</h3><p><strong>先纠正事实：项目里不是两个 Agent 实现，是三个。</strong></p>
+<h3 id="Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？"><a href="#Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？" class="headerlink" title="Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？"></a><span id="q20"></span>Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</h3><p><strong>先纠正事实：项目里不是两个 Agent 实现，是三个。</strong></p>
 <ul>
 <li><code>FullPilotAgent</code> — Eino ReAct 图 + 11 个注册工具，<strong>走 tool calling</strong></li>
 <li><code>SimplePilotAgent</code> — 手搓 messages、无任何工具，<strong>全项目无人调用</strong>（早期快速启动遗留）</li>
@@ -826,7 +826,7 @@
 <li><strong>输出改结构体</strong>：返回 <code>Finding</code> &#x2F; <code>EvidenceItem</code> 而不是拼文本，因为下游要综合、要溯源。</li>
 </ul>
 <p><strong>所以一句话收口：tool calling &#x3D; 函数 + 一层”让模型选函数、给参数”的协议外壳。去掉外壳，剩下的就是普通函数调用。</strong></p>
-<h3 id="5-什么时候必须加这层外壳？（判据）"><a href="#5-什么时候必须加这层外壳？（判据）" class="headerlink" title="5. 什么时候必须加这层外壳？（判据）"></a>5. 什么时候必须加这层外壳？（判据）</h3><p>看一句：<strong>“该调哪个函数、参数填什么”能不能穷举。</strong></p>
+<h3 id="Q21-什么时候必须加这层外壳？（判据）"><a href="#Q21-什么时候必须加这层外壳？（判据）" class="headerlink" title="Q21. 什么时候必须加这层外壳？（判据）"></a><span id="q21"></span>Q21. 什么时候必须加这层外壳？（判据）</h3><p>看一句：<strong>“该调哪个函数、参数填什么”能不能穷举。</strong></p>
 <ul>
 <li>不能穷举（用户可能问任何事）→ 必须加壳，让模型自己选。FullAgent 就是这种。</li>
 <li>能穷举（故障分析就那几条查法：查告警、查日志、查知识库）→ 加壳只换来不确定性和 token 成本。Orchestrator 就是这种。</li>
