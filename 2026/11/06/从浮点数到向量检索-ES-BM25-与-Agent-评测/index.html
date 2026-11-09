@@ -457,7 +457,7 @@
             <div id="articleContent">
                 <h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一份文档入库（写）"><a href="#流程-A：一份文档入库（写）" class="headerlink" title="流程 A：一份文档入库（写）"></a>流程 A：一份文档入库（写）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Upload（带 title/content/category）</span><br><span class="line">  → 内容哈希生成 ID（不纳入 title）</span><br><span class="line">  → DocumentExists 查重：命中就 return，连 embedding 都不算</span><br><span class="line">  → Embedder 生成向量 → doc.Vector = vector</span><br><span class="line">  → json.Marshal 整个 struct（一次序列化，向量和文本粘在一起）</span><br><span class="line">  → 一次 HTTP PUT 进 ES</span><br><span class="line">  → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部原文进 _source</span><br></pre></td></tr></table></figure>
 
-<p>（详见 <a href="#q5">Q5</a>、<a href="#q11">Q11</a>）</p>
+<p>代码：<code>knowledge_controller.go</code> → <code>knowledge_retriever.go</code> → <code>elasticsearch.go</code>（详见 <a href="#q5">Q5</a>、<a href="#q11">Q11</a>）</p>
 <h3 id="流程-B：一次检索（读）"><a href="#流程-B：一次检索（读）" class="headerlink" title="流程 B：一次检索（读）"></a>流程 B：一次检索（读）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k          （只碰文本）</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k          （只碰浮点）</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排、去重 → 取 content 原文拼 prompt → 发给 LLM</span><br></pre></td></tr></table></figure>
 
 <p><strong>LLM 从头到尾没看见过向量。</strong>（详见 <a href="#q13">Q13</a>）</p>
@@ -494,7 +494,7 @@
 <li>哈希要在<strong>文本清洗之后</strong>算，否则脏版&#x2F;净版会被当成两份</li>
 <li>近似重复（改两行）哈希失效，要 SimHash &#x2F; MinHash</li>
 </ul>
-<h2 id="二、Pilot-知识库去重改造（代码）"><a href="#二、Pilot-知识库去重改造（代码）" class="headerlink" title="二、Pilot 知识库去重改造（代码）"></a>二、Pilot 知识库去重改造（代码）</h2><h3 id="Q4-原来的实现有什么问题？"><a href="#Q4-原来的实现有什么问题？" class="headerlink" title="Q4. 原来的实现有什么问题？"></a><span id="q4"></span>Q4. 原来的实现有什么问题？</h3><p>（改前）</p>
+<h2 id="二、Pilot-知识库去重改造（代码）"><a href="#二、Pilot-知识库去重改造（代码）" class="headerlink" title="二、Pilot 知识库去重改造（代码）"></a>二、Pilot 知识库去重改造（代码）</h2><h3 id="Q4-原来的实现有什么问题？"><a href="#Q4-原来的实现有什么问题？" class="headerlink" title="Q4. 原来的实现有什么问题？"></a><span id="q4"></span>Q4. 原来的实现有什么问题？</h3><p><code>internal/ai/retriever/knowledge_retriever.go</code>（改前）</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *KnowledgeRetriever)</span></span> generateDocID(title, content <span class="type">string</span>) <span class="type">string</span> &#123;</span><br><span class="line">	hash := md5.Sum([]<span class="type">byte</span>(title + content))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(hash[:])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>问题一：ID 把 title 算进去了。</strong> 内容一样、标题不同 → 不同 ID → 两条记录、两段相同向量。</p>
@@ -585,27 +585,27 @@
 <h2 id="五、向量怎么存、怎么检索（走代码）"><a href="#五、向量怎么存、怎么检索（走代码）" class="headerlink" title="五、向量怎么存、怎么检索（走代码）"></a>五、向量怎么存、怎么检索（走代码）</h2><h3 id="Q11-向量是哪一步存的？其他信息哪一步传进去的？"><a href="#Q11-向量是哪一步存的？其他信息哪一步传进去的？" class="headerlink" title="Q11. 向量是哪一步存的？其他信息哪一步传进去的？"></a><span id="q11"></span>Q11. 向量是哪一步存的？其他信息哪一步传进去的？</h3><blockquote>
 <p>最容易误解的事实：<strong>全程只有一次写请求</strong>，向量和文本是一起进去的。</p>
 </blockquote>
-<p><strong>第 1 步</strong> — 构造文档，此时没有向量</p>
+<p><strong>第 1 步</strong> <code>knowledge_controller.go</code> — 构造文档，此时没有向量</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doc := &amp;types.KnowledgeDocument&#123;Title: req.Title, Content: req.Content, Category: req.Category&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>第 2 步</strong> — 算内容哈希 ID + <code>DocumentExists</code> 查重，命中直接 return（连模型都不调）</p>
-<p><strong>第 3 步</strong> — 唯一一次调 embedding 模型，向量在这里产生</p>
+<p><strong>第 2 步</strong> <code>knowledge_retriever.go</code> — 算内容哈希 ID + <code>DocumentExists</code> 查重，命中直接 return（连模型都不调）</p>
+<p><strong>第 3 步</strong> <code>knowledge_retriever.go</code> — 唯一一次调 embedding 模型，向量在这里产生</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vector, err := r.embedder.Embed(r.ctx, content)</span><br></pre></td></tr></table></figure>
 
-<p><strong>第 4 步</strong> — 向量挂回同一个 struct</p>
+<p><strong>第 4 步</strong> <code>knowledge_retriever.go</code> — 向量挂回同一个 struct</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doc.Vector = vector</span><br></pre></td></tr></table></figure>
 
-<p><strong>第 5 步</strong> — 整个 doc 指针交给 ES</p>
+<p><strong>第 5 步</strong> <code>knowledge_retriever.go</code> — 整个 doc 指针交给 ES</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> elasticsearch.IndexDocument(r.ctx, r.indexName, doc.ID, doc)</span><br></pre></td></tr></table></figure>
 
-<p><strong>第 6 步</strong> — 序列化成一个 JSON body</p>
+<p><strong>第 6 步</strong> <code>pkg/elasticsearch/elasticsearch.go</code> — 序列化成一个 JSON body</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data, err := json.Marshal(document)</span><br></pre></td></tr></table></figure>
 
 <p>body 里同时有 <code>title/content/category/tags/vector/created_at/updated_at</code>。</p>
-<p><strong>第 7 步</strong> — 一次 HTTP PUT 落盘</p>
+<p><strong>第 7 步</strong> <code>pkg/elasticsearch/elasticsearch.go</code> — 一次 HTTP PUT 落盘</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">req := esapi.IndexRequest&#123;Index: index, DocumentID: docID, Body: strings.NewReader(<span class="type">string</span>(data)), Refresh: refresh&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>ES 拿到后按 mapping 拆</strong>：</p>
+<p><strong>ES 拿到后按 mapping 拆</strong>（<code>knowledge_retriever.go</code>）：</p>
 <ul>
 <li><code>title</code> &#x2F; <code>content</code> → <code>text</code> + standard 分词器 → 分词、建倒排</li>
 <li><code>category</code> &#x2F; <code>tags</code> → <code>keyword</code> → 不分词，精确匹配索引</li>
@@ -699,12 +699,13 @@
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_abc&quot;</span><span class="punctuation">,</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">,</span><span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;service\&quot;:\&quot;payment\&quot;,\&quot;window\&quot;:\&quot;15m\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
 <p>坑：<strong><code>arguments</code> 是 JSON 字符串，不是对象</strong>，评测要再 <code>json.Unmarshal</code> 一次。</p>
-<p><strong>第二层 ReAct 循环</strong>：Eino 把 <code>tool_calls</code> 和执行结果（<code>role:&quot;tool&quot;</code> + <code>tool_call_id</code>）拼回消息列表喂下一轮（挂 <code>ToolCallingModel</code>）。这些 tool 消息<strong>只活在这次的内存里</strong>，循环结束就没了。</p>
+<p><strong>第二层 ReAct 循环</strong>：Eino 把 <code>tool_calls</code> 和执行结果（<code>role:&quot;tool&quot;</code> + <code>tool_call_id</code>）拼回消息列表喂下一轮（<code>full_agent.go</code> 挂 <code>ToolCallingModel</code>）。这些 tool 消息<strong>只活在这次的内存里</strong>，循环结束就没了。</p>
 <p><strong>第三层 持久化：Pilot 根本没落盘</strong>（关键）</p>
+<p><code>pkg/types/types.go</code></p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ChatMessage <span class="keyword">struct</span> &#123;</span><br><span class="line">	Role      <span class="type">string</span>    <span class="string">`json:&quot;role&quot;`</span></span><br><span class="line">	Content   <span class="type">string</span>    <span class="string">`json:&quot;content&quot;`</span></span><br><span class="line">	Timestamp time.Time <span class="string">`json:&quot;timestamp&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>只有 role 和 content，没有 tool_calls 字段。</strong></p>
-<p> 落库：</p>
+<p><code>chat_controller.go</code> 落库：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_ = c.shortTermMemory.SaveMessage(..., types.ChatMessage&#123;Role: <span class="string">&quot;user&quot;</span>, Content: req.Query&#125;)</span><br><span class="line">_ = c.shortTermMemory.SaveMessage(..., types.ChatMessage&#123;Role: <span class="string">&quot;assistant&quot;</span>, Content: result.Answer&#125;)</span><br></pre></td></tr></table></figure>
 
 <p>只存「问了什么」「最终答了什么」，<strong>中间调了哪些工具、参数是什么、返回了什么全丢了</strong>。ES 里的运行日志是服务端 INFO&#x2F;ERROR，不是结构化 trace。</p>

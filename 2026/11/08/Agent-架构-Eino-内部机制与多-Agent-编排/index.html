@@ -459,7 +459,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）"></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）"></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引，查不到就报错</span><br><span class="line">⑤ 执行注册进来的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></table></figure>
+                <h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）"></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）"></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错</span><br><span class="line">⑤ 执行注册进来的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></table></figure>
 
 <h3 id="流程-B：多-Agent-排障编排"><a href="#流程-B：多-Agent-排障编排" class="headerlink" title="流程 B：多 Agent 排障编排"></a>流程 B：多 Agent 排障编排</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">query</span><br><span class="line">  → ① Planner 分诊（规则，不调模型）→ Plan</span><br><span class="line">  → ② 两路 goroutine 并行：Evidence / Knowledge</span><br><span class="line">  → ③ 按 roleOrder 稳定排序</span><br><span class="line">  → ④ Synthesizer（唯一一次模型调用）→ 三段式答案</span><br><span class="line">  → ⑤ Result&#123;Answer, Plan, Steps, Findings, Limitations&#125;</span><br></pre></td></tr></table></figure>
 
@@ -483,7 +483,7 @@
 <ol>
 <li><strong>语言栈</strong>：项目是 Go + GoFrame，LangGraph 是 Python，跨语言成本远大于收益</li>
 <li><strong>Go 生态没第二个这么全的</strong>：组件层（ChatModel &#x2F; Embedder &#x2F; Retriever &#x2F; Tool &#x2F; Lambda）+ 编排层（compose.Graph）+ Agent 层（react.NewAgent）+ 可观测（callbacks）</li>
-<li><strong>图编排收益确实用上了</strong>（八股 §3）：<code>FullPilotAgent</code> 不直接拼 messages，而是把输入清洗、知识检索、Prompt 模板、ReAct Agent 编成一张可执行图</li>
+<li><strong>图编排收益确实用上了</strong>：<code>FullPilotAgent</code> 不直接拼 messages，而是把输入清洗、知识检索、Prompt 模板、ReAct Agent 编成一张可执行图（<code>full_agent.go</code>）</li>
 <li><strong>运维场景要可预测</strong>：同样输入走同样路径、结论能溯源，比多 Agent 自由对话更合适</li>
 </ol>
 <p><strong>顺带</strong>：Eino 其实也有 checkpoint（<code>compose/checkpoint.go</code>），所以「状态持久化」这块它不比 LangGraph 缺，差的主要是生态和 HITL 的成熟度。</p>
@@ -567,7 +567,7 @@
 <p><strong>图怎么表达循环</strong>：边允许指回前面（回边）。ReAct 内部就是：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ChatModel ─(有 ToolCalls)→ Tools ─(非 return_direct)→ 回到 ChatModel</span><br><span class="line">    └─(无 ToolCalls)→ END</span><br></pre></td></tr></table></figure>
 
-<p>代码在 （ChatModel 出去的分支）和 <code>:333</code>（Tools 出去的分支，<code>endNode = nodeKeyModel</code> 就是回边）。</p>
+<p>代码在 <code>react.go</code>（ChatModel 出去的分支）和另一处（Tools 出去的分支，<code>endNode = nodeKeyModel</code> 就是回边）。</p>
 <p><strong>有回边就必须有上限</strong>：</p>
 <ul>
 <li>Eino：<code>compose.WithMaxRunSteps(config.MaxStep)</code>，Pilot 设 25，默认 12</li>
@@ -586,7 +586,8 @@
 <li>外层 <code>FullPilotAgent</code> 的图是 <strong>DAG</strong>（无环），只是「带分支的流水线」，强在分支和多前驱汇合（<code>AllPredecessor</code>）</li>
 <li>ReAct 内部的图<strong>才是真正的状态机</strong>：有回边、有状态累积、有终止条件</li>
 </ul>
-<h3 id="Q8-ReAct-的-state-结构体是什么？"><a href="#Q8-ReAct-的-state-结构体是什么？" class="headerlink" title="Q8. ReAct 的 state 结构体是什么？"></a><span id="q8"></span>Q8. ReAct 的 <code>state</code> 结构体是什么？</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> &#123;</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Q8-ReAct-的-state-结构体是什么？"><a href="#Q8-ReAct-的-state-结构体是什么？" class="headerlink" title="Q8. ReAct 的 state 结构体是什么？"></a><span id="q8"></span>Q8. ReAct 的 <code>state</code> 结构体是什么？</h3><p><code>flow/agent/react/react.go</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> &#123;</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong><code>Messages</code> —— 整个 Agent 的记忆</strong></p>
 <ul>
@@ -599,19 +600,19 @@
 <p>两种写入方式：</p>
 <ul>
 <li>配置声明：<code>ToolReturnDirectly: map[string]struct{}{&quot;get_current_time&quot;: {}}</code></li>
-<li>工具运行时喊：<code>react.SetReturnDirectly(ctx)</code></li>
+<li>工具运行时喊：<code>react.SetReturnDirectly(ctx)</code>（<code>react.go</code>）</li>
 </ul>
 <p>存 <code>tool_call_id</code> 而不是工具名，是因为<strong>并行调用时要精确标记是哪一次</strong>。</p>
-<p>读取它的就是 Tools 之后那个分支函数：非空 → <code>direct_return</code> → END，空 → 回 ChatModel。</p>
-<p><strong>Pilot 现状</strong>：<code>ToolReturnDirectly</code> 是空 map，这条路没启用。</p>
-<p><strong>一个细节印证「state 可序列化」</strong>： 的 <code>schema.RegisterName[*state](&quot;_eino_react_state&quot;)</code>，注册类型名就是为了序列化&#x2F;checkpoint。</p>
+<p>读取它的就是 Tools 之后那个分支函数（<code>react.go</code>）：非空 → <code>direct_return</code> → END，空 → 回 ChatModel。</p>
+<p><strong>Pilot 现状</strong>：<code>ToolReturnDirectly</code> 是空 map（<code>full_agent.go</code>），这条路没启用。</p>
+<p><strong>一个细节印证「state 可序列化」</strong>：<code>react.go</code> 的 <code>schema.RegisterName[*state](&quot;_eino_react_state&quot;)</code>，注册类型名就是为了序列化&#x2F;checkpoint。</p>
 <h3 id="Q9-我现在到底是怎么停的？"><a href="#Q9-我现在到底是怎么停的？" class="headerlink" title="Q9. 我现在到底是怎么停的？"></a><span id="q9"></span>Q9. 我现在到底是怎么停的？</h3><p><strong>三条停止路径，只有一条读 state：</strong></p>
 <p><strong>路径一（Pilot 走的就是这条，零 state）</strong></p>
-<p><code>modelPostBranchCondition</code>只看<strong>模型输出的消息</strong>：</p>
+<p><code>modelPostBranchCondition</code>（<code>react.go</code>）只看<strong>模型输出的消息</strong>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.ToolCalls) &gt; <span class="number">0</span> &#123; <span class="keyword">return</span> <span class="literal">true</span>, <span class="literal">nil</span> &#125;   <span class="comment">// 去 Tools</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.Content) == <span class="number">0</span> &#123; <span class="keyword">continue</span> &#125;            <span class="comment">// 空 chunk 跳过</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>, <span class="literal">nil</span>                                <span class="comment">// 有文字没工具 → END</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>路径二（Pilot 未启用）</strong></p>
-<p> 的分支函数<strong>第一行就把输入流 <code>Close()</code> 掉，只读 state</strong>：</p>
+<p><code>react.go</code> 的分支函数<strong>第一行就把输入流 <code>Close()</code> 掉，只读 state</strong>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msgsStream.Close()</span><br><span class="line">compose.ProcessState[*state](ctx, <span class="function"><span class="keyword">func</span><span class="params">(_ context.Context, state *state)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(state.ReturnDirectlyToolCallID) &gt; <span class="number">0</span> &#123; endNode = nodeKeyDirectReturn &#125;</span><br><span class="line">	<span class="keyword">else</span> &#123; endNode = nodeKeyModel &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
 <p><strong>为什么这个信息非得放 state</strong>：<code>role:&quot;tool&quot;</code> 的消息里只有 <code>tool_call_id</code> 和 <code>content</code>，装不下「我要求直接返回」这种执行期元信息。</p>
@@ -622,7 +623,7 @@
 <h3 id="Q10-Eino-为什么是中心化的？"><a href="#Q10-Eino-为什么是中心化的？" class="headerlink" title="Q10. Eino 为什么是中心化的？"></a><span id="q10"></span>Q10. Eino 为什么是中心化的？</h3><p><strong>中心化 ≠ 部署在一台机器。判据是：谁决定下一步、谁持有状态、节点能不能自主发起。</strong></p>
 <p><strong>五个「中心」：</strong></p>
 <ol>
-<li><strong>编译期中心</strong>：<code>g.Compile()</code> 把图编成一个对象，结构静态固定</li>
+<li><strong>编译期中心</strong>：<code>g.Compile()</code> 把图编成一个对象，结构静态固定（<code>full_agent.go</code>）</li>
 <li><strong>调度中心</strong>：pregel 引擎决定谁跑、按 <code>AllPredecessor</code> &#x2F; <code>AnyPredecessor</code> 判触发、统一计步（撞 <code>MaxRunSteps</code> 就停）</li>
 <li><strong>状态中心</strong>：state 是引擎持有的全局对象，节点只能通过 <code>compose.ProcessState</code> 读写，<strong>节点之间不直接通信</strong></li>
 <li><strong>分支中心</strong>：<code>AddBranch</code> 的条件函数只返回节点名，由引擎去执行；<strong>节点不能自己跳转，只能”申请”</strong></li>
@@ -672,32 +673,32 @@
 
 <p><strong>无缓冲 vs 带缓冲语义</strong>：无缓冲 &#x3D; 当面交接（双方必须同时在场）；带缓冲 &#x3D; 放快递柜（有格子就放，接收方随时来取）。</p>
 <p><strong>Pilot 选带缓冲的理由</strong>：收集方天然要在全部结束后才处理，没有「边收边处理」需求。</p>
-<p><strong>完整正确模式</strong>：</p>
+<p><strong>完整正确模式（<code>orchestrator.go</code>）</strong>：</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">outcomes := <span class="built_in">make</span>(<span class="keyword">chan</span> outcome, <span class="built_in">len</span>(roles))  <span class="comment">// 缓冲=角色数</span></span><br><span class="line"><span class="keyword">var</span> group sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, role := <span class="keyword">range</span> roles &#123;</span><br><span class="line">	group.Add(<span class="number">1</span>)                             <span class="comment">// 在 go 之前</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(role Role, executor Executor)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> group.Done()</span><br><span class="line">		...</span><br><span class="line">		outcomes &lt;- outcome&#123;...&#125;</span><br><span class="line">	&#125;(role, executor)</span><br><span class="line">&#125;</span><br><span class="line">group.Wait()</span><br><span class="line"><span class="built_in">close</span>(outcomes)                              <span class="comment">// Wait 之后才 close</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>两个坑</strong>：channel 不保证顺序（所以要按 <code>roleOrder</code> 排序）；验证方式 <code>go test -race</code>。</p>
 <h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）"></a>四、多 Agent 编排（核心）</h2><h3 id="Q14-多-Agent-编排是怎么跑的？"><a href="#Q14-多-Agent-编排是怎么跑的？" class="headerlink" title="Q14. 多 Agent 编排是怎么跑的？"></a><span id="q14"></span>Q14. 多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
 <p><strong>五个阶段：</strong></p>
-<p><strong>① 入口 <code>Orchestrator.Execute</code></strong></p>
+<p><strong>① 入口 <code>Orchestrator.Execute</code></strong>（<code>orchestrator.go</code>）</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plan := o.planner.Plan(query)                                        <span class="comment">// :58 分诊</span></span><br><span class="line">findings, branchSteps, limitations := o.executeBranches(...)         <span class="comment">// :71 并行</span></span><br><span class="line">answer, err := o.synthesizer.Synthesize(...)                         <span class="comment">// :75 收敛</span></span><br></pre></td></tr></table></figure>
 
-<p><code>Orchestrator</code> 只有四个字段（<code>:28</code>）：<code>planner</code>、<code>executors map[Role]Executor</code>、<code>synthesizer</code>、<strong><code>now func() time.Time</code>（为了测试注入时钟）</strong>。</p>
-<p><strong>② 分诊 <code>RulePlanner.Plan</code></strong></p>
+<p><code>Orchestrator</code> 只有四个字段：<code>planner</code>、<code>executors map[Role]Executor</code>、<code>synthesizer</code>、<strong><code>now func() time.Time</code>（为了测试注入时钟）</strong>。</p>
+<p><strong>② 分诊 <code>RulePlanner.Plan</code></strong>（<code>routing.go</code>）</p>
 <ul>
-<li>正则抽服务名：<code>service=payment</code> &#x2F; <code>service: payment</code>，抽不到用默认</li>
+<li>正则抽服务名（<code>routing.go</code>）：<code>service=payment</code> &#x2F; <code>service: payment</code>，抽不到用默认</li>
 <li>三层关键词决定选哪些角色：知识类 → <code>[Knowledge, Synthesis]</code>；可观测类&#x2F;故障类 → <code>[Triage, Evidence, Knowledge, Synthesis]</code>；都没命中 → <code>[Triage, Knowledge, Synthesis]</code></li>
 <li>算 <code>SkippedRoles</code>：把没选中的显式列出来，<strong>表示”这里没查是因为不需要”</strong></li>
 </ul>
-<p><strong>③ 并行执行 <code>executeBranches</code></strong></p>
+<p><strong>③ 并行执行 <code>executeBranches</code></strong>（<code>orchestrator.go</code>）</p>
 <p>三条<strong>不进 goroutine</strong> 的短路路径：</p>
 <ul>
-<li>没被选中（<code>:128</code>）→ <code>StatusSkipped</code> Step</li>
-<li>executor 没注入（<code>:133</code>）→ <code>StatusFailed</code> + <code>EXECUTOR_UNAVAILABLE</code></li>
-<li>执行报错（<code>:144</code>）→ <code>StatusFailed</code> + 一条 <code>Limitation</code>，<strong>另一个分支照常跑</strong></li>
+<li>没被选中→ <code>StatusSkipped</code> Step</li>
+<li>executor 没注入→ <code>StatusFailed</code> + <code>EXECUTOR_UNAVAILABLE</code></li>
+<li>执行报错→ <code>StatusFailed</code> + 一条 <code>Limitation</code>，<strong>另一个分支照常跑</strong></li>
 </ul>
-<p><strong>④ 稳定排序</strong>（<code>:173-174</code>）：按 <code>rolePosition</code>（：triage → evidence → knowledge → synthesis）排。</p>
+<p><strong>④ 稳定排序</strong>：按 <code>rolePosition</code>（<code>model.go</code>：triage → evidence → knowledge → synthesis）排。</p>
 <p><strong>为什么必须排</strong>：channel 出来的顺序取决于谁先跑完，不排的话同样请求两次返回的数组顺序会不一样，前端渲染会抖。</p>
-<p><strong>⑤ 收敛</strong>（<code>:74-94</code>）：模型挂了<strong>不返回 error</strong>，走 <code>fallbackAnswer()</code>（<code>:187</code>）用确定性模板拼三段：<code>Current conclusion / Missing data / Suggested next step</code>。</p>
+<p><strong>⑤ 收敛</strong>：模型挂了<strong>不返回 error</strong>，走 <code>fallbackAnswer()</code>用确定性模板拼三段：<code>Current conclusion / Missing data / Suggested next step</code>。</p>
 <p><strong>「宁可给一份带缺口的证据摘要，也不编一个看起来很完整的答案。」</strong></p>
 <p><strong>数据结构（<code>model.go</code>）</strong>：</p>
 <ul>
@@ -709,7 +710,7 @@
 <li><code>Limitation</code>：Role、Code、Message</li>
 <li><code>Result</code>：Answer、Plan、Steps、Findings、Limitations、Metadata</li>
 </ul>
-<p><code>Step</code> 的注释：<strong>不暴露提示词或模型推理过程</strong>——这是边界意识。</p>
+<p><code>Step</code> 的注释（<code>model.go</code>）：<strong>不暴露提示词或模型推理过程</strong>——这是边界意识。</p>
 <p><strong>三个设计决策：</strong></p>
 <ol>
 <li><strong>分诊用规则不用模型</strong>：路由错的代价 &gt; 慢一点；可测试（<code>routing_test.go</code>）、不抖动、省一次调用。代价是泛化弱，关键词硬枚举</li>
@@ -1123,13 +1124,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2026/11/09/%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E7%9B%B8%E9%81%87/">
+                <a href="/2026/11/09/LeetCode-141-%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E7%9B%B8%E9%81%87/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="环形链表：快慢指针为什么必相遇">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="LeetCode 141. 环形链表：快慢指针为什么必相遇">
                         
-                        <span class="card-title">环形链表：快慢指针为什么必相遇</span>
+                        <span class="card-title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
                     </div>
                 </a>
                 <div class="card-content article-content">

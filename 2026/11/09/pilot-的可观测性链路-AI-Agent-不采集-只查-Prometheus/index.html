@@ -505,16 +505,20 @@
 <li>采集周期 <code>scrape_interval: 15s</code>。</li>
 <li>每 15 秒对 targets 里的每个地址发一次 GET，把文本解析成时序样本写进 TSDB。</li>
 <li><strong>“捕捉”这个动作真正发生在这里，不在 pilot。</strong></li>
-<li>当前 targets 只监控自己（这是能拿来讲的实证）：</li>
+<li>当前 targets 只监控自己（这是能拿来讲的实证）：<ul>
 <li>Prometheus 自己（<code>localhost:9090</code>）</li>
 <li>pilot 自己的 <code>/metrics</code>（<code>host.docker.internal:8081</code>）</li>
+</ul>
+</li>
 </ul>
 <h3 id="第-3-步：pilot-用-HTTP-API-查询"><a href="#第-3-步：pilot-用-HTTP-API-查询" class="headerlink" title="第 3 步：pilot 用 HTTP API 查询"></a>第 3 步：pilot 用 HTTP API 查询</h3><p>调用链从工具入口一路往下：</p>
 <ul>
 <li>工具入口 <code>GetAlerts</code>（模型调工具的地方）→ <code>collector.GetAlerts</code> → <code>clients.GetAlerts</code></li>
-<li><code>clients</code> 里发两个请求：</li>
+<li><code>clients</code> 里发两个请求：<ul>
 <li><code>GET /api/v1/alerts</code> — 当前在 firing 的告警</li>
 <li><code>GET /api/v1/query_range</code> — 按时间区间查曲线</li>
+</ul>
+</li>
 <li>配置里 Prometheus 地址是 <code>localhost:9090</code>；日志走 ES，trace 走 Jaeger。</li>
 </ul>
 <p>拿到 JSON 之后才轮到 pilot 干活，判断逻辑在 collector 里拼 PromQL：</p>
@@ -590,9 +594,11 @@
 <h2 id="5-“监控项目”到底监控什么（三层对象）"><a href="#5-“监控项目”到底监控什么（三层对象）" class="headerlink" title="5. “监控项目”到底监控什么（三层对象）"></a>5. “监控项目”到底监控什么（三层对象）</h2><p>最小可监控单元不是”项目”，而是「一个会暴露 <code>/metrics</code> 的东西」。</p>
 <ul>
 <li><strong>机器层（infra）</strong>：装 node_exporter → CPU &#x2F; 内存 &#x2F; 磁盘 &#x2F; IO &#x2F; 网络。靶机脚本造的 cpu&#x2F;mem&#x2F;disk&#x2F;io 故障就在这层。</li>
-<li><strong>服务层（应用）</strong>：应用暴露 <code>/metrics</code> → QPS、P95 延迟、5xx 比率、Goroutine 数。告警规则全在这层，例如：</li>
+<li><strong>服务层（应用）</strong>：应用暴露 <code>/metrics</code> → QPS、P95 延迟、5xx 比率、Goroutine 数。告警规则全在这层，例如：<ul>
 <li><code>sum(rate(pilot_http_requests_total{status=~&quot;5..&quot;}[5m])) &gt; 0</code></li>
 <li><code>histogram_quantile(0.95, ... route)) &gt; 1</code></li>
+</ul>
+</li>
 <li><strong>日志与链路层</strong>：collector 调 <code>QueryLogs</code> 从 ES 捞错误日志；trace 走 <code>GetTrace</code> 查 Jaeger。</li>
 </ul>
 <p>三段检查落在同一个函数里，顺序固定（<code>AnalyzeAnomalies</code>）：</p>
@@ -969,13 +975,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2026/11/09/%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E7%9B%B8%E9%81%87/">
+                <a href="/2026/11/09/LeetCode-141-%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E7%9B%B8%E9%81%87/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="环形链表：快慢指针为什么必相遇">
+                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="LeetCode 141. 环形链表：快慢指针为什么必相遇">
                         
-                        <span class="card-title">环形链表：快慢指针为什么必相遇</span>
+                        <span class="card-title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
