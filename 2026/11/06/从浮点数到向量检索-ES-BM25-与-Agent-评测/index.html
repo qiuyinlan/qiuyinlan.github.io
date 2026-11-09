@@ -38,7 +38,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-06T13:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T01:22:07.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T03:20:21.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="检索" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-page-meta="">
   
@@ -57,7 +57,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-06T21:00:00+08:00","dateModified":"2026-11-09T09:22:07+08:00","datePublished":"2026-11-06T21:00:00+08:00","description":"零、主干流程速查（先看这个）流程 A：一份文档入库（写）1234567Upload（带 title/content/category）  → 内容哈希生成 ID（不纳入 title）  → DocumentExists 查重：命中就 return，连 embedding 都不算  → Embedder 生成向量 → doc.Vector = vector  → json.Marshal 整个...","headline":"从浮点数到向量检索：ES、BM25 与 Agent 评测","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"检索","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-06T21:00:00+08:00","dateModified":"2026-11-09T11:20:21+08:00","datePublished":"2026-11-06T21:00:00+08:00","description":"零、主干流程速查（先看这个）流程 A：一份文档入库（写）1234567Upload（带 title/content/category）  → 内容哈希生成 ID（不纳入 title）  → DocumentExists 查重：命中就 return，连 embedding 都不算  → Embedder 生成向量 → doc.Vector = vector  → json.Marshal 整个...","headline":"从浮点数到向量检索：ES、BM25 与 Agent 评测","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"检索","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   
 
   <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
@@ -193,6 +193,78 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">从</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">J</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
 <a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" title="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-navigation="">
   
   
@@ -255,78 +327,6 @@
     <span class="ui-collection__content">
       
       <span class="ui-collection__title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">J</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">从</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
       
       
     </span>
@@ -401,8 +401,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">5096 字 · 预计阅读 17 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-06T13:00:00.000Z">2026-11-06</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T01:22:07.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">5125 字 · 预计阅读 18 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-06T13:00:00.000Z">2026-11-06</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:20:21.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -685,6 +685,10 @@
 <li>结尾一句话收口</li>
 </ol>
 <p>反面教材：第一次讲 ES 存向量时从倒排索引原理讲起，没落到代码，对方连问三轮（向量发给模型？文档存哪？哪一步存的？）才讲清——等于把对方的时间翻了三倍。</p>
+<h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章" data-stellar-navigation=""></a>相关文章</h2><ul>
+<li><a href="https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>Agent 架构、Eino 内部机制与多 Agent 编排</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</a></li>
+</ul>
 </article>
 <div class="article-tags slide-up"><a class="tag" href="/tags/%E6%A3%80%E7%B4%A2/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>检索</a></div>
 
@@ -723,7 +727,7 @@
       <button type="button" class="cap-action ui-interactive card-hover card-hover--spotlight" data-shell-action="toggle-toc" aria-label="Toggle table of contents" aria-pressed="false"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg></span></button>
     </div>
   
-  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E6%B5%81%E7%A8%8B%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干流程速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9A%E4%B8%80%E4%BB%BD%E6%96%87%E6%A1%A3%E5%85%A5%E5%BA%93%EF%BC%88%E5%86%99%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 A：一份文档入库（写）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E4%B8%80%E6%AC%A1%E6%A3%80%E7%B4%A2%EF%BC%88%E8%AF%BB%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 B：一次检索（读）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-C%EF%BC%9A%E4%B8%80%E6%AC%A1%E8%AF%84%E4%BC%B0%EF%BC%88%E8%AF%84%E6%B5%8B%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 C：一次评估（评测）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81%E6%B5%AE%E7%82%B9%E6%95%B0" data-stellar-navigation=""><span class="toc-text">一、浮点数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-%E6%B5%AE%E7%82%B9%E6%95%B0%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. 浮点数是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-%E5%90%91%E9%87%8F%E6%A8%A1%E5%9E%8B%E4%B9%9F%E8%BF%94%E5%9B%9E%E6%B5%AE%E7%82%B9%E6%95%B0%EF%BC%8C%E9%82%A3%E4%B8%8D%E5%B0%B1%E4%B8%8D%E7%B2%BE%E7%A1%AE%E4%BA%86%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. 向量模型也返回浮点数，那不就不精确了？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-%E5%86%85%E5%AE%B9%E4%B8%80%E6%A0%B7%E3%80%81%E5%90%8D%E5%AD%97%E4%B8%8D%E4%B8%80%E6%A0%B7%EF%BC%8C%E4%BC%9A%E7%AE%97%E4%B8%A4%E9%81%8D%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. 内容一样、名字不一样，会算两遍吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Pilot-%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8E%BB%E9%87%8D%E6%94%B9%E9%80%A0%EF%BC%88%E4%BB%A3%E7%A0%81%EF%BC%89" data-stellar-navigation=""><span class="toc-text">二、Pilot 知识库去重改造（代码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-%E5%8E%9F%E6%9D%A5%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%9C%89%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. 原来的实现有什么问题？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-%E6%94%B9%E6%88%90%E4%BA%86%E4%BB%80%E4%B9%88%E6%A0%B7%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. 改成了什么样？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81ES-%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E5%AD%98%E7%9A%84" data-stellar-navigation=""><span class="toc-text">三、ES 到底怎么存的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-ES-%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AA%E6%97%A0%E9%99%90%E5%AD%98-JSON-%E7%9A%84%E6%96%87%E6%A1%A3%E5%BA%93%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. ES 就是一个无限存 JSON 的文档库吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-MySQL-%E8%83%8C%E5%90%8E%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%87%E4%BB%B6%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. MySQL 背后是一个文件吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-%E4%B8%BA%E4%BB%80%E4%B9%88-40G-%E4%BA%91%E7%9B%98%E4%B8%80%E7%BC%96%E8%AF%91%E5%B0%B1%E6%8C%82%EF%BC%9F%E7%9B%98%E4%B8%8D%E6%98%AF%E6%8C%BA%E5%A4%A7%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. 为什么 40G 云盘一编译就挂？盘不是挺大吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E4%B8%8E-BM25" data-stellar-navigation=""><span class="toc-text">四、倒排索引与 BM25</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-%E4%BB%80%E4%B9%88%E6%98%AF%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. 什么是倒排索引？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-BM25-%E4%B8%80%E5%AE%9A%E8%A6%81%E9%85%8D%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. BM25 一定要配倒排索引吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%94%E3%80%81%E5%90%91%E9%87%8F%E6%80%8E%E4%B9%88%E5%AD%98%E3%80%81%E6%80%8E%E4%B9%88%E6%A3%80%E7%B4%A2%EF%BC%88%E8%B5%B0%E4%BB%A3%E7%A0%81%EF%BC%89" data-stellar-navigation=""><span class="toc-text">五、向量怎么存、怎么检索（走代码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E5%90%91%E9%87%8F%E6%98%AF%E5%93%AA%E4%B8%80%E6%AD%A5%E5%AD%98%E7%9A%84%EF%BC%9F%E5%85%B6%E4%BB%96%E4%BF%A1%E6%81%AF%E5%93%AA%E4%B8%80%E6%AD%A5%E4%BC%A0%E8%BF%9B%E5%8E%BB%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 向量是哪一步存的？其他信息哪一步传进去的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E5%8F%AA%E5%8F%91%E5%90%91%E9%87%8F%EF%BC%8C%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E5%80%92%E6%8E%92%EF%BC%9F%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 只发向量，模型怎么倒排？文档内容在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q13-%E5%AE%8C%E6%95%B4%E6%A3%80%E7%B4%A2%E9%93%BE%E8%B7%AF" data-stellar-navigation=""><span class="toc-text">Q13. 完整检索链路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AD%E3%80%81Agent-%E8%AF%84%E6%B5%8B" data-stellar-navigation=""><span class="toc-text">六、Agent 评测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q14-%E6%80%8E%E4%B9%88%E8%AF%84%E4%BB%B7%E4%B8%80%E4%B8%AA-Agent-%E7%9A%84%E8%A1%A8%E7%8E%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q14. 怎么评价一个 Agent 的表现？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q15-%E3%80%8C%E8%87%AA%E5%8A%A8%E6%AF%94%E5%AF%B9%E3%80%8D%E5%85%B7%E4%BD%93%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%9F%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90" data-stellar-navigation=""><span class="toc-text">Q15. 「自动比对」具体怎么做？举个例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q16-%E8%BF%99%E6%98%AF%E4%B8%93%E9%97%A8%E7%9A%84%E8%AF%84%E6%B5%8B%E8%84%9A%E6%9C%AC%E5%81%9A%E7%9A%84%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q16. 这是专门的评测脚本做的吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q17-%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%9A%84-JSON-%E6%98%AF%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%AC%E6%9D%A5%E5%B0%B1%E6%9C%89%E5%90%97%EF%BC%9F%E6%96%B9%E4%BE%BF%E5%90%8E%E7%BB%AD%E8%AF%84%E6%B5%8B%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q17. 工具调用的 JSON 是执行时本来就有吗？方便后续评测吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%83%E3%80%81%E6%96%B9%E6%B3%95%E8%AE%BA%E6%B2%89%E6%B7%80%EF%BC%88%E8%AE%B2%E6%8A%80%E6%9C%AF%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF%EF%BC%89" data-stellar-navigation=""><span class="toc-text">七、方法论沉淀（讲技术的正确姿势）</span></a></li></ol></div>
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E6%B5%81%E7%A8%8B%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干流程速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9A%E4%B8%80%E4%BB%BD%E6%96%87%E6%A1%A3%E5%85%A5%E5%BA%93%EF%BC%88%E5%86%99%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 A：一份文档入库（写）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E4%B8%80%E6%AC%A1%E6%A3%80%E7%B4%A2%EF%BC%88%E8%AF%BB%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 B：一次检索（读）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-C%EF%BC%9A%E4%B8%80%E6%AC%A1%E8%AF%84%E4%BC%B0%EF%BC%88%E8%AF%84%E6%B5%8B%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 C：一次评估（评测）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81%E6%B5%AE%E7%82%B9%E6%95%B0" data-stellar-navigation=""><span class="toc-text">一、浮点数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-%E6%B5%AE%E7%82%B9%E6%95%B0%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. 浮点数是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-%E5%90%91%E9%87%8F%E6%A8%A1%E5%9E%8B%E4%B9%9F%E8%BF%94%E5%9B%9E%E6%B5%AE%E7%82%B9%E6%95%B0%EF%BC%8C%E9%82%A3%E4%B8%8D%E5%B0%B1%E4%B8%8D%E7%B2%BE%E7%A1%AE%E4%BA%86%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. 向量模型也返回浮点数，那不就不精确了？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-%E5%86%85%E5%AE%B9%E4%B8%80%E6%A0%B7%E3%80%81%E5%90%8D%E5%AD%97%E4%B8%8D%E4%B8%80%E6%A0%B7%EF%BC%8C%E4%BC%9A%E7%AE%97%E4%B8%A4%E9%81%8D%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. 内容一样、名字不一样，会算两遍吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Pilot-%E7%9F%A5%E8%AF%86%E5%BA%93%E5%8E%BB%E9%87%8D%E6%94%B9%E9%80%A0%EF%BC%88%E4%BB%A3%E7%A0%81%EF%BC%89" data-stellar-navigation=""><span class="toc-text">二、Pilot 知识库去重改造（代码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-%E5%8E%9F%E6%9D%A5%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%9C%89%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. 原来的实现有什么问题？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-%E6%94%B9%E6%88%90%E4%BA%86%E4%BB%80%E4%B9%88%E6%A0%B7%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. 改成了什么样？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81ES-%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E5%AD%98%E7%9A%84" data-stellar-navigation=""><span class="toc-text">三、ES 到底怎么存的</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-ES-%E5%B0%B1%E6%98%AF%E4%B8%80%E4%B8%AA%E6%97%A0%E9%99%90%E5%AD%98-JSON-%E7%9A%84%E6%96%87%E6%A1%A3%E5%BA%93%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. ES 就是一个无限存 JSON 的文档库吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-MySQL-%E8%83%8C%E5%90%8E%E6%98%AF%E4%B8%80%E4%B8%AA%E6%96%87%E4%BB%B6%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. MySQL 背后是一个文件吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-%E4%B8%BA%E4%BB%80%E4%B9%88-40G-%E4%BA%91%E7%9B%98%E4%B8%80%E7%BC%96%E8%AF%91%E5%B0%B1%E6%8C%82%EF%BC%9F%E7%9B%98%E4%B8%8D%E6%98%AF%E6%8C%BA%E5%A4%A7%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. 为什么 40G 云盘一编译就挂？盘不是挺大吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E4%B8%8E-BM25" data-stellar-navigation=""><span class="toc-text">四、倒排索引与 BM25</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-%E4%BB%80%E4%B9%88%E6%98%AF%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. 什么是倒排索引？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-BM25-%E4%B8%80%E5%AE%9A%E8%A6%81%E9%85%8D%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. BM25 一定要配倒排索引吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%94%E3%80%81%E5%90%91%E9%87%8F%E6%80%8E%E4%B9%88%E5%AD%98%E3%80%81%E6%80%8E%E4%B9%88%E6%A3%80%E7%B4%A2%EF%BC%88%E8%B5%B0%E4%BB%A3%E7%A0%81%EF%BC%89" data-stellar-navigation=""><span class="toc-text">五、向量怎么存、怎么检索（走代码）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E5%90%91%E9%87%8F%E6%98%AF%E5%93%AA%E4%B8%80%E6%AD%A5%E5%AD%98%E7%9A%84%EF%BC%9F%E5%85%B6%E4%BB%96%E4%BF%A1%E6%81%AF%E5%93%AA%E4%B8%80%E6%AD%A5%E4%BC%A0%E8%BF%9B%E5%8E%BB%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 向量是哪一步存的？其他信息哪一步传进去的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E5%8F%AA%E5%8F%91%E5%90%91%E9%87%8F%EF%BC%8C%E6%A8%A1%E5%9E%8B%E6%80%8E%E4%B9%88%E5%80%92%E6%8E%92%EF%BC%9F%E6%96%87%E6%A1%A3%E5%86%85%E5%AE%B9%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 只发向量，模型怎么倒排？文档内容在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q13-%E5%AE%8C%E6%95%B4%E6%A3%80%E7%B4%A2%E9%93%BE%E8%B7%AF" data-stellar-navigation=""><span class="toc-text">Q13. 完整检索链路</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AD%E3%80%81Agent-%E8%AF%84%E6%B5%8B" data-stellar-navigation=""><span class="toc-text">六、Agent 评测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q14-%E6%80%8E%E4%B9%88%E8%AF%84%E4%BB%B7%E4%B8%80%E4%B8%AA-Agent-%E7%9A%84%E8%A1%A8%E7%8E%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q14. 怎么评价一个 Agent 的表现？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q15-%E3%80%8C%E8%87%AA%E5%8A%A8%E6%AF%94%E5%AF%B9%E3%80%8D%E5%85%B7%E4%BD%93%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%9F%E4%B8%BE%E4%B8%AA%E4%BE%8B%E5%AD%90" data-stellar-navigation=""><span class="toc-text">Q15. 「自动比对」具体怎么做？举个例子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q16-%E8%BF%99%E6%98%AF%E4%B8%93%E9%97%A8%E7%9A%84%E8%AF%84%E6%B5%8B%E8%84%9A%E6%9C%AC%E5%81%9A%E7%9A%84%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q16. 这是专门的评测脚本做的吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q17-%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E7%9A%84-JSON-%E6%98%AF%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%AC%E6%9D%A5%E5%B0%B1%E6%9C%89%E5%90%97%EF%BC%9F%E6%96%B9%E4%BE%BF%E5%90%8E%E7%BB%AD%E8%AF%84%E6%B5%8B%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q17. 工具调用的 JSON 是执行时本来就有吗？方便后续评测吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%83%E3%80%81%E6%96%B9%E6%B3%95%E8%AE%BA%E6%B2%89%E6%B7%80%EF%BC%88%E8%AE%B2%E6%8A%80%E6%9C%AF%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF%EF%BC%89" data-stellar-navigation=""><span class="toc-text">七、方法论沉淀（讲技术的正确姿势）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0" data-stellar-navigation=""><span class="toc-text">相关文章</span></a></li></ol></div>
   <div class="widget-footer"><a class="top ui-interactive" onclick="util.scrollTop()"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M20.536 3.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464" opacity=".5"></path><path fill="currentColor" d="M9.53 12.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 9.56z"></path><path fill="currentColor" d="M9.53 16.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 13.56z"></path></svg></span><span>回到顶部</span></a></div>
 </widget>
 
@@ -802,4 +806,4 @@
 <script data-stellar-script="core" defer="" src="/js/navigation-init.js?v=2.0.0"></script>
 </div>
 
-<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","signature":"6cabaa1bdd0625d2c38020cccbf7f9122e4884aac7dc482c39b92d08f7f97fdc"}</script></body></html>
+<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","signature":"979457b31b69508f86e40bd9f6c134b7c49a9f4370ffd8d5122f19f4c89bcbac"}</script></body></html>

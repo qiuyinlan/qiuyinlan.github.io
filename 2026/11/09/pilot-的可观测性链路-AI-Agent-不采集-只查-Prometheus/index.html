@@ -38,7 +38,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-09T13:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T03:12:45.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T03:20:21.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="go" data-stellar-page-meta="">
 <meta property="article:tag" content="可观测性" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus" data-stellar-page-meta="">
@@ -58,7 +58,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T21:00:00+08:00","dateModified":"2026-11-09T11:12:45+08:00","datePublished":"2026-11-09T21:00:00+08:00","description":"0. 一句话结论pilot 不采集任何指标，它只查 Prometheus。\n它不认识”机器”，只认识一个 URL。所以”监控另一台机器”改的不是代码，是 Prometheus 的 targets 列表。\n1. 三跳链路（两头都不直连）12345靶机 node_exporter:9100      ↑ Prometheus 每 15s 主动拉Prometheus:9090      ↑ pil...","headline":"pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"可观测性, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-09T21:00:00+08:00","dateModified":"2026-11-09T11:20:21+08:00","datePublished":"2026-11-09T21:00:00+08:00","description":"0. 一句话结论pilot 不采集任何指标，它只查 Prometheus。\n它不认识”机器”，只认识一个 URL。所以”监控另一台机器”改的不是代码，是 Prometheus 的 targets 列表。\n1. 三跳链路（两头都不直连）12345靶机 node_exporter:9100      ↑ Prometheus 每 15s 主动拉Prometheus:9090      ↑ pil...","headline":"pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"可观测性, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   
 
   <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
@@ -194,6 +194,78 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">从</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">J</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
 <a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" title="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-navigation="">
   
   
@@ -256,78 +328,6 @@
     <span class="ui-collection__content">
       
       <span class="ui-collection__title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">J</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">从</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
       
       
     </span>
@@ -402,8 +402,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">2599 字 · 预计阅读 9 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T13:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:12:45.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">2631 字 · 预计阅读 9 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-09T13:00:00.000Z">2026-11-09</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:20:21.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -634,6 +634,10 @@
 <p>之所以这么设计，是因为要回答”过去半小时发生了什么”就必须有时序存储，而采集必须独立于提问、固定频率地进行，所以拆成采集端和查询端。好处是 pilot 对业务零侵入，换监控对象只改 Prometheus 的 targets，代码不用动；代价是没接 Prometheus 就什么都看不见。</p>
 </blockquote>
 <p><strong>追问预案</strong>：为什么不装 agent 直接采集？→ 见第 5 节末尾的定位口径。</p>
+<h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章" data-stellar-navigation=""></a>相关文章</h2><ul>
+<li><a href="https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>Agent 架构、Eino 内部机制与多 Agent 编排</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>从浮点数到向量检索：ES、BM25 与 Agent 评测</a></li>
+</ul>
 </article>
 <div class="article-tags slide-up"><a class="tag" href="/tags/go/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>go</a><a class="tag" href="/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>可观测性</a></div>
 
@@ -672,7 +676,7 @@
       <button type="button" class="cap-action ui-interactive card-hover card-hover--spotlight" data-shell-action="toggle-toc" aria-label="Toggle table of contents" aria-pressed="false"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg></span></button>
     </div>
   
-  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#0-%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%BB%93%E8%AE%BA" data-stellar-navigation=""><span class="toc-text">0. 一句话结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#1-%E4%B8%89%E8%B7%B3%E9%93%BE%E8%B7%AF%EF%BC%88%E4%B8%A4%E5%A4%B4%E9%83%BD%E4%B8%8D%E7%9B%B4%E8%BF%9E%EF%BC%89" data-stellar-navigation=""><span class="toc-text">1. 三跳链路（两头都不直连）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#2-%E4%B8%89%E6%AD%A5%E6%8B%86%E5%BC%80%E7%9C%8B" data-stellar-navigation=""><span class="toc-text">2. 三步拆开看</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-1-%E6%AD%A5%EF%BC%9A%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2-metrics" data-stellar-navigation=""><span class="toc-text">第 1 步：服务暴露 /metrics</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-2-%E6%AD%A5%EF%BC%9APrometheus-%E4%B8%BB%E5%8A%A8%E6%8B%89%E5%8F%96" data-stellar-navigation=""><span class="toc-text">第 2 步：Prometheus 主动拉取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-3-%E6%AD%A5%EF%BC%9Apilot-%E7%94%A8-HTTP-API-%E6%9F%A5%E8%AF%A2" data-stellar-navigation=""><span class="toc-text">第 3 步：pilot 用 HTTP API 查询</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#3-pilot-%E6%80%8E%E4%B9%88%E6%8A%8A%E6%95%B0%E6%8D%AE%E7%9C%9F%E6%AD%A3%E6%8B%BF%E5%88%B0%E6%89%8B%EF%BC%9A%E4%B8%89%E4%B8%AA-HTTP-client" data-stellar-navigation=""><span class="toc-text">3. pilot 怎么把数据真正拿到手：三个 HTTP client</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%80%E6%AC%A1%E6%9F%A5%E8%AF%A2%E7%9A%84%E5%9B%BA%E5%AE%9A%E4%BA%94%E6%AD%A5" data-stellar-navigation=""><span class="toc-text">一次查询的固定五步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%BA%94%E4%B8%AA%E7%AB%AF%E7%82%B9%EF%BC%8C%E5%8F%AA%E6%9C%89%E2%80%9D%E6%80%8E%E4%B9%88%E6%8B%BC%E8%AF%B7%E6%B1%82%E2%80%9D%E4%B8%8D%E5%90%8C" data-stellar-navigation=""><span class="toc-text">五个端点，只有”怎么拼请求”不同</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E9%94%99%E8%AF%AF%E5%88%86%E4%B8%A4%E5%B1%82%EF%BC%8C%E5%8F%AA%E5%88%A4%E7%8A%B6%E6%80%81%E7%A0%81%E4%BC%9A%E6%BC%8F" data-stellar-navigation=""><span class="toc-text">错误分两层，只判状态码会漏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%BB%93%E6%9E%9C%E6%9C%80%E5%90%8E%E6%80%8E%E4%B9%88%E5%8F%98%E5%9B%9E%E7%BB%99%E6%A8%A1%E5%9E%8B%E7%9C%8B%E7%9A%84%E6%96%87%E6%9C%AC" data-stellar-navigation=""><span class="toc-text">结果最后怎么变回给模型看的文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%80%E6%AC%A1%E5%BC%82%E5%B8%B8%E5%88%86%E6%9E%90%E4%BC%9A%E5%8F%91%E4%B8%89%E4%B8%AA%E8%AF%B7%E6%B1%82%EF%BC%8C%E4%B8%B2%E8%A1%8C" data-stellar-navigation=""><span class="toc-text">一次异常分析会发三个请求，串行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#4-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E8%BF%99%E4%B8%AA%E6%9E%B6%E6%9E%84%EF%BC%88%E5%9B%A0%E6%9E%9C%E9%93%BE%EF%BC%8C%E4%B8%80%E4%B8%AA%E9%80%BC%E4%B8%80%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">4. 为什么是这个架构（因果链，一个逼一个）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#5-%E2%80%9C%E7%9B%91%E6%8E%A7%E9%A1%B9%E7%9B%AE%E2%80%9D%E5%88%B0%E5%BA%95%E7%9B%91%E6%8E%A7%E4%BB%80%E4%B9%88%EF%BC%88%E4%B8%89%E5%B1%82%E5%AF%B9%E8%B1%A1%EF%BC%89" data-stellar-navigation=""><span class="toc-text">5. “监控项目”到底监控什么（三层对象）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#6-%E8%87%AA%E8%A7%82%E6%B5%8B%E9%97%AD%E7%8E%AF%EF%BC%88pilot-%E8%87%AA%E5%B7%B1%E4%B9%9F%E8%A2%AB%E8%A7%82%E6%B5%8B%EF%BC%89" data-stellar-navigation=""><span class="toc-text">6. 自观测闭环（pilot 自己也被观测）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#7-%E9%83%A8%E7%BD%B2%E4%BD%8D%E7%BD%AE%EF%BC%9A%E4%B8%8D%E6%98%AF%E2%80%9D%E6%9C%AC%E6%9C%BA-vs-%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E2%80%9D%EF%BC%8C%E6%98%AF%E2%80%9D%E5%90%8C%E6%9C%BA%E8%BF%98%E6%98%AF%E5%88%86%E5%BC%80%E2%80%9D" data-stellar-navigation=""><span class="toc-text">7. 部署位置：不是”本机 vs 云服务器”，是”同机还是分开”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#8-%E9%9D%A2%E8%AF%95%E6%80%8E%E4%B9%88%E7%AD%94%EF%BC%8830-%E7%A7%92%E7%89%88%EF%BC%89" data-stellar-navigation=""><span class="toc-text">8. 面试怎么答（30 秒版）</span></a></li></ol></div>
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#0-%E4%B8%80%E5%8F%A5%E8%AF%9D%E7%BB%93%E8%AE%BA" data-stellar-navigation=""><span class="toc-text">0. 一句话结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#1-%E4%B8%89%E8%B7%B3%E9%93%BE%E8%B7%AF%EF%BC%88%E4%B8%A4%E5%A4%B4%E9%83%BD%E4%B8%8D%E7%9B%B4%E8%BF%9E%EF%BC%89" data-stellar-navigation=""><span class="toc-text">1. 三跳链路（两头都不直连）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#2-%E4%B8%89%E6%AD%A5%E6%8B%86%E5%BC%80%E7%9C%8B" data-stellar-navigation=""><span class="toc-text">2. 三步拆开看</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-1-%E6%AD%A5%EF%BC%9A%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2-metrics" data-stellar-navigation=""><span class="toc-text">第 1 步：服务暴露 /metrics</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-2-%E6%AD%A5%EF%BC%9APrometheus-%E4%B8%BB%E5%8A%A8%E6%8B%89%E5%8F%96" data-stellar-navigation=""><span class="toc-text">第 2 步：Prometheus 主动拉取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%AC%AC-3-%E6%AD%A5%EF%BC%9Apilot-%E7%94%A8-HTTP-API-%E6%9F%A5%E8%AF%A2" data-stellar-navigation=""><span class="toc-text">第 3 步：pilot 用 HTTP API 查询</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#3-pilot-%E6%80%8E%E4%B9%88%E6%8A%8A%E6%95%B0%E6%8D%AE%E7%9C%9F%E6%AD%A3%E6%8B%BF%E5%88%B0%E6%89%8B%EF%BC%9A%E4%B8%89%E4%B8%AA-HTTP-client" data-stellar-navigation=""><span class="toc-text">3. pilot 怎么把数据真正拿到手：三个 HTTP client</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%80%E6%AC%A1%E6%9F%A5%E8%AF%A2%E7%9A%84%E5%9B%BA%E5%AE%9A%E4%BA%94%E6%AD%A5" data-stellar-navigation=""><span class="toc-text">一次查询的固定五步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%BA%94%E4%B8%AA%E7%AB%AF%E7%82%B9%EF%BC%8C%E5%8F%AA%E6%9C%89%E2%80%9D%E6%80%8E%E4%B9%88%E6%8B%BC%E8%AF%B7%E6%B1%82%E2%80%9D%E4%B8%8D%E5%90%8C" data-stellar-navigation=""><span class="toc-text">五个端点，只有”怎么拼请求”不同</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E9%94%99%E8%AF%AF%E5%88%86%E4%B8%A4%E5%B1%82%EF%BC%8C%E5%8F%AA%E5%88%A4%E7%8A%B6%E6%80%81%E7%A0%81%E4%BC%9A%E6%BC%8F" data-stellar-navigation=""><span class="toc-text">错误分两层，只判状态码会漏</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E7%BB%93%E6%9E%9C%E6%9C%80%E5%90%8E%E6%80%8E%E4%B9%88%E5%8F%98%E5%9B%9E%E7%BB%99%E6%A8%A1%E5%9E%8B%E7%9C%8B%E7%9A%84%E6%96%87%E6%9C%AC" data-stellar-navigation=""><span class="toc-text">结果最后怎么变回给模型看的文本</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%80%E6%AC%A1%E5%BC%82%E5%B8%B8%E5%88%86%E6%9E%90%E4%BC%9A%E5%8F%91%E4%B8%89%E4%B8%AA%E8%AF%B7%E6%B1%82%EF%BC%8C%E4%B8%B2%E8%A1%8C" data-stellar-navigation=""><span class="toc-text">一次异常分析会发三个请求，串行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#4-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E8%BF%99%E4%B8%AA%E6%9E%B6%E6%9E%84%EF%BC%88%E5%9B%A0%E6%9E%9C%E9%93%BE%EF%BC%8C%E4%B8%80%E4%B8%AA%E9%80%BC%E4%B8%80%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">4. 为什么是这个架构（因果链，一个逼一个）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#5-%E2%80%9C%E7%9B%91%E6%8E%A7%E9%A1%B9%E7%9B%AE%E2%80%9D%E5%88%B0%E5%BA%95%E7%9B%91%E6%8E%A7%E4%BB%80%E4%B9%88%EF%BC%88%E4%B8%89%E5%B1%82%E5%AF%B9%E8%B1%A1%EF%BC%89" data-stellar-navigation=""><span class="toc-text">5. “监控项目”到底监控什么（三层对象）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#6-%E8%87%AA%E8%A7%82%E6%B5%8B%E9%97%AD%E7%8E%AF%EF%BC%88pilot-%E8%87%AA%E5%B7%B1%E4%B9%9F%E8%A2%AB%E8%A7%82%E6%B5%8B%EF%BC%89" data-stellar-navigation=""><span class="toc-text">6. 自观测闭环（pilot 自己也被观测）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#7-%E9%83%A8%E7%BD%B2%E4%BD%8D%E7%BD%AE%EF%BC%9A%E4%B8%8D%E6%98%AF%E2%80%9D%E6%9C%AC%E6%9C%BA-vs-%E4%BA%91%E6%9C%8D%E5%8A%A1%E5%99%A8%E2%80%9D%EF%BC%8C%E6%98%AF%E2%80%9D%E5%90%8C%E6%9C%BA%E8%BF%98%E6%98%AF%E5%88%86%E5%BC%80%E2%80%9D" data-stellar-navigation=""><span class="toc-text">7. 部署位置：不是”本机 vs 云服务器”，是”同机还是分开”</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#8-%E9%9D%A2%E8%AF%95%E6%80%8E%E4%B9%88%E7%AD%94%EF%BC%8830-%E7%A7%92%E7%89%88%EF%BC%89" data-stellar-navigation=""><span class="toc-text">8. 面试怎么答（30 秒版）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0" data-stellar-navigation=""><span class="toc-text">相关文章</span></a></li></ol></div>
   <div class="widget-footer"><a class="top ui-interactive" onclick="util.scrollTop()"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M20.536 3.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464" opacity=".5"></path><path fill="currentColor" d="M9.53 12.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 9.56z"></path><path fill="currentColor" d="M9.53 16.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 13.56z"></path></svg></span><span>回到顶部</span></a></div>
 </widget>
 
@@ -751,4 +755,4 @@
 <script data-stellar-script="core" defer="" src="/js/navigation-init.js?v=2.0.0"></script>
 </div>
 
-<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/","signature":"c599e2252571043a0c8709b71578c2caa3380376c299551947a460c065b95fb6"}</script></body></html>
+<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/","signature":"5b3f807c5c53ec6db9cb49c1e9eb76ca1ece3d875a9b6f07185f6a8dfd037543"}</script></body></html>

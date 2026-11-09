@@ -38,7 +38,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-08T13:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-09T03:12:45.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T03:20:21.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="agent" data-stellar-page-meta="">
 <meta property="article:tag" content="go" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-page-meta="">
@@ -58,7 +58,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-08T21:00:00+08:00","dateModified":"2026-11-09T11:12:45+08:00","datePublished":"2026-11-08T21:00:00+08:00","description":"零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行...","headline":"Agent 架构、Eino 内部机制与多 Agent 编排","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-08T21:00:00+08:00","dateModified":"2026-11-09T11:20:21+08:00","datePublished":"2026-11-08T21:00:00+08:00","description":"零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行...","headline":"Agent 架构、Eino 内部机制与多 Agent 编排","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   
 
   <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
@@ -194,6 +194,78 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">从</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">J</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
 <a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" title="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-navigation="">
   
   
@@ -256,78 +328,6 @@
     <span class="ui-collection__content">
       
       <span class="ui-collection__title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">J</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">从</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">H</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
       
       
     </span>
@@ -402,8 +402,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">9096 字 · 预计阅读 31 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:12:45.000Z">2026-11-09</time></span></div>
+</div><div class="right"><span class="cap reading">9143 字 · 预计阅读 31 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T03:20:21.000Z">2026-11-09</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -961,6 +961,11 @@
 <p><strong>边界</strong>：壳在 <code>internal/ai/agent</code> + <code>tools</code> + <code>prompt</code>；芯是 <code>models.NewMainChatModel</code>（qwen-plus）。</p>
 <p><strong>面试口径</strong>：别只答「五层/六层」就停，要接一句「去掉这层会怎样」——那才是踩过坑的证据。</p>
 <p><strong>用户原话/补充</strong>：（待补）</p>
+<h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章" data-stellar-navigation=""></a>相关文章</h2><ul>
+<li><a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>从浮点数到向量检索：ES、BM25 与 Agent 评测</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</a></li>
+</ul>
 </article>
 <div class="article-tags slide-up"><a class="tag" href="/tags/agent/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>agent</a><a class="tag" href="/tags/go/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>go</a></div>
 
@@ -999,7 +1004,7 @@
       <button type="button" class="cap-action ui-interactive card-hover card-hover--spotlight" data-shell-action="toggle-toc" aria-label="Toggle table of contents" aria-pressed="false"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg></span></button>
     </div>
   
-  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9AEino-ReAct-%E4%B8%80%E6%AC%A1%E5%BE%80%E8%BF%94%EF%BC%88%E8%B0%81%E5%8F%91%E8%B5%B7%E3%80%81%E8%B0%81%E6%89%A7%E8%A1%8C%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 A：Eino ReAct 一次往返（谁发起、谁执行）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E5%A4%9A-Agent-%E6%8E%92%E9%9A%9C%E7%BC%96%E6%8E%92" data-stellar-navigation=""><span class="toc-text">流程 B：多 Agent 排障编排</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81Agent-%E6%A1%86%E6%9E%B6%E4%B8%8E%E6%9E%B6%E6%9E%84%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">一、Agent 框架与架构选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-%E6%9C%89%E5%93%AA%E4%BA%9B-Agent-%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-LangGraph%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-ReAct-%E5%92%8C-Plan-Execute-%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. ReAct 和 Plan-Execute 的使用场景？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-%E6%9C%89%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84-Agent-%E6%A1%86%E6%9E%B6%E5%90%97%EF%BC%9F%E7%94%A8%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. 有去中心化的 Agent 框架吗？用在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-Agent-%E4%B9%8B%E9%97%B4%E6%98%AF%E6%80%8E%E4%B9%88%E4%BA%A4%E6%B5%81%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. Agent 之间是怎么交流的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-sub-agent-%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. sub-agent 怎么实现？为什么要做？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6" data-stellar-navigation=""><span class="toc-text">二、Eino 内部机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-Chain-%E4%B8%8D%E8%83%BD%E5%BE%AA%E7%8E%AF%E5%90%97%EF%BC%9F%E5%9B%BE%E5%8F%AF%E4%BB%A5%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. Chain 不能循环吗？图可以？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-%E3%80%8C%E5%9B%BE%E6%98%AF%E7%8A%B6%E6%80%81%E6%9C%BA%E3%80%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D%EF%BC%9FChain-%E4%B8%8D%E6%98%AF%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. 「图是状态机」是什么意思？Chain 不是吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-ReAct-%E7%9A%84-state-%E7%BB%93%E6%9E%84%E4%BD%93%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. ReAct 的 state 结构体是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-%E6%88%91%E7%8E%B0%E5%9C%A8%E5%88%B0%E5%BA%95%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9C%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. 我现在到底是怎么停的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-Eino-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. Eino 为什么是中心化的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81Go-%E5%B9%B6%E5%8F%91%EF%BC%9Achannel-%E6%94%B6%E7%BB%93%E6%9E%9C" data-stellar-navigation=""><span class="toc-text">三、Go 并发：channel 收结果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8-WaitGroup%EF%BC%9Fchannel-%E4%B8%8D%E8%83%BD%E6%9B%BF%E4%BB%A3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 为什么要用 WaitGroup？channel 不能替代吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E8%AE%A1%E6%95%B0%E5%99%A8%E6%98%AF-goroutine-%E8%B7%91%E5%AE%8C%E8%87%AA%E5%8A%A8%E5%87%8F%E4%B8%80%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 计数器是 goroutine 跑完自动减一吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q13-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%B8%A6%E7%BC%93%E5%86%B2%EF%BC%9F%E6%97%A0%E7%BC%93%E5%86%B2%E6%AD%BB%E9%94%81%E6%98%AF%E6%80%8E%E4%B9%88%E5%9B%9E%E4%BA%8B%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%EF%BC%88%E6%A0%B8%E5%BF%83%EF%BC%89" data-stellar-navigation=""><span class="toc-text">四、多 Agent 编排（核心）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q14-%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%E6%98%AF%E6%80%8E%E4%B9%88%E8%B7%91%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q14. 多 Agent 编排是怎么跑的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%94%E3%80%81%E8%AF%AD%E8%A8%80%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">五、语言选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q15-%E7%94%A8-Go-%E5%86%99-Agent-%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q15. 用 Go 写 Agent 有什么好处？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q16-%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE%E6%9C%89%E5%A4%A7%E9%87%8F%E8%AF%B7%E6%B1%82%E5%90%97%EF%BC%9F%E6%98%AF%E7%BD%91%E5%85%B3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q16. 这个项目有大量请求吗？是网关吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AD%E3%80%81%E9%9D%A2%E8%AF%95%E5%8F%A3%E5%BE%84%E6%8F%90%E9%86%92" data-stellar-navigation=""><span class="toc-text">六、面试口径提醒</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%83%E3%80%81%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E5%8F%91%E7%94%9F%E7%9A%84%EF%BC%882026-11-09-%E8%A1%A5%E8%AE%B2%EF%BC%89" data-stellar-navigation=""><span class="toc-text">七、工具调用到底怎么发生的（2026-11-09 补讲）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q17-%E6%A8%A1%E5%9E%8B%E2%80%9D%E5%86%B3%E5%AE%9A%E8%B0%83%E5%B7%A5%E5%85%B7%E2%80%9D%E8%BF%99%E4%BB%B6%E4%BA%8B%EF%BC%8C%E5%9C%A8%E5%8D%8F%E8%AE%AE%E5%B1%82%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q17. 模型”决定调工具”这件事，在协议层是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q18-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9D%9E%E8%A6%81%E6%90%9E%E6%88%90%E6%B6%88%E6%81%AF%EF%BC%9F%E5%9B%A0%E4%B8%BA-HTTP-%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%E7%9A%84" data-stellar-navigation=""><span class="toc-text">Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q19-%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E8%A2%AB%E6%89%BE%E5%88%B0%EF%BC%9F%E5%8F%82%E6%95%B0%E6%94%BE%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q19. 工具怎么被找到？参数放在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q20-%E9%82%A3%E4%B8%A4%E4%B8%AA-Agent-%E6%98%AF%E6%80%8E%E4%B9%88%E5%88%86%E5%B7%A5%E7%9A%84%EF%BC%9F%E4%B8%80%E4%B8%AA%E8%B5%B0%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%EF%BC%8C%E4%B8%80%E4%B8%AA%E4%B8%8D%E8%B5%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q21-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%BF%85%E9%A1%BB%E5%8A%A0%E8%BF%99%E5%B1%82%E5%A4%96%E5%A3%B3%EF%BC%9F%EF%BC%88%E5%88%A4%E6%8D%AE%EF%BC%89" data-stellar-navigation=""><span class="toc-text">Q21. 什么时候必须加这层外壳？（判据）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%9C%AC%E8%8A%82%E8%A6%81%E7%82%B9%E6%B5%81%E6%B0%B4%EF%BC%88%E8%87%AA%E6%B5%8B%E7%94%A8%EF%BC%89" data-stellar-navigation=""><span class="toc-text">本节要点流水（自测用）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AB%E3%80%81Agent-%E7%94%B1%E5%93%AA%E5%87%A0%E9%83%A8%E5%88%86%E7%BB%84%E6%88%90%EF%BC%88%E5%85%AD%E4%BB%B6-%E7%BC%96%E6%8E%92%E5%99%A8%EF%BC%89" data-stellar-navigation=""><span class="toc-text">八、Agent 由哪几部分组成（六件 + 编排器）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B9%9D%E3%80%81Agent-Harness%EF%BC%88%E8%85%BE%E8%AE%AF%E4%B8%80%E9%9D%A2-15-%E9%97%AE%EF%BC%89" data-stellar-navigation=""><span class="toc-text">九、Agent Harness（腾讯一面 15 问）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#H1-harness-%E6%9C%89%E5%87%A0%E5%B1%82%EF%BC%8C%E6%80%8E%E4%B9%88%E6%9E%84%E6%88%90%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">H1. harness 有几层，怎么构成的？</span></a></li></ol></li></ol></div>
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9AEino-ReAct-%E4%B8%80%E6%AC%A1%E5%BE%80%E8%BF%94%EF%BC%88%E8%B0%81%E5%8F%91%E8%B5%B7%E3%80%81%E8%B0%81%E6%89%A7%E8%A1%8C%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 A：Eino ReAct 一次往返（谁发起、谁执行）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E5%A4%9A-Agent-%E6%8E%92%E9%9A%9C%E7%BC%96%E6%8E%92" data-stellar-navigation=""><span class="toc-text">流程 B：多 Agent 排障编排</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81Agent-%E6%A1%86%E6%9E%B6%E4%B8%8E%E6%9E%B6%E6%9E%84%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">一、Agent 框架与架构选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-%E6%9C%89%E5%93%AA%E4%BA%9B-Agent-%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-LangGraph%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-ReAct-%E5%92%8C-Plan-Execute-%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. ReAct 和 Plan-Execute 的使用场景？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-%E6%9C%89%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84-Agent-%E6%A1%86%E6%9E%B6%E5%90%97%EF%BC%9F%E7%94%A8%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. 有去中心化的 Agent 框架吗？用在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-Agent-%E4%B9%8B%E9%97%B4%E6%98%AF%E6%80%8E%E4%B9%88%E4%BA%A4%E6%B5%81%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. Agent 之间是怎么交流的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-sub-agent-%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. sub-agent 怎么实现？为什么要做？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6" data-stellar-navigation=""><span class="toc-text">二、Eino 内部机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-Chain-%E4%B8%8D%E8%83%BD%E5%BE%AA%E7%8E%AF%E5%90%97%EF%BC%9F%E5%9B%BE%E5%8F%AF%E4%BB%A5%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. Chain 不能循环吗？图可以？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-%E3%80%8C%E5%9B%BE%E6%98%AF%E7%8A%B6%E6%80%81%E6%9C%BA%E3%80%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D%EF%BC%9FChain-%E4%B8%8D%E6%98%AF%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. 「图是状态机」是什么意思？Chain 不是吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-ReAct-%E7%9A%84-state-%E7%BB%93%E6%9E%84%E4%BD%93%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. ReAct 的 state 结构体是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-%E6%88%91%E7%8E%B0%E5%9C%A8%E5%88%B0%E5%BA%95%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9C%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. 我现在到底是怎么停的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-Eino-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. Eino 为什么是中心化的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81Go-%E5%B9%B6%E5%8F%91%EF%BC%9Achannel-%E6%94%B6%E7%BB%93%E6%9E%9C" data-stellar-navigation=""><span class="toc-text">三、Go 并发：channel 收结果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8-WaitGroup%EF%BC%9Fchannel-%E4%B8%8D%E8%83%BD%E6%9B%BF%E4%BB%A3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 为什么要用 WaitGroup？channel 不能替代吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E8%AE%A1%E6%95%B0%E5%99%A8%E6%98%AF-goroutine-%E8%B7%91%E5%AE%8C%E8%87%AA%E5%8A%A8%E5%87%8F%E4%B8%80%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 计数器是 goroutine 跑完自动减一吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q13-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%B8%A6%E7%BC%93%E5%86%B2%EF%BC%9F%E6%97%A0%E7%BC%93%E5%86%B2%E6%AD%BB%E9%94%81%E6%98%AF%E6%80%8E%E4%B9%88%E5%9B%9E%E4%BA%8B%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%EF%BC%88%E6%A0%B8%E5%BF%83%EF%BC%89" data-stellar-navigation=""><span class="toc-text">四、多 Agent 编排（核心）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q14-%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%E6%98%AF%E6%80%8E%E4%B9%88%E8%B7%91%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q14. 多 Agent 编排是怎么跑的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%94%E3%80%81%E8%AF%AD%E8%A8%80%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">五、语言选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q15-%E7%94%A8-Go-%E5%86%99-Agent-%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q15. 用 Go 写 Agent 有什么好处？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q16-%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE%E6%9C%89%E5%A4%A7%E9%87%8F%E8%AF%B7%E6%B1%82%E5%90%97%EF%BC%9F%E6%98%AF%E7%BD%91%E5%85%B3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q16. 这个项目有大量请求吗？是网关吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AD%E3%80%81%E9%9D%A2%E8%AF%95%E5%8F%A3%E5%BE%84%E6%8F%90%E9%86%92" data-stellar-navigation=""><span class="toc-text">六、面试口径提醒</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%83%E3%80%81%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E5%8F%91%E7%94%9F%E7%9A%84%EF%BC%882026-11-09-%E8%A1%A5%E8%AE%B2%EF%BC%89" data-stellar-navigation=""><span class="toc-text">七、工具调用到底怎么发生的（2026-11-09 补讲）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q17-%E6%A8%A1%E5%9E%8B%E2%80%9D%E5%86%B3%E5%AE%9A%E8%B0%83%E5%B7%A5%E5%85%B7%E2%80%9D%E8%BF%99%E4%BB%B6%E4%BA%8B%EF%BC%8C%E5%9C%A8%E5%8D%8F%E8%AE%AE%E5%B1%82%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q17. 模型”决定调工具”这件事，在协议层是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q18-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9D%9E%E8%A6%81%E6%90%9E%E6%88%90%E6%B6%88%E6%81%AF%EF%BC%9F%E5%9B%A0%E4%B8%BA-HTTP-%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%E7%9A%84" data-stellar-navigation=""><span class="toc-text">Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q19-%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E8%A2%AB%E6%89%BE%E5%88%B0%EF%BC%9F%E5%8F%82%E6%95%B0%E6%94%BE%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q19. 工具怎么被找到？参数放在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q20-%E9%82%A3%E4%B8%A4%E4%B8%AA-Agent-%E6%98%AF%E6%80%8E%E4%B9%88%E5%88%86%E5%B7%A5%E7%9A%84%EF%BC%9F%E4%B8%80%E4%B8%AA%E8%B5%B0%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%EF%BC%8C%E4%B8%80%E4%B8%AA%E4%B8%8D%E8%B5%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q21-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%BF%85%E9%A1%BB%E5%8A%A0%E8%BF%99%E5%B1%82%E5%A4%96%E5%A3%B3%EF%BC%9F%EF%BC%88%E5%88%A4%E6%8D%AE%EF%BC%89" data-stellar-navigation=""><span class="toc-text">Q21. 什么时候必须加这层外壳？（判据）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%9C%AC%E8%8A%82%E8%A6%81%E7%82%B9%E6%B5%81%E6%B0%B4%EF%BC%88%E8%87%AA%E6%B5%8B%E7%94%A8%EF%BC%89" data-stellar-navigation=""><span class="toc-text">本节要点流水（自测用）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AB%E3%80%81Agent-%E7%94%B1%E5%93%AA%E5%87%A0%E9%83%A8%E5%88%86%E7%BB%84%E6%88%90%EF%BC%88%E5%85%AD%E4%BB%B6-%E7%BC%96%E6%8E%92%E5%99%A8%EF%BC%89" data-stellar-navigation=""><span class="toc-text">八、Agent 由哪几部分组成（六件 + 编排器）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B9%9D%E3%80%81Agent-Harness%EF%BC%88%E8%85%BE%E8%AE%AF%E4%B8%80%E9%9D%A2-15-%E9%97%AE%EF%BC%89" data-stellar-navigation=""><span class="toc-text">九、Agent Harness（腾讯一面 15 问）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#H1-harness-%E6%9C%89%E5%87%A0%E5%B1%82%EF%BC%8C%E6%80%8E%E4%B9%88%E6%9E%84%E6%88%90%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">H1. harness 有几层，怎么构成的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E7%9B%B8%E5%85%B3%E6%96%87%E7%AB%A0" data-stellar-navigation=""><span class="toc-text">相关文章</span></a></li></ol></div>
   <div class="widget-footer"><a class="top ui-interactive" onclick="util.scrollTop()"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M20.536 3.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464" opacity=".5"></path><path fill="currentColor" d="M9.53 12.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 9.56z"></path><path fill="currentColor" d="M9.53 16.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 13.56z"></path></svg></span><span>回到顶部</span></a></div>
 </widget>
 
@@ -1078,4 +1083,4 @@
 <script data-stellar-script="core" defer="" src="/js/navigation-init.js?v=2.0.0"></script>
 </div>
 
-<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","signature":"c599e2252571043a0c8709b71578c2caa3380376c299551947a460c065b95fb6"}</script></body></html>
+<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","signature":"5b3f807c5c53ec6db9cb49c1e9eb76ca1ece3d875a9b6f07185f6a8dfd037543"}</script></body></html>
