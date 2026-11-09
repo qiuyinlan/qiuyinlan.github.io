@@ -92,26 +92,38 @@
   display: none;
 }
 
-/* 窄屏：收成右下角一个小圆钮，点开浮层 */
-.toc-fab {
+/* 圆形按钮：宽屏贴右上角，窄屏贴右下角 */
+.toc-circle {
   position: fixed;
   right: 20px;
   bottom: 28px;
-  z-index: 40;
+  z-index: 41;
   display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
   border: 1px solid var(--text-p3, rgba(0, 0, 0, 0.08));
   border-radius: 50%;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
   color: var(--text-p1, #333);
   background: var(--bg-a50, rgba(255, 255, 255, 0.85));
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.toc-circle:hover {
+  transform: scale(1.06);
+  color: var(--theme, #1bcdfc);
+}
+
+.toc-circle--top {
+  top: 96px;
+  bottom: auto;
+  right: 24px;
 }
 
 .toc-float--overlay {
@@ -130,7 +142,7 @@
 
 @media print {
   .toc-float,
-  .toc-fab {
+  .toc-circle {
     display: none !important;
   }
 }
