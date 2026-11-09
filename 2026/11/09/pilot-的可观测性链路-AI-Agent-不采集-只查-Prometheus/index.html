@@ -459,13 +459,8 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <blockquote>
-<p>主题：pilot 到底「监控」什么、指标从哪来、「捕捉」这个动作发生在谁身上。<br>核心结论先放前面：<strong>pilot 不采集任何指标，它只查 Prometheus。</strong></p>
-</blockquote>
-<hr>
-<h2 id="0-一句话结论"><a href="#0-一句话结论" class="headerlink" title="0. 一句话结论"></a>0. 一句话结论</h2><p><strong>pilot 不采集任何指标，它只查 Prometheus。</strong></p>
+                <h2 id="0-一句话结论"><a href="#0-一句话结论" class="headerlink" title="0. 一句话结论"></a>0. 一句话结论</h2><p><strong>pilot 不采集任何指标，它只查 Prometheus。</strong></p>
 <p>它不认识”机器”，只认识一个 URL。所以”监控另一台机器”改的不是代码，是 Prometheus 的 targets 列表。</p>
-<hr>
 <h2 id="1-三跳链路（两头都不直连）"><a href="#1-三跳链路（两头都不直连）" class="headerlink" title="1. 三跳链路（两头都不直连）"></a>1. 三跳链路（两头都不直连）</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">靶机 node_exporter:9100</span><br><span class="line">      ↑ Prometheus 每 15s 主动拉</span><br><span class="line">Prometheus:9090</span><br><span class="line">      ↑ pilot 发 HTTP 查询</span><br><span class="line">   pilot</span><br></pre></td></tr></table></figure>
 
 <p>谁发起 → 谁接收 → 数据落在哪：</p>
@@ -498,7 +493,6 @@
 </tr>
 </tbody></table>
 <p><strong>一句话</strong>：pilot 是”读数据库的人”，Prometheus 是”采集并存储的人”，业务服务是”产生数据的人”。</p>
-<hr>
 <h2 id="2-三步拆开看"><a href="#2-三步拆开看" class="headerlink" title="2. 三步拆开看"></a>2. 三步拆开看</h2><h3 id="第-1-步：服务暴露-metrics"><a href="#第-1-步：服务暴露-metrics" class="headerlink" title="第 1 步：服务暴露 /metrics"></a>第 1 步：服务暴露 <code>/metrics</code></h3><p>内容本质是一段 HTTP 明文文本，一行一个样本：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pilot_http_requests_total&#123;route=&quot;/api/v1/chat&quot;,status=&quot;200&quot;&#125; 42</span><br><span class="line">pilot_http_request_duration_seconds_bucket&#123;le=&quot;0.1&quot;&#125; 128</span><br></pre></td></tr></table></figure>
 
@@ -532,7 +526,6 @@
 
 <p>按 <code>service</code> 标签定位一个服务，值 &gt; 0.8 就记一条 <code>high_cpu</code> 异常。</p>
 <p><strong>pilot 不知道你的业务代码长什么样，它只知道指标名和标签。</strong></p>
-<hr>
 <h2 id="3-pilot-怎么把数据真正拿到手：三个-HTTP-client"><a href="#3-pilot-怎么把数据真正拿到手：三个-HTTP-client" class="headerlink" title="3. pilot 怎么把数据真正拿到手：三个 HTTP client"></a>3. pilot 怎么把数据真正拿到手：三个 HTTP client</h2><p><strong>最容易误判的一点：pilot 里没有 Prometheus &#x2F; ES &#x2F; Jaeger 的 SDK，也没有数据库驱动。所谓”拿数据”，就是自己用 <code>net/http</code> 发请求，读响应体，<code>json.Unmarshal</code>。</strong></p>
 <p>启动时 <code>NewDataCollector</code> 从配置读三个 URL，各 new 一个 client：</p>
 <ul>
@@ -591,7 +584,6 @@
 <p>结构体 → 人读的文本 → 再包一层 JSON 字符串 → 作为 tool 消息回到模型。<strong>这是整条链路唯一”面向模型”的地方</strong>，也是工具函数签名是 <code>(string, error)</code> 的原因。</p>
 <h3 id="一次异常分析会发三个请求，串行"><a href="#一次异常分析会发三个请求，串行" class="headerlink" title="一次异常分析会发三个请求，串行"></a>一次异常分析会发三个请求，串行</h3><p><code>AnalyzeAnomalies</code> 的顺序是固定的：告警 → 日志（限 100 条）→ CPU 指标阈值。</p>
 <p>而且<strong>单个数据源失败只打 warning 日志，不中断整次分析</strong>——Prometheus 挂了不代表日志里没线索。</p>
-<hr>
 <h2 id="4-为什么是这个架构（因果链，一个逼一个）"><a href="#4-为什么是这个架构（因果链，一个逼一个）" class="headerlink" title="4. 为什么是这个架构（因果链，一个逼一个）"></a>4. 为什么是这个架构（因果链，一个逼一个）</h2><ol>
 <li>用户要问”过去半小时 CPU 怎么涨的” → pilot 自己不存时序数据 → <strong>必须有 TSDB</strong>，这就是 Prometheus。</li>
 <li>机器挂了现场必须留住（挂了还得有最后几秒数据）、采集要固定频率 → 采集不能由”有人提问”触发 → <strong>采集必须是独立常驻进程</strong>。</li>
@@ -599,7 +591,6 @@
 </ol>
 <p>再加一条设计收益：pull 模型下，<strong>同一个 Prometheus 的指标能同时喂给 Grafana、pilot 和其他系统</strong>；pilot 不需要装在被监控机上、不需要常驻、不需要任何权限。</p>
 <p>代价也很清楚：<strong>没有 Prometheus，pilot 就是个什么都看不见的空壳。</strong></p>
-<hr>
 <h2 id="5-“监控项目”到底监控什么（三层对象）"><a href="#5-“监控项目”到底监控什么（三层对象）" class="headerlink" title="5. “监控项目”到底监控什么（三层对象）"></a>5. “监控项目”到底监控什么（三层对象）</h2><p>最小可监控单元不是”项目”，而是「一个会暴露 <code>/metrics</code> 的东西」。</p>
 <ul>
 <li><strong>机器层（infra）</strong>：装 node_exporter → CPU &#x2F; 内存 &#x2F; 磁盘 &#x2F; IO &#x2F; 网络。靶机脚本造的 cpu&#x2F;mem&#x2F;disk&#x2F;io 故障就在这层。</li>
@@ -637,7 +628,6 @@
 </tbody></table>
 <p>所以”接入一个项目来监控”只是最常见的一种形态；也可以是一台主机、一个容器、一个中间件（MySQL exporter &#x2F; Redis exporter 都是同一套路）。</p>
 <p><strong>面试定位口径</strong>：pilot 是<strong>数据源接入型</strong> AIOps Agent，不是 Zabbix 那种”装 agent 到被监控机上采集”的模型。好处是零侵入 + 复用 Prometheus 生态，代价是能力上限取决于你喂了哪些数据源。</p>
-<hr>
 <h2 id="6-自观测闭环（pilot-自己也被观测）"><a href="#6-自观测闭环（pilot-自己也被观测）" class="headerlink" title="6. 自观测闭环（pilot 自己也被观测）"></a>6. 自观测闭环（pilot 自己也被观测）</h2><p>pilot 不只消费观测数据，它也生产：</p>
 <ul>
 <li>HTTP 指标 <code>pilot_http_requests_total</code>、<code>pilot_http_request_duration_seconds</code>、<code>pilot_http_requests_inflight</code></li>
@@ -646,7 +636,6 @@
 </ul>
 <p>Prometheus 的 targets 里那个 <code>host.docker.internal:8081</code> 抓的就是它自己。</p>
 <p>面试验收点：<strong>“调完一次接口，指标&#x2F;日志&#x2F;trace 三样有没有真的产生”是可验证的</strong>，不是 PPT 上的。</p>
-<hr>
 <h2 id="7-部署位置：不是”本机-vs-云服务器”，是”同机还是分开”"><a href="#7-部署位置：不是”本机-vs-云服务器”，是”同机还是分开”" class="headerlink" title="7. 部署位置：不是”本机 vs 云服务器”，是”同机还是分开”"></a>7. 部署位置：不是”本机 vs 云服务器”，是”同机还是分开”</h2><p>先纠正一个容易写错的假设：<strong>“localhost” 只是当前配置的取值，不是架构约束。</strong> pilot 是无状态的，它只做一件事——往配置里那个 URL 发 HTTP 请求。所以改部署位置，改的只是这个 URL。</p>
 <p>由此，”pilot 在哪跑”和”数据源栈在哪跑”是两个独立的决定，组合有四种：</p>
 <table>
@@ -688,22 +677,6 @@
 <p>之所以这么设计，是因为要回答”过去半小时发生了什么”就必须有时序存储，而采集必须独立于提问、固定频率地进行，所以拆成采集端和查询端。好处是 pilot 对业务零侵入，换监控对象只改 Prometheus 的 targets，代码不用动；代价是没接 Prometheus 就什么都看不见。</p>
 </blockquote>
 <p><strong>追问预案</strong>：为什么不装 agent 直接采集？→ 见第 5 节末尾的定位口径。</p>
-<hr>
-<h2 id="9-后续继续补的点（占位，写在一个知识域里）"><a href="#9-后续继续补的点（占位，写在一个知识域里）" class="headerlink" title="9. 后续继续补的点（占位，写在一个知识域里）"></a>9. 后续继续补的点（占位，写在一个知识域里）</h2><ul>
-<li><input disabled="" type="checkbox"> 指标为什么是四种类型（Counter &#x2F; Gauge &#x2F; Histogram &#x2F; Summary），以及 Histogram 和 Summary 的取舍</li>
-<li><input disabled="" type="checkbox"> label 与高基数：为什么把 user_id 塞进 label 会炸</li>
-<li><input disabled="" type="checkbox"> PromQL 三招：<code>rate</code>、<code>increase</code>、<code>histogram_quantile</code>，以及为什么要 <code>[5m]</code> 窗口</li>
-<li><input disabled="" type="checkbox"> pull 模型和 push 模型的取舍，短命任务怎么办（Pushgateway）</li>
-<li><input disabled="" type="checkbox"> exporter 到底是什么（node_exporter 怎么把 &#x2F;proc 变成指标）</li>
-<li><input disabled="" type="checkbox"> 告警的状态机：<code>pending</code> 那一层为什么必须存在</li>
-<li><input disabled="" type="checkbox"> 日志要落地的三件事（结构化、trace_id、限条数）</li>
-<li><input disabled="" type="checkbox"> trace &#x2F; span &#x2F; parent 三个词，以及”为什么指标+日志替代不了链路”</li>
-<li><input disabled="" type="checkbox"> Prometheus 的 TSDB 怎么存：block、WAL、压缩、保留期</li>
-<li><input disabled="" type="checkbox"> recording rules：为什么要预计算</li>
-<li><input disabled="" type="checkbox"> OpenTelemetry 与 Jaeger 的三层关系（SDK &#x2F; Collector &#x2F; 后端）</li>
-<li><input disabled="" type="checkbox"> Loki vs ES：日志场景为什么有人放弃全文索引</li>
-<li><input disabled="" type="checkbox"> Grafana 在这套链路里的位置（和 pilot 是并列的消费者）</li>
-</ul>
 
                 
             </div>

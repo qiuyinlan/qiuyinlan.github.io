@@ -459,16 +459,11 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <blockquote>
-<p>从「Agent 怎么选架构」一路讲到「多 Agent 编排到底怎么跑」，最后补上工具调用的协议层。<br>涉及 pilot 的地方标出具体文件与行号，方便对照代码。</p>
-</blockquote>
-<hr>
-<h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）"></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）"></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go:399），查不到就报错</span><br><span class="line">⑤ 执行你写的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></table></figure>
+                <h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）"></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）"></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go:399），查不到就报错</span><br><span class="line">⑤ 执行你写的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></table></figure>
 
 <h3 id="流程-B：多-Agent-排障编排（你的「多-Agent」）"><a href="#流程-B：多-Agent-排障编排（你的「多-Agent」）" class="headerlink" title="流程 B：多 Agent 排障编排（你的「多 Agent」）"></a>流程 B：多 Agent 排障编排（你的「多 Agent」）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">query</span><br><span class="line">  → ① Planner 分诊（规则，不调模型）→ Plan</span><br><span class="line">  → ② 两路 goroutine 并行：Evidence / Knowledge</span><br><span class="line">  → ③ 按 roleOrder 稳定排序</span><br><span class="line">  → ④ Synthesizer（唯一一次模型调用）→ 三段式答案</span><br><span class="line">  → ⑤ Result&#123;Answer, Plan, Steps, Findings, Limitations&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>关键认知：四个角色里只有 Synthesizer 调模型，前三个是普通 Go 代码在查数据。</strong></p>
-<hr>
 <h2 id="一、Agent-框架与架构选型"><a href="#一、Agent-框架与架构选型" class="headerlink" title="一、Agent 框架与架构选型"></a>一、Agent 框架与架构选型</h2><h3 id="Q1-有哪些-Agent-开发框架？为什么用-LangGraph？"><a href="#Q1-有哪些-Agent-开发框架？为什么用-LangGraph？" class="headerlink" title="Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？"></a>Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</h3><p><strong>按编排模型分四类：</strong></p>
 <ul>
 <li><strong>Chain 式</strong>：LangChain（LCEL）、LlamaIndex、Semantic Kernel、Spring AI —— 线性流水线，流程一复杂就打补丁</li>
@@ -564,7 +559,6 @@
 </ul>
 <p><strong>Pilot 的诚实说法</strong>：严格说没有完整 sub-agent，但排障流水线里两个 executor 已经是<strong>简化版</strong>——职责单一、上下文隔离、结果摘要化，<strong>区别只在于它们是确定流程而不是自主 Agent</strong>。</p>
 <p><strong>什么时候不该用</strong>：工具少于 10 个、任务单一、子任务极短。判断标准：<strong>子任务的上下文体积是否显著大于结论体积</strong>。</p>
-<hr>
 <h2 id="二、Eino-内部机制"><a href="#二、Eino-内部机制" class="headerlink" title="二、Eino 内部机制"></a>二、Eino 内部机制</h2><h3 id="Q6-Chain-不能循环吗？图可以？"><a href="#Q6-Chain-不能循环吗？图可以？" class="headerlink" title="Q6. Chain 不能循环吗？图可以？"></a>Q6. Chain 不能循环吗？图可以？</h3><p><strong>不是「不能」，是「循环在图里是原生表达，在 Chain 里得自己手写」。</strong></p>
 <ul>
 <li><strong>Chain 语义是 DAG</strong>：<code>A → B → C → 结束</code>，进度由<strong>位置</strong>决定，没有回边的概念</li>
@@ -644,7 +638,6 @@
 <li>中心化 ≠ 不能并行（多 tool_calls 并行、两个 executor 并行）</li>
 </ul>
 <p><strong>收益</strong>：可预测、可测试、可观测、有硬上限、责任清晰。<strong>代价</strong>：单点、不支持跨组织、节点能力受限。<strong>这四条代价对「单组织内部排障」全都不构成问题，所以中心化是正解不是妥协。</strong></p>
-<hr>
 <h2 id="三、Go-并发：channel-收结果"><a href="#三、Go-并发：channel-收结果" class="headerlink" title="三、Go 并发：channel 收结果"></a>三、Go 并发：channel 收结果</h2><h3 id="Q11-为什么要用-WaitGroup？channel-不能替代吗？"><a href="#Q11-为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="Q11. 为什么要用 WaitGroup？channel 不能替代吗？"></a>Q11. 为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
 <p><strong>close 两条铁律</strong>：只能发送方调；只能在所有发送完成后调。</p>
 <p>多个 goroutine 都在发时，<strong>谁是最后一个？没人知道</strong> → 必须有个外部全局计数器，那就是 WaitGroup。</p>
@@ -684,7 +677,6 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">outcomes := <span class="built_in">make</span>(<span class="keyword">chan</span> outcome, <span class="built_in">len</span>(roles))  <span class="comment">// 缓冲=角色数</span></span><br><span class="line"><span class="keyword">var</span> group sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, role := <span class="keyword">range</span> roles &#123;</span><br><span class="line">	group.Add(<span class="number">1</span>)                             <span class="comment">// 在 go 之前</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(role Role, executor Executor)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> group.Done()</span><br><span class="line">		...</span><br><span class="line">		outcomes &lt;- outcome&#123;...&#125;</span><br><span class="line">	&#125;(role, executor)</span><br><span class="line">&#125;</span><br><span class="line">group.Wait()</span><br><span class="line"><span class="built_in">close</span>(outcomes)                              <span class="comment">// Wait 之后才 close</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>两个坑</strong>：channel 不保证顺序（所以要按 <code>roleOrder</code> 排序）；验证方式 <code>go test -race</code>。</p>
-<hr>
 <h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）"></a>四、多 Agent 编排（核心）</h2><h3 id="Q14-我的多-Agent-编排是怎么跑的？"><a href="#Q14-我的多-Agent-编排是怎么跑的？" class="headerlink" title="Q14. 我的多 Agent 编排是怎么跑的？"></a>Q14. 我的多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
 <p><strong>五个阶段：</strong></p>
 <p><strong>① 入口 <code>Orchestrator.Execute</code></strong>（<code>orchestrator.go:51</code>）</p>
@@ -733,7 +725,6 @@
 <li>findings 没有跨角色消解（两份证据矛盾时让 Synthesizer 自己权衡，没做冲突检测）</li>
 <li>可观测只到角色级（工具级 span 没接进去）</li>
 </ol>
-<hr>
 <h2 id="五、语言选型"><a href="#五、语言选型" class="headerlink" title="五、语言选型"></a>五、语言选型</h2><h3 id="Q15-用-Go-写-Agent-有什么好处？"><a href="#Q15-用-Go-写-Agent-有什么好处？" class="headerlink" title="Q15. 用 Go 写 Agent 有什么好处？"></a>Q15. 用 Go 写 Agent 有什么好处？</h3><p><strong>先承认：Go 不是写 Agent 的主流，主流是 Python。</strong></p>
 <p><strong>Go 赢在：</strong></p>
 <ul>
@@ -767,7 +758,6 @@
 <p><strong>QPS 才 20，但同时 300 个连接挂着等 IO。</strong> 这才是 Go 真正赢的地方：300 个 goroutine 几十 MB，context 超时能掐断，SSE 长连接写得干净。</p>
 <p><strong>项目里真正「量大」的入口</strong>：知识库灌库（批量 embedding）、日志查询（一次几千条）、<code>/metrics</code> 抓取、<code>cmd/e2echeck</code>。</p>
 <p><strong>准确描述：低 QPS、高单请求成本、长连接驻留。</strong></p>
-<hr>
 <h2 id="六、面试口径提醒"><a href="#六、面试口径提醒" class="headerlink" title="六、面试口径提醒"></a>六、面试口径提醒</h2><ul>
 <li>别说「高并发网关」，会被问「你转发给谁」</li>
 <li>别说「多 Agent 是多个 Agent 互相聊天」，你的实际是「1 次模型调用 + 2 个数据查询 + 1 个规则路由」</li>
@@ -775,9 +765,8 @@
 <li>去中心化那块：知道 A2A vs MCP 不是一回事，且明确说自己没有生产落地</li>
 <li>主动说出四条不足，比硬凑优点可信</li>
 </ul>
-<hr>
 <h2 id="七、工具调用到底怎么发生的（2026-11-09-补讲）"><a href="#七、工具调用到底怎么发生的（2026-11-09-补讲）" class="headerlink" title="七、工具调用到底怎么发生的（2026-11-09 补讲）"></a>七、工具调用到底怎么发生的（2026-11-09 补讲）</h2><blockquote>
-<p>这一节是和用户一行行对出来的，讲的是「模型说要调工具」到「本地函数真的被执行」之间的机制。<br>前面 §二 讲的是 Eino 的循环和状态，这一节讲的是<strong>协议层</strong>：消息怎么传、谁解析、工具怎么被找到。</p>
+<p>讲的是「模型说要调工具」到「本地函数真的被执行」之间的<strong>协议层</strong>：消息怎么传、谁解析、工具怎么被找到。</p>
 </blockquote>
 <h3 id="Q15-模型”决定调工具”这件事，在协议层是什么？"><a href="#Q15-模型”决定调工具”这件事，在协议层是什么？" class="headerlink" title="Q15. 模型”决定调工具”这件事，在协议层是什么？"></a>Q15. 模型”决定调工具”这件事，在协议层是什么？</h3><p><strong>一句话：是一条 <code>role=assistant</code>、<code>tool_calls</code> 非空的普通消息。不是动作，是内容。</strong></p>
 <p>chat 接口只有一个请求体、一个数组：</p>
@@ -892,27 +881,6 @@
 <li>工作流复用 collector 而不是工具，因为工具层是专门为”给模型看”服务的</li>
 <li>判据：能不能穷举”查什么”，能穷举就别加壳</li>
 </ul>
-<h2 id="八、本篇覆盖的知识点与后续方向"><a href="#八、本篇覆盖的知识点与后续方向" class="headerlink" title="八、本篇覆盖的知识点与后续方向"></a>八、本篇覆盖的知识点与后续方向</h2><p>截至 2026-11-06 讲过的：</p>
-<ul>
-<li>✅ 浮点数 → 向量 → ES 存储 → 倒排&#x2F;BM25 → 检索链路（另一篇）</li>
-<li>✅ JSON&#x2F;JSONL → function calling → trace 落盘（另一篇）</li>
-<li>✅ Agent 框架选型 → ReAct&#x2F;Plan-Execute → 去中心化 → Agent 交流（§一 Q1-Q4）</li>
-<li>✅ Eino 内部：循环、状态机、state、停止条件、中心化（§二 Q6-Q10）</li>
-<li>✅ channel&#x2F;WaitGroup（§三 Q11-Q13）</li>
-<li>✅ 多 Agent 编排四步（§四 Q14）</li>
-</ul>
-<p>2026-11-09 补的：</p>
-<ul>
-<li>✅ 工具调用的协议层：消息机制、<code>tool_calls</code> 字符串、按名查表、最后一刻反序列化、<code>toolCallID</code> 配对（§七 Q15-Q17）</li>
-<li>✅ 两套 Agent 的分界：走 tool calling 还是直接调函数，判据是”能不能穷举查什么”（§七 Q18-Q19）</li>
-<li>✅ pilot 取数全链路（三个 HTTP client）已写在可观测性那篇的第 3 节</li>
-</ul>
-<p><strong>后续方向：</strong></p>
-<ol>
-<li>多 Agent 编排四步的分步详解还没讲（§四 只给了骨架）：分诊 → 两路并发 → 收敛 → 结果结构</li>
-<li>然后回到 22 题清单，Q8 起了头（SFT&#x2F;LoRA&#x2F;本地部署&#x2F;HNSW 那一组 AI 算法题）</li>
-</ol>
-<hr>
 
                 
             </div>

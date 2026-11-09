@@ -383,12 +383,9 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-主题：pilot 到底「监控」什么、指标从哪来、「捕捉」这个动作发生在谁身上。核心结论先放前面：pilot 不采集任何指标，它只查 Prometheus。
-
-
-0. 一句话结论pilot 不采集任何指标，它只查 Prometheus。
-它
+                                0. 一句话结论pilot 不采集任何指标，它只查 Prometheus。
+它不认识”机器”，只认识一个 URL。所以”监控另一台机器”改的不是代码，是 Prometheus 的 targets 列表。
+1. 三跳链路（两头都不直连）123
                             
                         </div>
                         <div class="publish-info">
@@ -438,11 +435,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-从「Agent 怎么选架构」一路讲到「多 Agent 编排到底怎么跑」，最后补上工具调用的协议层。涉及 pilot 的地方标出具体文件与行号，方便对照代码。
-
-
-零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁
+                                零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③
                             
                         </div>
                         <div class="publish-info">
@@ -492,11 +485,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-承接第一份 2026-11-06-浮点向量ES与Agent评测.md。这一份聚焦三件事：数据格式怎么选、function calling 到底是什么、以及「落盘」具体怎么落地。涉及 Pilot 的地方都标 文件名:行号。
-
-
-零、主干流程
+                                零、主干流程速查（先看这个）流程 A：一次 function calling 往返12345678910111213① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）        ↓② 模型：返回 t
                             
                         </div>
                         <div class="publish-info">
@@ -546,11 +535,7 @@
                     <div class="card-content article-content">
                         <div class="summary block-with-text">
                             
-                                
-来源：一次连续对话，从「浮点数是啥」一路问到「Agent 怎么评测」。全部答案按真实执行顺序走代码，涉及 Pilot 的地方都标了 文件名:行号。
-
-
-零、主干流程速查（先看这个）这份文档的主线是「数据从哪来、到哪去、存在哪」，概念和原理
+                                零、主干流程速查（先看这个）流程 A：一份文档入库（写）1234567Upload（带 title/content/category）  → 内容哈希生成 ID（不纳入 title）  → DocumentExists 查重：命中就 ret
                             
                         </div>
                         <div class="publish-info">

@@ -455,12 +455,7 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <blockquote>
-<p>来源：一次连续对话，从「浮点数是啥」一路问到「Agent 怎么评测」。<br>全部答案按<strong>真实执行顺序走代码</strong>，涉及 Pilot 的地方都标了 <code>文件名:行号</code>。</p>
-</blockquote>
-<hr>
-<h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><p><strong>这份文档的主线是「数据从哪来、到哪去、存在哪」，概念和原理都是附属。</strong></p>
-<h3 id="流程-A：一份文档入库（写）"><a href="#流程-A：一份文档入库（写）" class="headerlink" title="流程 A：一份文档入库（写）"></a>流程 A：一份文档入库（写）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Upload（带 title/content/category）</span><br><span class="line">  → 内容哈希生成 ID（不纳入 title）</span><br><span class="line">  → DocumentExists 查重：命中就 return，连 embedding 都不算</span><br><span class="line">  → Embedder 生成向量 → doc.Vector = vector</span><br><span class="line">  → json.Marshal 整个 struct（一次序列化，向量和文本粘在一起）</span><br><span class="line">  → 一次 HTTP PUT 进 ES</span><br><span class="line">  → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部原文进 _source</span><br></pre></td></tr></table></figure>
+                <h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一份文档入库（写）"><a href="#流程-A：一份文档入库（写）" class="headerlink" title="流程 A：一份文档入库（写）"></a>流程 A：一份文档入库（写）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Upload（带 title/content/category）</span><br><span class="line">  → 内容哈希生成 ID（不纳入 title）</span><br><span class="line">  → DocumentExists 查重：命中就 return，连 embedding 都不算</span><br><span class="line">  → Embedder 生成向量 → doc.Vector = vector</span><br><span class="line">  → json.Marshal 整个 struct（一次序列化，向量和文本粘在一起）</span><br><span class="line">  → 一次 HTTP PUT 进 ES</span><br><span class="line">  → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部原文进 _source</span><br></pre></td></tr></table></figure>
 
 <p>代码：<code>knowledge_controller.go:66</code> → <code>knowledge_retriever.go:73-99</code> → <code>elasticsearch.go:82-97</code>（详见 Q5、Q11）</p>
 <h3 id="流程-B：一次检索（读）"><a href="#流程-B：一次检索（读）" class="headerlink" title="流程 B：一次检索（读）"></a>流程 B：一次检索（读）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k          （只碰文本）</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k          （只碰浮点）</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排、去重 → 取 content 原文拼 prompt → 发给 LLM</span><br></pre></td></tr></table></figure>
@@ -469,7 +464,6 @@
 <h3 id="流程-C：一次评估（评测）"><a href="#流程-C：一次评估（评测）" class="headerlink" title="流程 C：一次评估（评测）"></a>流程 C：一次评估（评测）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">评测集（golden case：问题 + 期望工具 + 关键参数）</span><br><span class="line">  → 跑一次真实 chat</span><br><span class="line">  → 从轨迹里抽出 tool name + args</span><br><span class="line">  → 分档比对（工具名精确、枚举精确、时间窗口容忍、集合不看顺序）</span><br><span class="line">  → 算 pass 率 → 出报告、失败样本清单 → 历史对比</span><br></pre></td></tr></table></figure>
 
 <p><strong>前置条件：工具调用必须落盘（见第二份文档 Q10）。</strong>（详见 Q14-Q17）</p>
-<hr>
 <h2 id="一、浮点数"><a href="#一、浮点数" class="headerlink" title="一、浮点数"></a>一、浮点数</h2><h3 id="Q1-浮点数是什么？"><a href="#Q1-浮点数是什么？" class="headerlink" title="Q1. 浮点数是什么？"></a>Q1. 浮点数是什么？</h3><p>用「科学计数法的二进制版」表示小数：<code>±1.xxxx × 2^e</code>，由符号位、尾数、指数三部分组成。</p>
 <p><code>float64</code> 是 1 位符号 + 11 位指数 + 52 位尾数。小数点位置「浮动」，所以范围大。</p>
 <p><strong>两个必答的坑：</strong></p>
@@ -500,7 +494,6 @@
 <li>哈希要在<strong>文本清洗之后</strong>算，否则脏版&#x2F;净版会被当成两份</li>
 <li>近似重复（改两行）哈希失效，要 SimHash &#x2F; MinHash</li>
 </ul>
-<hr>
 <h2 id="二、Pilot-知识库去重改造（代码）"><a href="#二、Pilot-知识库去重改造（代码）" class="headerlink" title="二、Pilot 知识库去重改造（代码）"></a>二、Pilot 知识库去重改造（代码）</h2><h3 id="Q4-原来的实现有什么问题？"><a href="#Q4-原来的实现有什么问题？" class="headerlink" title="Q4. 原来的实现有什么问题？"></a>Q4. 原来的实现有什么问题？</h3><p><code>internal/ai/retriever/knowledge_retriever.go:405</code>（改前）</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *KnowledgeRetriever)</span></span> generateDocID(title, content <span class="type">string</span>) <span class="type">string</span> &#123;</span><br><span class="line">	hash := md5.Sum([]<span class="type">byte</span>(title + content))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(hash[:])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -518,7 +511,6 @@
 <p>配套新增 <code>pkg/elasticsearch/elasticsearch.go</code> 的 <code>DocumentExists(ctx, index, docID)</code>，404 视为「不存在」而非错误。</p>
 <p><strong>边界：</strong> 显式传 ID 时保留覆盖更新语义（只对内容生成式 ID 做「存在即跳过」）；近似重复识别不了。</p>
 <p><strong>面试口径：不是强业务主键设计，而是「按内容幂等 + 成本前置拦截」。</strong></p>
-<hr>
 <h2 id="三、ES-到底怎么存的"><a href="#三、ES-到底怎么存的" class="headerlink" title="三、ES 到底怎么存的"></a>三、ES 到底怎么存的</h2><h3 id="Q6-ES-就是一个无限存-JSON-的文档库吗？"><a href="#Q6-ES-就是一个无限存-JSON-的文档库吗？" class="headerlink" title="Q6. ES 就是一个无限存 JSON 的文档库吗？"></a>Q6. ES 就是一个无限存 JSON 的文档库吗？</h3><p>大体对，但四个限定：</p>
 <ol>
 <li><strong>存储单位是 document</strong>（JSON），归在 index 里，index 再切成 shard。</li>
@@ -551,7 +543,6 @@
 <blockquote>
 <p>项目规则已固化：<strong>AI 不在服务器上跑 <code>go build</code> &#x2F; <code>go vet</code> &#x2F; <code>go test</code></strong>，见 <code>AGENTS.md</code>「编译验证流程」。</p>
 </blockquote>
-<hr>
 <h2 id="四、倒排索引与-BM25"><a href="#四、倒排索引与-BM25" class="headerlink" title="四、倒排索引与 BM25"></a>四、倒排索引与 BM25</h2><h3 id="Q9-什么是倒排索引？"><a href="#Q9-什么是倒排索引？" class="headerlink" title="Q9. 什么是倒排索引？"></a>Q9. 什么是倒排索引？</h3><p><strong>正排 &#x3D; 文档 → 词；倒排 &#x3D; 词 → 文档。</strong></p>
 <p>例子：</p>
 <ul>
@@ -591,7 +582,6 @@
 <li><strong>参数可调</strong>：<code>k1=1.2</code> 控制词频饱和，<code>b=0.75</code> 控制文档长度惩罚，可按字段配 <code>similarity</code>。</li>
 </ol>
 <p>一句话：<strong>BM25 是公式，倒排索引是数据源，ES 焊死的原因是最优搭配，不是技术依赖。</strong></p>
-<hr>
 <h2 id="五、向量怎么存、怎么检索（走代码）"><a href="#五、向量怎么存、怎么检索（走代码）" class="headerlink" title="五、向量怎么存、怎么检索（走代码）"></a>五、向量怎么存、怎么检索（走代码）</h2><h3 id="Q11-向量是哪一步存的？其他信息哪一步传进去的？"><a href="#Q11-向量是哪一步存的？其他信息哪一步传进去的？" class="headerlink" title="Q11. 向量是哪一步存的？其他信息哪一步传进去的？"></a>Q11. 向量是哪一步存的？其他信息哪一步传进去的？</h3><blockquote>
 <p>最容易误解的事实：<strong>全程只有一次写请求</strong>，向量和文本是一起进去的。</p>
 </blockquote>
@@ -641,7 +631,6 @@
 </ol>
 <p><strong>LLM 从头到尾没看见过向量。</strong> 向量只在检索阶段当中间变量用了一次就被扔了。</p>
 <p>向量是「找文档的钥匙」，内容是「最终给模型看的资料」。</p>
-<hr>
 <h2 id="六、Agent-评测"><a href="#六、Agent-评测" class="headerlink" title="六、Agent 评测"></a>六、Agent 评测</h2><h3 id="Q14-怎么评价一个-Agent-的表现？"><a href="#Q14-怎么评价一个-Agent-的表现？" class="headerlink" title="Q14. 怎么评价一个 Agent 的表现？"></a>Q14. 怎么评价一个 Agent 的表现？</h3><p>不能用一个分数，分三层：</p>
 <p><strong>第一层 单步质量（工具选择对不对）</strong> — 最好评，因为输入输出都结构化：工具选择准确率、参数正确率、无效调用率。</p>
 <p><strong>第二层 链路质量（多步走完没有）</strong> — 任务完成率、平均步数&#x2F;冗余步数、失败可恢复率、循环检测。要评得有 golden trajectory 对照。</p>
@@ -726,7 +715,6 @@
 <p>实现：Eino ReAct 的 <code>OnToolStart</code> &#x2F; <code>OnToolEnd</code> 钩子里抓 name + args + 延迟，写文件或独立 ES 索引。<strong>顺带好处不止评测</strong>——线上排查「用户说答错了」时能直接看这一步调了什么，比看最终回答有用得多。</p>
 <p><strong>面试答法：</strong> 分清「协议层」和「可观测层」。内存里有 ≠ 能事后审计。主动说出缺口（只能做到端到端，做不到工具级归因），比假装「天然能评测」强。</p>
 <p>一句话：<strong>协议给了你 JSON，但没给你历史记录——要评测，得自己把 trace 写下来。</strong></p>
-<hr>
 <h2 id="七、方法论沉淀（讲技术的正确姿势）"><a href="#七、方法论沉淀（讲技术的正确姿势）" class="headerlink" title="七、方法论沉淀（讲技术的正确姿势）"></a>七、方法论沉淀（讲技术的正确姿势）</h2><p>这次最大的教训不是知识点，是讲法。</p>
 <p><strong>讲「XX 是怎么工作的」，按真实执行顺序走代码：</strong></p>
 <ol>
