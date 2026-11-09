@@ -1,479 +1,454 @@
-<!DOCTYPE HTML>
-<html lang="zh-CN">
-
-
-<head>
-    <meta charset="utf-8">
-    <meta name="keywords" content="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹, hi,it&#39;s Qiu Yinlan!">
-    <meta name="description" content="分享技术、生活和学习笔记">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="renderer" content="webkit|ie-stand|ie-comp">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-
-
-    <title>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹 | hi,it&#39;s Qiu Yinlan!</title>
-    <link rel="icon" type="image/png" href="/favicon.png">
-
-    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
-    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
-    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
-    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/matery.css">
-    <link rel="stylesheet" type="text/css" href="/css/my.css">
-
-    <script src="/libs/jquery/jquery.min.js"></script>
-
-<meta name="generator" content="Hexo 8.1.2"></head>
-
-
-
-
-<body>
-    <header class="navbar-fixed">
-    <nav id="headNav" class="bg-color nav-transparent">
-        <div id="navContainer" class="nav-wrapper container">
-            <div class="brand-logo">
-                <a href="/" class="waves-effect waves-light">
-                    
-                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
-                    
-                    <span class="logo-span">hi,it&#39;s Qiu Yinlan!</span>
-                </a>
-            </div>
-            
-
-<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
-<ul class="right nav-menu">
+<!DOCTYPE html><html lang="zh-CN"><head>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/" class="waves-effect waves-light">
-      
-      <i class="fas fa-home" style="zoom: 0.6;"></i>
-      
-      <span>首页</span>
-    </a>
-    
-  </li>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0" theme-name="Stellar" theme-version="2.0.0">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/tags" class="waves-effect waves-light">
-      
-      <i class="fas fa-tags" style="zoom: 0.6;"></i>
-      
-      <span>标签</span>
-    </a>
-    
-  </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/categories" class="waves-effect waves-light">
-      
-      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
-      
-      <span>分类</span>
-    </a>
-    
-  </li>
+  <meta name="generator" content="Hexo 8.1.2">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/archives" class="waves-effect waves-light">
-      
-      <i class="fas fa-archive" style="zoom: 0.6;"></i>
-      
-      <span>归档</span>
-    </a>
-    
-  </li>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title data-stellar-page-meta="">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹 - hi,it's Qiu Yinlan!</title>
+  <script data-stellar-script="core">
+    (function () {
+      var key = 'stellar:v2:leftbar-state';
+      var fallback = "expanded";
+      try {
+        var value = localStorage.getItem(key);
+        document.documentElement.dataset.leftbarState = value === 'collapsed' || value === 'expanded' ? value : fallback;
+      } catch (error) {
+        document.documentElement.dataset.leftbarState = fallback;
+      }
+    })();
+  </script>
+
+  <meta name="description" content="零、主干流程速查（先看这个）流程 A：一次 function calling 往返12345678910111213① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）        ↓② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西        ↓③ Go 进程内 Eino ReAct 收到响应 → 解析成 schema.M" data-stellar-page-meta="">
+<meta property="og:type" content="article" data-stellar-page-meta="">
+<meta property="og:title" content="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-page-meta="">
+<meta property="og:url" content="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-stellar-page-meta="">
+<meta property="og:site_name" content="hi,it's Qiu Yinlan!" data-stellar-page-meta="">
+<meta property="og:description" content="零、主干流程速查（先看这个）流程 A：一次 function calling 往返12345678910111213① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）        ↓② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西        ↓③ Go 进程内 Eino ReAct 收到响应 → 解析成 schema.M" data-stellar-page-meta="">
+<meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
+<meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
+<meta property="article:published_time" content="2026-11-07T13:00:00.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T01:22:07.000Z" data-stellar-page-meta="">
+<meta property="article:tag" content="agent" data-stellar-page-meta="">
+<meta property="article:tag" content="llm" data-stellar-page-meta="">
+<meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-page-meta="">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/about" class="waves-effect waves-light">
-      
-      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
-      
-      <span>关于</span>
-    </a>
-    
-  </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/contact" class="waves-effect waves-light">
-      
-      <i class="fas fa-comments" style="zoom: 0.6;"></i>
-      
-      <span>留言板</span>
-    </a>
-    
-  </li>
+  <meta name="keywords" content="agent,llm" data-stellar-page-meta="">
+
+  <!-- feed -->
   
-  <li>
-    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
-      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
-    </a>
-  </li>
-</ul>
+
+  <link rel="preload" href="/css/main.css?v=2.0.0" as="style">
+  <link rel="stylesheet" href="/css/main.css?v=2.0.0">
+  <style>:root{--text-loading:"正在加载";--text-loading-error:"加载失败，请稍后重试。"}</style>
 
 
-<div id="mobile-nav" class="side-nav sidenav">
+  
 
-    <div class="mobile-head bg-color">
-        
-        <img src="/medias/logo.png" class="logo-img circle responsive-img">
-        
-        <div class="logo-name">hi,it&#39;s Qiu Yinlan!</div>
-        <div class="logo-desc">
-            
-            分享技术、生活和学习笔记
-            
-        </div>
-    </div>
+  
 
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-07T21:00:00+08:00","dateModified":"2026-11-09T09:22:07+08:00","datePublished":"2026-11-07T21:00:00+08:00","description":"零、主干流程速查（先看这个）流程 A：一次 function calling 往返12345678910111213① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）        ↓② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西        ↓③ Go 进程内 Eino ReAct 收到响应 → 解析成 schem...","headline":"JSON、JSONL 与 Function Calling：Agent 的调用与轨迹","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, llm","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  
+
+  <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
+  <link rel="preload" as="script" href="/js/stellar-icons.js?v=39c6ac17e854ffe2">
+  
+  
+</head>
+<body data-page-type="content" data-page-layout="post" data-article-style="tech"><div data-stellar-runtime-region="" id="site-cover" class="site-cover"></div><div class="site-shell" id="start" data-regions="leftbar rightbar"><div class="site-workspace">
+<aside data-stellar-runtime-region="" id="leftbar-region" class="site-region site-region--leftbar" data-region="leftbar" aria-label="Leftbar"><div class="site-region__surface ui-surface"><div class="site-region__decoration" aria-hidden="true"></div><div class="site-region__viewport"><header class="site-region__header site-region__zone site-region__zone--top">
+    <div class="widget-instance widget-instance--brand" data-widget-id="leftbar:fixed:brand" data-presentation="leftbar" data-leftbar-rail="">
+<header class="brand-header brand-header--regular brand-header--site"><div class="brand-wrap"><a class="brand-image brand-image--avatar" href="/"><img no-lazy="" src="/favicon.png" alt="" onerror="this.onerror=null;this.src=&quot;/images/stellar-error.491ee870f4940739.svg&quot;"></a><a class="brand-title" href="/"><div class="brand-name">Qiu Yinlan</div><div class="brand-tagline cap">分享技术、生活和学习笔记</div></a></div><div class="brand-search">
+
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
     
+<button class="ui-collection__item ui-interactive card-hover card-hover--spotlight search-trigger has-hover-surface" type="button" title="搜索" aria-label="搜索" data-shell-action="open-search" data-search-instance="leftbar-brand-search" data-search-domain="blog" data-search-domain-label="博客" data-search-domain-blog="true">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"></path><circle cx="14" cy="11" r="4"></circle></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">搜索</span>
+      
+      
+    </span>
+  
+  <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
 
-    <ul class="menu-list mobile-menu-list">
-        
-        <li class="m-nav-item">
-	  
-		<a href="/" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-home"></i>
-			
-			首页
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/tags" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-tags"></i>
-			
-			标签
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/categories" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-bookmark"></i>
-			
-			分类
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/archives" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-archive"></i>
-			
-			归档
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/about" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-user-circle"></i>
-			
-			关于
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/contact" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-comments"></i>
-			
-			留言板
-		</a>
-          
-        </li>
-        
-        
-        <li><div class="divider"></div></li>
-        <li>
-            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
-                <i class="fab fa-github-square fa-fw"></i>Fork Me
-            </a>
-        </li>
-        
-    </ul>
+  
+</button>
+
+  
 </div>
 
 
-        </div>
+</div></header>
+</div>
+  </header>
+  <div class="site-region__body site-region__zone site-region__zone--body">
+    <div class="widget-instance widget-instance--menu" data-widget-id="leftbar:fixed:menu" data-presentation="leftbar" data-leftbar-rail="">
 
-        
-            <style>
-    .nav-transparent .github-corner {
-        display: none !important;
-    }
 
-    .github-corner {
-        position: absolute;
-        z-index: 10;
-        top: 0;
-        right: 0;
-        border: 0;
-        transform: scale(1.1);
-    }
-
-    .github-corner svg {
-        color: #0f9d58;
-        fill: #fff;
-        height: 64px;
-        width: 64px;
-    }
-
-    .github-corner:hover .octo-arm {
-        animation: a 0.56s ease-in-out;
-    }
-
-    .github-corner .octo-arm {
-        animation: none;
-    }
-
-    @keyframes a {
-        0%,
-        to {
-            transform: rotate(0);
-        }
-        20%,
-        60% {
-            transform: rotate(-25deg);
-        }
-        40%,
-        80% {
-            transform: rotate(10deg);
-        }
-    }
-</style>
-
-<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
-   data-tooltip="Fork Me" data-position="left" data-delay="50">
-    <svg viewBox="0 0 250 250" aria-hidden="true">
-        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-              fill="currentColor" class="octo-body"></path>
-    </svg>
+<nav class="menu dis-select">
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-active is-themed" href="/" title="近期发布" aria-current="page" style="--item-theme:#1BCDFC;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.879 2.879C5 3.757 5 5.172 5 8v8c0 2.828 0 4.243.879 5.121C6.757 22 8.172 22 11 22h2c2.828 0 4.243 0 5.121-.879C19 20.243 19 18.828 19 16V8c0-2.828 0-4.243-.879-5.121C17.243 2 15.828 2 13 2h-2c-2.828 0-4.243 0-5.121.879M8.25 17a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75M9 12.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zM8.25 9A.75.75 0 0 1 9 8.25h6a.75.75 0 0 1 0 1.5H9A.75.75 0 0 1 8.25 9" clip-rule="evenodd"></path><path fill="currentColor" d="M5.235 4.058C5 4.941 5 6.177 5 8v8c0 1.823 0 3.058.235 3.942L5 19.924c-.975-.096-1.631-.313-2.121-.803C2 18.243 2 16.828 2 14v-4c0-2.829 0-4.243.879-5.121c.49-.49 1.146-.707 2.121-.803zm13.53 15.884C19 19.058 19 17.822 19 16V8c0-1.823 0-3.059-.235-3.942l.235.018c.975.096 1.631.313 2.121.803C22 5.757 22 7.17 22 9.999v4c0 2.83 0 4.243-.879 5.122c-.49.49-1.146.707-2.121.803z" opacity=".5"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">近期发布</span>
+      
+      
+    </span>
+  
+  
+  <span class="ui-collection__indicator"></span>
 </a>
-        
-    </nav>
 
-</header>
-
+  
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/notebooks/" title="笔记" style="--item-theme:#3DC550;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M14.25 4.48v3.057c0 .111 0 .27.02.406a.94.94 0 0 0 .445.683a.96.96 0 0 0 .783.072c.13-.04.272-.108.378-.159L17 8.005l1.124.534c.106.05.248.119.378.16a.96.96 0 0 0 .783-.073a.94.94 0 0 0 .444-.683c.021-.136.021-.295.021-.406V3.031q.17-.008.332-.013C21.154 2.98 22 3.86 22 4.933v11.21c0 1.112-.906 2.01-2.015 2.08c-.97.06-2.108.179-2.985.41c-1.082.286-1.99 1.068-3.373 1.436c-.626.167-1.324.257-1.627.323V5.174c.32-.079 1.382-.203 1.674-.371q.277-.162.576-.323m5.478 8.338a.75.75 0 0 1-.546.91l-4 1a.75.75 0 0 1-.364-1.456l4-1a.75.75 0 0 1 .91.546" clip-rule="evenodd"></path><path fill="currentColor" d="M18.25 3.151c-.62.073-1.23.18-1.75.336a8 8 0 0 0-.75.27v3.182l.75-.356l.008-.005a1.1 1.1 0 0 1 .492-.13q.071 0 .138.01c.175.029.315.1.354.12l.009.005l.749.356z"></path><path fill="currentColor" d="M12 5.214c-.334-.064-1.057-.161-1.718-.339C8.938 4.515 8.05 3.765 7 3.487c-.887-.234-2.041-.352-3.018-.412C2.886 3.007 2 3.9 2 4.998v11.146c0 1.11.906 2.01 2.015 2.079c.97.06 2.108.179 2.985.41c.486.129 1.216.431 1.873.726c1.005.451 2.052.797 3.127 1.034z" opacity=".5"></path><path fill="currentColor" d="M4.273 12.818a.75.75 0 0 1 .91-.545l4 1a.75.75 0 1 1-.365 1.455l-4-1a.75.75 0 0 1-.545-.91m.909-4.545a.75.75 0 1 0-.364 1.455l4 1a.75.75 0 0 0 .364-1.455z"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">笔记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/wiki/" title="项目" style="--item-theme:#F44336;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="m12 16.068l-3.771 3.905c-.54.559-.81.839-1.04.935c-.52.22-1.099.032-1.373-.448c-.12-.21-.158-.59-.232-1.35c-.043-.43-.064-.644-.128-.824a1.43 1.43 0 0 0-.835-.864c-.173-.067-.38-.089-.795-.133c-.734-.077-1.101-.116-1.305-.24c-.463-.284-.646-.883-.433-1.422c.094-.237.364-.517.904-1.076L5.456 12l1.238-1.238zl5.306-5.306L18.544 12l2.464 2.55c.54.56.81.84.904 1.076c.213.54.03 1.139-.433 1.423c-.204.124-.57.163-1.305.24c-.414.044-.622.066-.795.133c-.389.149-.69.462-.835.864c-.064.18-.085.394-.128.823c-.075.76-.112 1.14-.232 1.351c-.274.48-.853.669-1.374.448c-.228-.096-.498-.376-1.038-.935z" opacity=".5"></path><path fill="currentColor" fill-rule="evenodd" d="M12 16a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-10c-.284 0-.474.34-.854 1.023l-.098.176c-.108.194-.162.29-.246.354c-.085.064-.19.088-.4.135l-.19.044c-.738.167-1.107.25-1.195.532s.164.577.667 1.165l.13.152c.143.167.215.25.247.354s.021.215 0 .438l-.02.203c-.076.785-.114 1.178.115 1.352c.23.174.576.015 1.267-.303l.178-.082c.197-.09.295-.135.399-.135s.202.045.399.135l.178.082c.691.319 1.037.477 1.267.303s.191-.567.115-1.352l-.02-.203c-.021-.223-.032-.334 0-.438s.104-.187.247-.354l.13-.152c.503-.588.755-.882.667-1.165c-.088-.282-.457-.365-1.195-.532l-.19-.044c-.21-.047-.315-.07-.4-.135c-.084-.064-.138-.16-.246-.354l-.098-.176C12.474 6.34 12.284 6 12 6" clip-rule="evenodd"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">项目</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/archives/" title="归档" style="--item-theme:#7C4DFF;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M6.94028 2C7.35614 2 7.69326 2.32421 7.69326 2.72414V4.18487C8.36117 4.17241 9.10983 4.17241 9.95219 4.17241H13.9681C14.8104 4.17241 15.5591 4.17241 16.227 4.18487V2.72414C16.227 2.32421 16.5641 2 16.98 2C17.3958 2 17.733 2.32421 17.733 2.72414V4.24894C19.178 4.36022 20.1267 4.63333 20.8236 5.30359C21.5206 5.97385 21.8046 6.88616 21.9203 8.27586L22 9H2.92456H2V8.27586C2.11571 6.88616 2.3997 5.97385 3.09665 5.30359C3.79361 4.63333 4.74226 4.36022 6.1873 4.24894V2.72414C6.1873 2.32421 6.52442 2 6.94028 2Z"></path><path d="M21.9995 14.0001V12.0001C21.9995 11.161 21.9963 9.66527 21.9834 9H2.00917C1.99626 9.66527 1.99953 11.161 1.99953 12.0001V14.0001C1.99953 17.7713 1.99953 19.6569 3.1711 20.8285C4.34267 22.0001 6.22829 22.0001 9.99953 22.0001H13.9995C17.7708 22.0001 19.6564 22.0001 20.828 20.8285C21.9995 19.6569 21.9995 17.7713 21.9995 14.0001Z" opacity=".5"></path><path d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"></path><path d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"></path><path d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"></path><path d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"></path><path d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"></path><path d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"></path></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">归档</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/16.jpg')">
-    <div class="container" style="right: 0px;left: 0px;">
-        <div class="row">
-            <div class="col s12 m12 l12">
-                <div class="brand">
-                    <h1 class="description center-align post-title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</h1>
-                </div>
-            </div>
-        </div>
-    </div>
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/about/" title="关于">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20" opacity=".5"></path><path d="M12 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6m0 7.5c-3.04 0-5.5 1.57-5.5 3.5c0 .65.28 1.26.77 1.77A7.96 7.96 0 0 0 12 20.5a7.96 7.96 0 0 0 4.73-1.73c.49-.51.77-1.12.77-1.77c0-1.93-2.46-3.5-5.5-3.5"></path></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">关于</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
 </div>
 
+</nav>
 
+</div>
+    <div class="widgets widget-stack widget-stack--leftbar widget-stack--body"><div class="widget-instance widget-instance--recent" data-widget-id="leftbar:1:recent" data-presentation="leftbar">
 
-
-<main class="post-container content">
-
+<widget class="widget-wrapper slide-up recent-widget">
+  
+    <div class="widget-header dis-select">
+      <span class="name">最近更新</span>
+      
+    </div>
+  
+  <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
     
-    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
-<style>
-    #articleContent h1::before,
-    #articleContent h2::before,
-    #articleContent h3::before,
-    #articleContent h4::before,
-    #articleContent h5::before,
-    #articleContent h6::before {
-        display: block;
-        content: " ";
-        height: 100px;
-        margin-top: -100px;
-        visibility: hidden;
-    }
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" title="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">A</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #articleContent :focus {
-        outline: none;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-fixed {
-        position: fixed;
-        top: 64px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">J</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget {
-        width: 345px;
-        padding-left: 20px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">从</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget .toc-title {
-        padding: 35px 0 15px 17px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget ol {
-        padding: 0;
-        list-style: none;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content {
-        padding-bottom: 30px;
-        overflow: auto;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/01/%E5%8D%9A%E5%AE%A2%E5%A4%B1%E8%B4%A5%E6%97%A5%E8%AE%B0/" title="博客失败日记" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">博</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">博客失败日记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content ol {
-        padding-left: 10px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/01/%E5%8D%9A%E5%AE%A2/" title="博客" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">博</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">博客</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content ol li {
-        padding-left: 10px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/07/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/" title="ftp协议介绍及代码" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">F</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">ftp协议介绍及代码</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content .toc-link:hover {
-        color: #42b983;
-        font-weight: 700;
-        text-decoration: underline;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/07/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/" title="5.26-6.1周复盘" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">5</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">5.26-6.1周复盘</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content .toc-link::before {
-        background-color: transparent;
-        max-height: 25px;
+  
+</div></div>
+  
+</widget>
 
-        position: absolute;
-        right: 23.5vw;
-        display: block;
-    }
 
-    #toc-content .is-active-link {
-        color: #42b983;
-    }
+</div></div>
+  </div>
+  <footer class="site-region__footer">
+    
+    <div class="site-region__system ui-collection" data-layout="inline" data-variant="nav" data-density="compact">
+      <div class="site-region__settings"><div class="widget-instance widget-instance--settings" data-widget-id="leftbar:fixed:settings" data-presentation="leftbar" data-leftbar-rail="">
+<a class="settings-widget ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/settings/" data-profile-provider="" data-profile-identity-enabled="false" data-profile-fallback-avatar="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg" data-settings-placement="leftbar" data-settings-label="设置" aria-label="设置" title="设置">
+  <span class="settings-widget__avatar" aria-hidden="true">
+    <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2Z" clip-rule="evenodd" opacity=".5"></path><path d="M12.4277 8.25C10.3567 8.25 8.67773 9.92893 8.67773 12C8.67773 14.0711 10.3567 15.75 12.4277 15.75C14.4988 15.75 16.1777 14.0711 16.1777 12C16.1777 9.92893 14.4988 8.25 12.4277 8.25Z"></path></g></svg></span>
+  </span>
+  <span class="settings-widget__name ui-collection__title">设置</span>
+</a>
+</div></div>
+      <button type="button" class="leftbar-state-toggle ui-collection__item ui-interactive card-hover card-hover--spotlight is-icon-only" aria-label="Collapse leftbar" aria-expanded="true" data-shell-action="toggle-leftbar"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.172 4.172C2 5.343 2 7.229 2 11v2c0 3.771 0 5.657 1.172 6.828S6.229 21 10 21h5V3h-5C6.229 3 4.343 3 3.172 4.172" clip-rule="evenodd" opacity=".5"></path><path fill="currentColor" d="M5.5 9.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm1 4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zM22 13v-2c0-3.771 0-5.657-1.172-6.828c-.974-.975-3.192-1.139-5.828-1.166v17.988c2.636-.027 4.854-.191 5.828-1.166C22 18.657 22 16.771 22 13"></path></svg></span></button>
+    </div>
+  </footer></div></div></aside>
+<main data-stellar-runtime-region="" class="site-main" id="main">
 
-    #floating-toc-btn {
-        position: fixed;
-        right: 15px;
-        bottom: 76px;
-        padding-top: 15px;
-        margin-bottom: 0;
-        z-index: 998;
-    }
 
-    #floating-toc-btn .btn-floating {
-        width: 48px;
-        height: 48px;
-    }
-
-    #floating-toc-btn .btn-floating i {
-        line-height: 48px;
-        font-size: 1.4rem;
-    }
-</style>
-<div class="row">
-    <div id="main-content" class="col s12 m12 l9">
-        <!-- 文章内容详情 -->
-<div id="artDetail">
-    <div class="card">
-        <div class="card-content article-info">
-            <div class="row tag-cate">
-                <div class="col s7">
-                    
-                    <div class="article-tag">
-                        
-                            <a href="/tags/agent/">
-                                <span class="chip bg-color">agent</span>
-                            </a>
-                        
-                            <a href="/tags/llm/">
-                                <span class="chip bg-color">llm</span>
-                            </a>
-                        
-                    </div>
-                    
-                </div>
-                <div class="col s5 right-align">
-                    
-                    <div class="post-cate">
-                        <i class="fas fa-bookmark fa-fw icon-category"></i>
-                        
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                技术
-                            </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="post-info">
-                
-                <div class="post-date info-break-policy">
-                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2026-11-07
-                </div>
-                
-
-                
-
-                
-
-                
-
-                
-            </div>
-        </div>
-        <hr class="clearfix">
-
+<div class="article-banner-wrap slide-up"><div class="article banner top">
+  <div class="content">
+    
+    <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+</div><div class="right"><span class="cap reading">3849 字 · 预计阅读 13 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-07T13:00:00.000Z">2026-11-07</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T01:22:07.000Z">2026-11-09</time></span></div>
+</div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span></h1>
         
-
-        
-
-        <div class="card-content article-card-content">
-            <div id="articleContent">
-                <h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一次-function-calling-往返"><a href="#流程-A：一次-function-calling-往返" class="headerlink" title="流程 A：一次 function calling 往返"></a>流程 A：一次 function calling 往返</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）</span><br><span class="line">        ↓</span><br><span class="line">② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西</span><br><span class="line">        ↓</span><br><span class="line">③ Go 进程内 Eino ReAct 收到响应 → 解析成 schema.Message</span><br><span class="line">        ↓</span><br><span class="line">④ ToolsNode 按 name 查索引（compose/tool_node.go），查不到直接报错</span><br><span class="line">        ↓</span><br><span class="line">⑤ 执行你写的 Go 闭包 → 真去查 ES / Prometheus / Redis（副作用只在这发生）</span><br><span class="line">        ↓</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id，塞回 messages</span><br><span class="line">        ↓</span><br><span class="line">⑦ 回到 ①，循环，直到模型不再返回 tool_calls 或撞 MaxStep=25</span><br></pre></td></tr></table></figure>
+      </div>
+    </div>
+    
+  </div>
+  </div></div>
+<article class="md-text content slide-up"><h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）" data-stellar-navigation=""></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一次-function-calling-往返"><a href="#流程-A：一次-function-calling-往返" class="headerlink" title="流程 A：一次 function calling 往返" data-stellar-navigation=""></a>流程 A：一次 function calling 往返</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程：发 HTTP 请求（messages + 11 个工具的 schema）</span><br><span class="line">        ↓</span><br><span class="line">② 模型：返回 tool_calls（工具名 + JSON 参数），不执行任何东西</span><br><span class="line">        ↓</span><br><span class="line">③ Go 进程内 Eino ReAct 收到响应 → 解析成 schema.Message</span><br><span class="line">        ↓</span><br><span class="line">④ ToolsNode 按 name 查索引（compose/tool_node.go），查不到直接报错</span><br><span class="line">        ↓</span><br><span class="line">⑤ 执行你写的 Go 闭包 → 真去查 ES / Prometheus / Redis（副作用只在这发生）</span><br><span class="line">        ↓</span><br><span class="line">⑥ 结果包成 role:"tool" + tool_call_id，塞回 messages</span><br><span class="line">        ↓</span><br><span class="line">⑦ 回到 ①，循环，直到模型不再返回 tool_calls 或撞 MaxStep=25</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>记住三句：</strong> 模型只点菜、你炒菜；模型无状态，不回灌它永远不知道执行结果；接收方永远是客户端。</p>
-<h3 id="流程-B：知识库入库（写一次）"><a href="#流程-B：知识库入库（写一次）" class="headerlink" title="流程 B：知识库入库（写一次）"></a>流程 B：知识库入库（写一次）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Upload → 算内容哈希 ID → DocumentExists 查重（命中就 return，不算向量）</span><br><span class="line">      → Embedder 生成向量 → 挂回 doc.Vector</span><br><span class="line">      → json.Marshal 整个 struct → 一次 HTTP PUT 进 ES</span><br><span class="line">      → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部进 _source</span><br></pre></td></tr></table></figure>
+<h3 id="流程-B：知识库入库（写一次）"><a href="#流程-B：知识库入库（写一次）" class="headerlink" title="流程 B：知识库入库（写一次）" data-stellar-navigation=""></a>流程 B：知识库入库（写一次）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Upload → 算内容哈希 ID → DocumentExists 查重（命中就 return，不算向量）</span><br><span class="line">      → Embedder 生成向量 → 挂回 doc.Vector</span><br><span class="line">      → json.Marshal 整个 struct → 一次 HTTP PUT 进 ES</span><br><span class="line">      → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部进 _source</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="流程-C：检索（读一次）"><a href="#流程-C：检索（读一次）" class="headerlink" title="流程 C：检索（读一次）"></a>流程 C：检索（读一次）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排 → 取 content 原文拼 prompt → 发给 LLM（向量到此为止，永不进 prompt）</span><br></pre></td></tr></table></figure>
+<h3 id="流程-C：检索（读一次）"><a href="#流程-C：检索（读一次）" class="headerlink" title="流程 C：检索（读一次）" data-stellar-navigation=""></a>流程 C：检索（读一次）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排 → 取 content 原文拼 prompt → 发给 LLM（向量到此为止，永不进 prompt）</span><br></pre></td></tr></tbody></table></figure>
 
 <blockquote>
-<p>三条流程对应的代码细节分别在本文件 <a href="#q6">Q6</a>、<a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/#q5">从浮点数到向量检索：ES、BM25 与 Agent 评测 的 Q5</a>、<a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/#q13">从浮点数到向量检索：ES、BM25 与 Agent 评测 的 Q13</a>。</p>
+<p>三条流程对应的代码细节分别在本文件 <a href="#q6" data-stellar-navigation="">Q6</a>、<a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/#q5" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>从浮点数到向量检索：ES、BM25 与 Agent 评测 的 Q5</a>、<a href="https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/#q13" data-md-link="" data-stellar-navigation=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>从浮点数到向量检索：ES、BM25 与 Agent 评测 的 Q13</a>。</p>
 </blockquote>
-<h2 id="一、JSON-与-JSONL"><a href="#一、JSON-与-JSONL" class="headerlink" title="一、JSON 与 JSONL"></a>一、JSON 与 JSONL</h2><h3 id="Q1-JSON-和-JSONL-有什么区别？"><a href="#Q1-JSON-和-JSONL-有什么区别？" class="headerlink" title="Q1. JSON 和 JSONL 有什么区别？"></a><span id="q1"></span>Q1. JSON 和 JSONL 有什么区别？</h3><p><strong>JSON 是一个完整的值</strong>，可以是对象也可以是数组，语法上必须括号闭合、能被整体解析。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">&quot;tool&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="number">2</span><span class="punctuation">,</span><span class="attr">&quot;tool&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_metrics&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+<h2 id="一、JSON-与-JSONL"><a href="#一、JSON-与-JSONL" class="headerlink" title="一、JSON 与 JSONL" data-stellar-navigation=""></a>一、JSON 与 JSONL</h2><h3 id="Q1-JSON-和-JSONL-有什么区别？"><a href="#Q1-JSON-和-JSONL-有什么区别？" class="headerlink" title="Q1. JSON 和 JSONL 有什么区别？" data-stellar-navigation=""></a><span id="q1"></span>Q1. JSON 和 JSONL 有什么区别？</h3><p><strong>JSON 是一个完整的值</strong>，可以是对象也可以是数组，语法上必须括号闭合、能被整体解析。</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"id"</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">"tool"</span><span class="punctuation">:</span><span class="string">"query_logs"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="punctuation">{</span><span class="attr">"id"</span><span class="punctuation">:</span><span class="number">2</span><span class="punctuation">,</span><span class="attr">"tool"</span><span class="punctuation">:</span><span class="string">"query_metrics"</span><span class="punctuation">}</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>JSONL（JSON Lines &#x2F; NDJSON）是一行一个独立 JSON</strong>，行间用 <code>\n</code> 分隔。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;id&quot;:1,&quot;tool&quot;:&quot;query_logs&quot;,&quot;ok&quot;:true&#125;</span><br><span class="line">&#123;&quot;id&quot;:2,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;ok&quot;:true&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>JSONL（JSON Lines / NDJSON）是一行一个独立 JSON</strong>，行间用 <code>\n</code> 分隔。</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">{"id":1,"tool":"query_logs","ok":true}</span><br><span class="line">{"id":2,"tool":"query_metrics","ok":true}</span><br></pre></td></tr></tbody></table></figure>
 
 <p>三个必须记住的语法点：</p>
 <ul>
@@ -483,33 +458,33 @@
 </ul>
 <p>所以整份 JSONL 文件<strong>不是合法 JSON</strong>，<code>json.Unmarshal</code> 整个文件会报错；反过来每行单独拿出来都合法。</p>
 <p><strong>内存差异：</strong> 用 <code>json.Unmarshal</code> 解析 1GB 的 JSON 数组，内存里同时存在原始字节 + 解析结果，约 2 倍；JSONL 可以一行一行读，只留一行在内存里。</p>
-<h3 id="Q2-为什么日志-trace-评测结果都用-JSONL？"><a href="#Q2-为什么日志-trace-评测结果都用-JSONL？" class="headerlink" title="Q2. 为什么日志 &#x2F; trace &#x2F; 评测结果都用 JSONL？"></a><span id="q2"></span>Q2. 为什么日志 &#x2F; trace &#x2F; 评测结果都用 JSONL？</h3><p>四条，从强到弱：</p>
+<h3 id="Q2-为什么日志-trace-评测结果都用-JSONL？"><a href="#Q2-为什么日志-trace-评测结果都用-JSONL？" class="headerlink" title="Q2. 为什么日志 / trace / 评测结果都用 JSONL？" data-stellar-navigation=""></a><span id="q2"></span>Q2. 为什么日志 / trace / 评测结果都用 JSONL？</h3><p>四条，从强到弱：</p>
 <ol>
 <li><strong>追加友好。</strong> JSON 数组要往 <code>]</code> 前塞逗号，得 seek 到文件尾改，并发写直接打架。JSONL 就是 <code>append</code>，一行写完就完事。</li>
 <li><strong>损坏隔离。</strong> 写到一半断电，JSON 整个文件废；JSONL 只有最后一行残，前面全部有效，跳过坏行继续跑。<strong>这条对日志和 trace 是决定性的。</strong></li>
 <li><strong>流式处理。</strong> 一行一行来，1GB 文件也能在小内存机器上处理完。</li>
 <li><strong>命令行直接能玩。</strong> <code>grep</code>、<code>tail -f</code>、<code>wc -l</code>、<code>jq -c</code> 全部开箱可用。</li>
 </ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">&#x27;&quot;ok&quot;:false&#x27;</span> trace.jsonl | <span class="built_in">wc</span> -l    <span class="comment"># 统计失败用例</span></span><br><span class="line"><span class="built_in">tail</span> -f trace.jsonl                       <span class="comment"># 实时盯工具调用</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grep <span class="string">'"ok":false'</span> trace.jsonl | <span class="built_in">wc</span> -l    <span class="comment"># 统计失败用例</span></span><br><span class="line"><span class="built_in">tail</span> -f trace.jsonl                       <span class="comment"># 实时盯工具调用</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>JSON 数组得先 <code>jq &#39;.[]&#39;</code> 拆开，而且 <code>tail -f</code> 看到一个没闭合的数组啥也干不了。</p>
-<h3 id="Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？"><a href="#Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？" class="headerlink" title="Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？"></a><span id="q3"></span>Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？</h3><p><strong>写</strong>——<code>json.Encoder</code> 最省事，<code>Encode</code> 会自动在末尾补 <code>\n</code>，正好就是 JSONL 格式：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">enc := json.NewEncoder(f)</span><br><span class="line"><span class="keyword">for</span> _, call := <span class="keyword">range</span> calls &#123;</span><br><span class="line">    <span class="keyword">if</span> err := enc.Encode(call); err != <span class="literal">nil</span> &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JSON 数组得先 <code>jq '.[]'</code> 拆开，而且 <code>tail -f</code> 看到一个没闭合的数组啥也干不了。</p>
+<h3 id="Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？"><a href="#Q3-Go-里怎么写、怎么读-JSONL？有哪些坑？" class="headerlink" title="Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？" data-stellar-navigation=""></a><span id="q3"></span>Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？</h3><p><strong>写</strong>——<code>json.Encoder</code> 最省事，<code>Encode</code> 会自动在末尾补 <code>\n</code>，正好就是 JSONL 格式：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">enc := json.NewEncoder(f)</span><br><span class="line"><span class="keyword">for</span> _, call := <span class="keyword">range</span> calls {</span><br><span class="line">    <span class="keyword">if</span> err := enc.Encode(call); err != <span class="literal">nil</span> { ... }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>读</strong>——<code>bufio.Scanner</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sc := bufio.NewScanner(f)</span><br><span class="line">buf := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">0</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>)</span><br><span class="line">sc.Buffer(buf, <span class="number">8</span>&lt;&lt;<span class="number">20</span>)   <span class="comment">// 单行上限，默认只有 64KB</span></span><br><span class="line"><span class="keyword">for</span> sc.Scan() &#123;</span><br><span class="line">    <span class="keyword">var</span> call ToolCall</span><br><span class="line">    <span class="keyword">if</span> err := json.Unmarshal(sc.Bytes(), &amp;call); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">continue</span>        <span class="comment">// 坏行跳过，不影响后面</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">sc := bufio.NewScanner(f)</span><br><span class="line">buf := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">0</span>, <span class="number">1</span>&lt;&lt;<span class="number">20</span>)</span><br><span class="line">sc.Buffer(buf, <span class="number">8</span>&lt;&lt;<span class="number">20</span>)   <span class="comment">// 单行上限，默认只有 64KB</span></span><br><span class="line"><span class="keyword">for</span> sc.Scan() {</span><br><span class="line">    <span class="keyword">var</span> call ToolCall</span><br><span class="line">    <span class="keyword">if</span> err := json.Unmarshal(sc.Bytes(), &amp;call); err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="keyword">continue</span>        <span class="comment">// 坏行跳过，不影响后面</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>五个坑：</strong></p>
 <ul>
 <li><strong><code>Scanner</code> 默认单行上限 64KB</strong>，工具返回一大段日志塞进 trace 就爆，必须手动 <code>Buffer()</code> 放大</li>
 <li><strong>一行内不能有裸换行</strong>，字符串里的换行必须转义成 <code>\n</code>（<code>encoding/json</code> 会自动处理，手拼字符串会出事）</li>
-<li><strong>不能有行尾逗号</strong>，<code>{&quot;a&quot;:1,}</code> 非法</li>
+<li><strong>不能有行尾逗号</strong>，<code>{"a":1,}</code> 非法</li>
 <li><strong>不要在外面包数组</strong>，否则退化成 JSON，按行处理全废</li>
 <li><strong>UTF-8 无 BOM</strong>，带 BOM 会让只有第一行解析失败，是那种最诡异的 bug</li>
 </ul>
-<h3 id="Q4-怎么选-JSON-还是-JSONL？"><a href="#Q4-怎么选-JSON-还是-JSONL？" class="headerlink" title="Q4. 怎么选 JSON 还是 JSONL？"></a><span id="q4"></span>Q4. 怎么选 JSON 还是 JSONL？</h3><p>判断标准一条：<strong>这份数据是「一次性整体读」还是「一条条追加、一条条读」？</strong> 后者一律 JSONL。</p>
+<h3 id="Q4-怎么选-JSON-还是-JSONL？"><a href="#Q4-怎么选-JSON-还是-JSONL？" class="headerlink" title="Q4. 怎么选 JSON 还是 JSONL？" data-stellar-navigation=""></a><span id="q4"></span>Q4. 怎么选 JSON 还是 JSONL？</h3><p>判断标准一条：<strong>这份数据是「一次性整体读」还是「一条条追加、一条条读」？</strong> 后者一律 JSONL。</p>
 <ul>
-<li><strong>JSON</strong>：配置文件、API 请求&#x2F;响应、需要整体结构的（ES 的 mapping、<code>esapi.IndexRequest</code> 的 body）</li>
+<li><strong>JSON</strong>：配置文件、API 请求/响应、需要整体结构的（ES 的 mapping、<code>esapi.IndexRequest</code> 的 body）</li>
 <li><strong>JSONL</strong>：日志、trace、评测结果、训练数据、批处理中间产物</li>
 </ul>
 <p>落到 Pilot：</p>
@@ -519,872 +494,236 @@
 <li>但 tool trace 落盘必须是 <strong>JSONL</strong>（每步追加一行，跑完几万行，还要被脚本批量读）</li>
 </ul>
 <p>一句话：<strong>JSON 是一份文档，JSONL 是一叠同样的纸条——文档要好读，纸条要能一张张抽出来用。</strong></p>
-<h2 id="二、Function-Calling"><a href="#二、Function-Calling" class="headerlink" title="二、Function Calling"></a>二、Function Calling</h2><h3 id="Q5-Pilot-用-function-calling-了吗？"><a href="#Q5-Pilot-用-function-calling-了吗？" class="headerlink" title="Q5. Pilot 用 function calling 了吗？"></a><span id="q5"></span>Q5. Pilot 用 function calling 了吗？</h3><p><strong>用了，但一行相关代码都没手写——Eino 的 ReAct 全包了。</strong></p>
+<h2 id="二、Function-Calling"><a href="#二、Function-Calling" class="headerlink" title="二、Function Calling" data-stellar-navigation=""></a>二、Function Calling</h2><h3 id="Q5-Pilot-用-function-calling-了吗？"><a href="#Q5-Pilot-用-function-calling-了吗？" class="headerlink" title="Q5. Pilot 用 function calling 了吗？" data-stellar-navigation=""></a><span id="q5"></span>Q5. Pilot 用 function calling 了吗？</h3><p><strong>用了，但一行相关代码都没手写——Eino 的 ReAct 全包了。</strong></p>
 <p><strong>证据链四条：</strong></p>
 <p><strong>① 模型是 OpenAI 兼容协议</strong>（<code>internal/ai/models/chat_model.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chatModel, err := openai.NewChatModel(ctx, config)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chatModel, err := openai.NewChatModel(ctx, config)</span><br></pre></td></tr></tbody></table></figure>
 
-<p>function calling 不是厂商私货，就是 OpenAI 协议里的 <code>tools</code> 字段，DashScope &#x2F; DeepSeek 都支持。</p>
+<p>function calling 不是厂商私货，就是 OpenAI 协议里的 <code>tools</code> 字段，DashScope / DeepSeek 都支持。</p>
 <p><strong>② 字段名直接写了 ToolCalling</strong>（<code>full_agent.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.ToolCallingModel = chatModel.GetModel()</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config.ToolCallingModel = chatModel.GetModel()</span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>react.AgentConfig</code> 里这个字段类型是 <code>model.ToolCallingChatModel</code>（eino v0.7.14 <code>flow/agent/react/react.go</code>），<strong>要求模型必须能发起工具调用</strong>。</p>
 <p><strong>③ 注册了 11 个工具</strong>（<code>full_agent.go</code>）：<code>query_alerts</code>、<code>query_metrics</code>、<code>query_logs</code>、<code>search_knowledge</code>…</p>
 <p><strong>④ 工具的 JSON Schema 自动生成</strong>（<code>tools/knowledge_tools_impl.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t, err := utils.InferOptionableTool(</span><br><span class="line">	<span class="string">&quot;search_knowledge&quot;</span>,</span><br><span class="line">	<span class="string">&quot;搜索知识库，获取相关文档和最佳实践...&quot;</span>,</span><br><span class="line">	<span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t, err := utils.InferOptionableTool(</span><br><span class="line">	<span class="string">"search_knowledge"</span>,</span><br><span class="line">	<span class="string">"搜索知识库，获取相关文档和最佳实践..."</span>,</span><br><span class="line">	<span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) {</span><br></pre></td></tr></tbody></table></figure>
 
 <p>配套的 struct tag：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SearchKnowledgeInput <span class="keyword">struct</span> &#123;</span><br><span class="line">	Query <span class="type">string</span> <span class="string">`json:&quot;query&quot; jsonschema:&quot;description=搜索关键词或问题描述,required&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> SearchKnowledgeInput <span class="keyword">struct</span> {</span><br><span class="line">	Query <span class="type">string</span> <span class="string">`json:"query" jsonschema:"description=搜索关键词或问题描述,required"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>InferOptionableTool</code> 反射这个 struct，把 tag 转成 JSON Schema——<strong>这个 schema 就是 function calling 里 <code>parameters</code> 的内容</strong>。</p>
-<h3 id="Q6-Schema-是什么？是标准吗？"><a href="#Q6-Schema-是什么？是标准吗？" class="headerlink" title="Q6. Schema 是什么？是标准吗？"></a><span id="q6"></span>Q6. Schema 是什么？是标准吗？</h3><p><strong>Schema &#x3D; 结构说明书</strong>：用一份结构化描述，说明另一份数据长什么样。</p>
+<h3 id="Q6-Schema-是什么？是标准吗？"><a href="#Q6-Schema-是什么？是标准吗？" class="headerlink" title="Q6. Schema 是什么？是标准吗？" data-stellar-navigation=""></a><span id="q6"></span>Q6. Schema 是什么？是标准吗？</h3><p><strong>Schema = 结构说明书</strong>：用一份结构化描述，说明另一份数据长什么样。</p>
 <p>数据库的 <code>CREATE TABLE</code>、Protobuf 的 <code>.proto</code>、JSON 的 <strong>JSON Schema</strong>，都是同一类东西。</p>
 <p><strong>JSON Schema 是公开标准</strong>，规范在 <code>json-schema.org</code>，有 IETF 草案版本（draft-07、2020-12），<strong>不是 OpenAI 私有格式</strong>。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;object&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;服务名，如 payment&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;window&quot;</span><span class="punctuation">:</span>  <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;enum&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;5m&quot;</span><span class="punctuation">,</span> <span class="string">&quot;15m&quot;</span><span class="punctuation">,</span> <span class="string">&quot;1h&quot;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span>   <span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;string&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;enum&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;error&quot;</span><span class="punctuation">,</span> <span class="string">&quot;warn&quot;</span><span class="punctuation">,</span> <span class="string">&quot;info&quot;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;required&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;service&quot;</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"object"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"properties"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"service"</span><span class="punctuation">:</span> <span class="punctuation">{</span><span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"string"</span><span class="punctuation">,</span> <span class="attr">"description"</span><span class="punctuation">:</span> <span class="string">"服务名，如 payment"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"window"</span><span class="punctuation">:</span>  <span class="punctuation">{</span><span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"string"</span><span class="punctuation">,</span> <span class="attr">"enum"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"5m"</span><span class="punctuation">,</span> <span class="string">"15m"</span><span class="punctuation">,</span> <span class="string">"1h"</span><span class="punctuation">]</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"level"</span><span class="punctuation">:</span>   <span class="punctuation">{</span><span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"string"</span><span class="punctuation">,</span> <span class="attr">"enum"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"error"</span><span class="punctuation">,</span> <span class="string">"warn"</span><span class="punctuation">,</span> <span class="string">"info"</span><span class="punctuation">]</span><span class="punctuation">}</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"required"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"service"</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>用处有两个：<strong>给机器校验</strong>（不符就报错）+ <strong>给人&#x2F;AI 看</strong>（知道该填什么）。所以 function calling 拿它定义参数。</p>
-<h3 id="Q7-function-calling-的定义是什么？"><a href="#Q7-function-calling-的定义是什么？" class="headerlink" title="Q7. function calling 的定义是什么？"></a><span id="q7"></span>Q7. function calling 的定义是什么？</h3><p><strong>让模型不直接说人话，而是输出「要调哪个函数 + 参数是什么」这种结构化数据。</strong></p>
+<p>用处有两个：<strong>给机器校验</strong>（不符就报错）+ <strong>给人/AI 看</strong>（知道该填什么）。所以 function calling 拿它定义参数。</p>
+<h3 id="Q7-function-calling-的定义是什么？"><a href="#Q7-function-calling-的定义是什么？" class="headerlink" title="Q7. function calling 的定义是什么？" data-stellar-navigation=""></a><span id="q7"></span>Q7. function calling 的定义是什么？</h3><p><strong>让模型不直接说人话，而是输出「要调哪个函数 + 参数是什么」这种结构化数据。</strong></p>
 <p>对比：</p>
 <ul>
-<li><strong>传统</strong>：「你可以试试查看 payment 服务的日志，重点关注 error 级别……」→ 这是<strong>建议</strong>，还得自己解析，而且说法千变万化（查看日志&#x2F;看看 log&#x2F;检查一下日志），没法可靠解析</li>
-<li><strong>function calling</strong>：<code>{&quot;tool_calls&quot;:[{&quot;function&quot;:{&quot;name&quot;:&quot;query_logs&quot;,&quot;arguments&quot;:&quot;{\&quot;service\&quot;:\&quot;payment\&quot;,\&quot;level\&quot;:\&quot;error\&quot;}&quot;}}]}</code> → 这是<strong>指令</strong>，<code>json.Unmarshal</code> 直接能用</li>
+<li><strong>传统</strong>：「你可以试试查看 payment 服务的日志，重点关注 error 级别……」→ 这是<strong>建议</strong>，还得自己解析，而且说法千变万化（查看日志/看看 log/检查一下日志），没法可靠解析</li>
+<li><strong>function calling</strong>：<code>{"tool_calls":[{"function":{"name":"query_logs","arguments":"{\"service\":\"payment\",\"level\":\"error\"}"}}]}</code> → 这是<strong>指令</strong>，<code>json.Unmarshal</code> 直接能用</li>
 </ul>
 <p><strong>三个必须理解的点：</strong></p>
 <ol>
-<li><strong>模型不执行任何东西。</strong> 它只输出 JSON 说「我想调 query_logs」，真正查 Prometheus&#x2F;ES 的是你的 Go 代码。<strong>模型只点菜，你炒菜。</strong></li>
+<li><strong>模型不执行任何东西。</strong> 它只输出 JSON 说「我想调 query_logs」，真正查 Prometheus/ES 的是你的 Go 代码。<strong>模型只点菜，你炒菜。</strong></li>
 <li><strong>模型的「知识」来自你给的 <code>tools</code> 列表。</strong> 不注册的工具它永远不可能调，它只看得到这次请求里塞进去的那份 schema。</li>
-<li><strong>结果必须回灌。</strong> 执行完包成 <code>role:&quot;tool&quot;</code> + <code>tool_call_id</code> 塞回消息列表，再调一次模型，它才知道查到了什么。</li>
+<li><strong>结果必须回灌。</strong> 执行完包成 <code>role:"tool"</code> + <code>tool_call_id</code> 塞回消息列表，再调一次模型，它才知道查到了什么。</li>
 </ol>
-<p><strong>名字演化：</strong> OpenAI 2023-06 叫 <code>functions</code> &#x2F; function calling，2023-11 改名 <code>tools</code> &#x2F; tool calling。新名字支持一次返回多个调用（并行），也不限于函数。现在两者基本同义，前者是历史叫法。Eino 用的 <code>ToolCallingModel</code> &#x2F; <code>ToolsConfig</code> 就是新叫法。</p>
-<h3 id="Q8-一次请求里，function-calling-到底怎么走的？"><a href="#Q8-一次请求里，function-calling-到底怎么走的？" class="headerlink" title="Q8. 一次请求里，function calling 到底怎么走的？"></a><span id="q8"></span>Q8. 一次请求里，function calling 到底怎么走的？</h3><p>用户问「payment 最近为什么报错」。</p>
+<p><strong>名字演化：</strong> OpenAI 2023-06 叫 <code>functions</code> / function calling，2023-11 改名 <code>tools</code> / tool calling。新名字支持一次返回多个调用（并行），也不限于函数。现在两者基本同义，前者是历史叫法。Eino 用的 <code>ToolCallingModel</code> / <code>ToolsConfig</code> 就是新叫法。</p>
+<h3 id="Q8-一次请求里，function-calling-到底怎么走的？"><a href="#Q8-一次请求里，function-calling-到底怎么走的？" class="headerlink" title="Q8. 一次请求里，function calling 到底怎么走的？" data-stellar-navigation=""></a><span id="q8"></span>Q8. 一次请求里，function calling 到底怎么走的？</h3><p>用户问「payment 最近为什么报错」。</p>
 <p><strong>第 1 步 请求发出去</strong></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;model&quot;</span><span class="punctuation">:</span><span class="string">&quot;qwen-max&quot;</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;system&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;你是运维助手...&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;user&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;payment 最近为什么报错&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;tools&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;function&quot;</span><span class="punctuation">,</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">,</span><span class="attr">&quot;parameters&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span>...<span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span> ... 共 <span class="number">11</span> 个<span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"model"</span><span class="punctuation">:</span><span class="string">"qwen-max"</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">"messages"</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"system"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"你是运维助手..."</span><span class="punctuation">}</span><span class="punctuation">,</span><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"user"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"payment 最近为什么报错"</span><span class="punctuation">}</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">"tools"</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">{</span><span class="attr">"type"</span><span class="punctuation">:</span><span class="string">"function"</span><span class="punctuation">,</span><span class="attr">"function"</span><span class="punctuation">:</span><span class="punctuation">{</span><span class="attr">"name"</span><span class="punctuation">:</span><span class="string">"query_logs"</span><span class="punctuation">,</span><span class="attr">"parameters"</span><span class="punctuation">:</span><span class="punctuation">{</span>...<span class="punctuation">}</span><span class="punctuation">}</span><span class="punctuation">}</span><span class="punctuation">,</span> ... 共 <span class="number">11</span> 个<span class="punctuation">]</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>数据在 HTTP 请求里，模型看完就没了。</p>
 <p><strong>第 2 步 模型返回 tool_calls</strong>（数据在内存的 <code>schema.Message</code> 里）</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;&quot;</span><span class="punctuation">,</span><span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_1&quot;</span><span class="punctuation">,</span><span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_logs&quot;</span><span class="punctuation">,</span><span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;service\&quot;:\&quot;payment\&quot;,\&quot;level\&quot;:\&quot;error\&quot;,\&quot;window\&quot;:\&quot;15m\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">""</span><span class="punctuation">,</span><span class="attr">"tool_calls"</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">{</span><span class="attr">"id"</span><span class="punctuation">:</span><span class="string">"call_1"</span><span class="punctuation">,</span><span class="attr">"function"</span><span class="punctuation">:</span><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"name"</span><span class="punctuation">:</span><span class="string">"query_logs"</span><span class="punctuation">,</span><span class="attr">"arguments"</span><span class="punctuation">:</span><span class="string">"{\"service\":\"payment\",\"level\":\"error\",\"window\":\"15m\"}"</span><span class="punctuation">}</span><span class="punctuation">}</span><span class="punctuation">]</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>两个细节：<code>arguments</code> 是<strong>字符串</strong>，里面还有一层 JSON，要再 <code>Unmarshal</code> 一次；模型可以<strong>一次返回多个</strong> tool_calls（并行调用）。</p>
 <p><strong>第 3 步 Eino 找到 Go 函数执行</strong>——ReAct 按 name 从 <code>ToolsConfig.Tools</code> 匹配，把 arguments 反序列化成 <code>SearchKnowledgeInput</code>，然后 <code>InvokableRun</code>。</p>
 <p><strong>这一步是唯一能同时看到「工具名 + 参数 + 结果 + 耗时」的时刻。</strong></p>
 <p><strong>第 4 步 结果回灌再调模型</strong></p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;tool&quot;</span><span class="punctuation">,</span><span class="attr">&quot;tool_call_id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_1&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;status\&quot;:\&quot;ok\&quot;,\&quot;logs\&quot;:[...]&#125;&quot;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"tool"</span><span class="punctuation">,</span><span class="attr">"tool_call_id"</span><span class="punctuation">:</span><span class="string">"call_1"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="string">"{\"status\":\"ok\",\"logs\":[...]}"</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>循环直到模型不再返回 tool_calls，或撞上 <code>MaxStep: 25</code>（<code>full_agent.go</code>）。</p>
 <p><strong>第 5 步 结束，只存了两条消息</strong>（<code>full_agent.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage&#123;Role: <span class="string">&quot;user&quot;</span>, Content: query&#125;)</span><br><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage&#123;Role: <span class="string">&quot;assistant&quot;</span>, Content: result.Content&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage{Role: <span class="string">"user"</span>, Content: query})</span><br><span class="line">_ = a.shortTermMemory.SaveMessage(userID, sessionID, types.ChatMessage{Role: <span class="string">"assistant"</span>, Content: result.Content})</span><br></pre></td></tr></tbody></table></figure>
 
 <p>而 <code>types.ChatMessage</code> 只有三个字段（<code>pkg/types/types.go</code>）：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ChatMessage <span class="keyword">struct</span> &#123;</span><br><span class="line">	Role      <span class="type">string</span>    <span class="string">`json:&quot;role&quot;`</span></span><br><span class="line">	Content   <span class="type">string</span>    <span class="string">`json:&quot;content&quot;`</span></span><br><span class="line">	Timestamp time.Time <span class="string">`json:&quot;timestamp&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ChatMessage <span class="keyword">struct</span> {</span><br><span class="line">	Role      <span class="type">string</span>    <span class="string">`json:"role"`</span></span><br><span class="line">	Content   <span class="type">string</span>    <span class="string">`json:"content"`</span></span><br><span class="line">	Timestamp time.Time <span class="string">`json:"timestamp"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>第 1~4 步里发生的一切全部随函数返回被 GC 掉了。</strong></p>
 <hr>
-<h3 id="Q9-tool-calls-回给谁？谁去执行？"><a href="#Q9-tool-calls-回给谁？谁去执行？" class="headerlink" title="Q9. tool_calls 回给谁？谁去执行？"></a><span id="q9"></span>Q9. tool_calls 回给谁？谁去执行？</h3><p><strong>回给「发起请求的那个人」——在 Pilot 里就是跑在你自己服务器上的 Go 进程，具体是 Eino 的 ReAct 循环。模型只负责说，执行永远在你这边。</strong></p>
-<h3 id="数据流向"><a href="#数据流向" class="headerlink" title="数据流向"></a>数据流向</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">你的 Go 进程 ──HTTP 请求(messages + tools)──▶ 模型（DashScope 远端）</span><br><span class="line">你的 Go 进程 ◀──HTTP 响应(tool_calls)─────── 模型</span><br><span class="line">       │</span><br><span class="line">       └─▶ Eino ReAct → ToolsNode → 你写的 Go 函数 → 查 ES/Prometheus → 结果再回灌</span><br></pre></td></tr></table></figure>
+<h3 id="Q9-tool-calls-回给谁？谁去执行？"><a href="#Q9-tool-calls-回给谁？谁去执行？" class="headerlink" title="Q9. tool_calls 回给谁？谁去执行？" data-stellar-navigation=""></a><span id="q9"></span>Q9. tool_calls 回给谁？谁去执行？</h3><p><strong>回给「发起请求的那个人」——在 Pilot 里就是跑在你自己服务器上的 Go 进程，具体是 Eino 的 ReAct 循环。模型只负责说，执行永远在你这边。</strong></p>
+<h3 id="数据流向"><a href="#数据流向" class="headerlink" title="数据流向" data-stellar-navigation=""></a>数据流向</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">你的 Go 进程 ──HTTP 请求(messages + tools)──▶ 模型（DashScope 远端）</span><br><span class="line">你的 Go 进程 ◀──HTTP 响应(tool_calls)─────── 模型</span><br><span class="line">       │</span><br><span class="line">       └─▶ Eino ReAct → ToolsNode → 你写的 Go 函数 → 查 ES/Prometheus → 结果再回灌</span><br></pre></td></tr></tbody></table></figure>
 
 <p>模型那端从头到尾只是<strong>算出一段文本给你</strong>，它没有能力执行任何东西。</p>
-<h3 id="按执行顺序走一遍"><a href="#按执行顺序走一遍" class="headerlink" title="按执行顺序走一遍"></a>按执行顺序走一遍</h3><p><strong>第 1 步 模型返回 HTTP 响应。</strong> 远端返回 200，body 里有 <code>tool_calls</code>。这个响应回到的是<strong>发起请求的客户端</strong>——eino-ext 的 <code>openai.ChatModel</code>。</p>
+<h3 id="按执行顺序走一遍"><a href="#按执行顺序走一遍" class="headerlink" title="按执行顺序走一遍" data-stellar-navigation=""></a>按执行顺序走一遍</h3><p><strong>第 1 步 模型返回 HTTP 响应。</strong> 远端返回 200，body 里有 <code>tool_calls</code>。这个响应回到的是<strong>发起请求的客户端</strong>——eino-ext 的 <code>openai.ChatModel</code>。</p>
 <p><strong>第 2 步 解析成 <code>*schema.Message</code>。</strong> <code>ToolCalls</code> 字段带上 name、arguments、id。</p>
 <p><strong>第 3 步 ReAct 循环判断要不要调工具。</strong> <code>ToolCalls</code> 为空 → 直接返回 <code>Content</code>（结束）；非空 → 交给 ToolsNode。</p>
 <p><strong>第 4 步 ToolsNode 按名字找工具</strong>（<code>compose/tool_node.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">index, ok := tuple.indexes[toolCall.Function.Name]</span><br><span class="line"><span class="keyword">if</span> !ok &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">&quot;tool %s not found in toolsNode indexes&quot;</span>, toolCall.Function.Name)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">index, ok := tuple.indexes[toolCall.Function.Name]</span><br><span class="line"><span class="keyword">if</span> !ok {</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span>, fmt.Errorf(<span class="string">"tool %s not found in toolsNode indexes"</span>, toolCall.Function.Name)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>这个报错就是「模型编了一个不存在的工具名」</strong>——它只看到你给的 schema，但偶尔还是会拼错或幻觉出一个不存在的工具。找不到就直接报错，不会瞎执行。</p>
 <p><strong>第 5 步 执行你写的那个 Go 闭包</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) &#123;</span><br><span class="line">    docs, err := kr.SearchDetailed(ctx, input.Query)   <span class="comment">// 真的去查 ES</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, input *SearchKnowledgeInput, opts ...tool.Option)</span></span> (<span class="type">string</span>, <span class="type">error</span>) {</span><br><span class="line">    docs, err := kr.SearchDetailed(ctx, input.Query)   <span class="comment">// 真的去查 ES</span></span><br><span class="line">    ...</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>这一步才真正产生副作用</strong>——发 HTTP 到 ES、查 Prometheus、读 Redis。全是你的代码在干。</p>
 <p><strong>第 6 步 结果包成 tool 消息回灌</strong>，再发一次请求给模型，它才知道下一步。</p>
-<h3 id="三个必须澄清的点"><a href="#三个必须澄清的点" class="headerlink" title="三个必须澄清的点"></a>三个必须澄清的点</h3><ol>
+<h3 id="三个必须澄清的点"><a href="#三个必须澄清的点" class="headerlink" title="三个必须澄清的点" data-stellar-navigation=""></a>三个必须澄清的点</h3><ol>
 <li><strong>模型没有任何执行能力。</strong> 它不能读你的文件、不能访问网络、不能查数据库，唯一输出就是 token 流。</li>
 <li><strong>它也不知道你到底执行没执行。</strong> 模型是<strong>无状态</strong>的，每轮都是独立请求。不回灌结果，它只能瞎猜或重复调用。<strong>回灌不是可选项，是协议的一部分。</strong></li>
 <li><strong>谁发请求谁收结果。</strong> curl 手测就是 shell 脚本收，用 Eino 就是 Eino 收，用 LangChain 就是 LangChain 收。<strong>接收方永远是客户端。</strong></li>
 </ol>
-<h3 id="不用框架的话，你自己就是执行者"><a href="#不用框架的话，你自己就是执行者" class="headerlink" title="不用框架的话，你自己就是执行者"></a>不用框架的话，你自己就是执行者</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    resp := callModel(msgs, tools)          <span class="comment">// 你发请求，你收 tool_calls</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(resp.ToolCalls) == <span class="number">0</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> resp.Content                  <span class="comment">// 没工具要调了，收工</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> _, tc := <span class="keyword">range</span> resp.ToolCalls &#123;</span><br><span class="line">        fn := registry[tc.Name]              <span class="comment">// 按名字查你注册的函数</span></span><br><span class="line">        out, err := fn(tc.Arguments)         <span class="comment">// 你执行</span></span><br><span class="line">        msgs = <span class="built_in">append</span>(msgs, toolMsg(tc.ID, out))   <span class="comment">// 你回灌</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="不用框架的话，你自己就是执行者"><a href="#不用框架的话，你自己就是执行者" class="headerlink" title="不用框架的话，你自己就是执行者" data-stellar-navigation=""></a>不用框架的话，你自己就是执行者</h3><figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> {</span><br><span class="line">    resp := callModel(msgs, tools)          <span class="comment">// 你发请求，你收 tool_calls</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(resp.ToolCalls) == <span class="number">0</span> {</span><br><span class="line">        <span class="keyword">return</span> resp.Content                  <span class="comment">// 没工具要调了，收工</span></span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">for</span> _, tc := <span class="keyword">range</span> resp.ToolCalls {</span><br><span class="line">        fn := registry[tc.Name]              <span class="comment">// 按名字查你注册的函数</span></span><br><span class="line">        out, err := fn(tc.Arguments)         <span class="comment">// 你执行</span></span><br><span class="line">        msgs = <span class="built_in">append</span>(msgs, toolMsg(tc.ID, out))   <span class="comment">// 你回灌</span></span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p>Eino 的 <code>react.NewAgent</code> 就是把这个 for 循环、工具索引、结果拼接全封装了。</p>
-<h3 id="安全边界"><a href="#安全边界" class="headerlink" title="安全边界"></a>安全边界</h3><p>既然模型能决定调什么函数、传什么参数，<strong>参数校验必须在工具里做</strong>。Pilot 每个工具都有 <code>if query == &quot;&quot;</code> 这类检查——不能因为「是模型传的」就默认合法。</p>
+<h3 id="安全边界"><a href="#安全边界" class="headerlink" title="安全边界" data-stellar-navigation=""></a>安全边界</h3><p>既然模型能决定调什么函数、传什么参数，<strong>参数校验必须在工具里做</strong>。Pilot 每个工具都有 <code>if query == ""</code> 这类检查——不能因为「是模型传的」就默认合法。</p>
 <p>一句话：<strong>模型的输出是「请求」，你的代码是「服务端」——它提议，你执行，结果再喂回去。</strong></p>
-<h2 id="三、trace-落盘"><a href="#三、trace-落盘" class="headerlink" title="三、trace 落盘"></a>三、trace 落盘</h2><h3 id="Q10-「落盘」是什么意思？"><a href="#Q10-「落盘」是什么意思？" class="headerlink" title="Q10. 「落盘」是什么意思？"></a><span id="q10"></span>Q10. 「落盘」是什么意思？</h3><p><strong>在第 3 步前后各插一个钩子，把当时看到的事实写成一行 JSON，追加到文件末尾。</strong></p>
+<h2 id="三、trace-落盘"><a href="#三、trace-落盘" class="headerlink" title="三、trace 落盘" data-stellar-navigation=""></a>三、trace 落盘</h2><h3 id="Q10-「落盘」是什么意思？"><a href="#Q10-「落盘」是什么意思？" class="headerlink" title="Q10. 「落盘」是什么意思？" data-stellar-navigation=""></a><span id="q10"></span>Q10. 「落盘」是什么意思？</h3><p><strong>在第 3 步前后各插一个钩子，把当时看到的事实写成一行 JSON，追加到文件末尾。</strong></p>
 <p>不写数据库、不建表，就是文件——因为目标只是「事后能查、能统计」，文件最省事。</p>
 <p>文件长这样（JSONL）：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_start&quot;,&quot;tool&quot;:&quot;query_logs&quot;,&quot;args&quot;:&#123;&quot;service&quot;:&quot;payment&quot;,&quot;level&quot;:&quot;error&quot;,&quot;window&quot;:&quot;15m&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_end&quot;,&quot;tool&quot;:&quot;query_logs&quot;,&quot;elapsed_ms&quot;:312,&quot;resp_bytes&quot;:4821&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_start&quot;,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;args&quot;:&#123;&quot;service&quot;:&quot;payment&quot;&#125;&#125;</span><br><span class="line">&#123;&quot;ts&quot;:&quot;...&quot;,&quot;trace_id&quot;:&quot;t-001&quot;,&quot;ev&quot;:&quot;tool_end&quot;,&quot;tool&quot;:&quot;query_metrics&quot;,&quot;elapsed_ms&quot;:188,&quot;resp_bytes&quot;:1203&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">{"ts":"...","trace_id":"t-001","ev":"tool_start","tool":"query_logs","args":{"service":"payment","level":"error","window":"15m"}}</span><br><span class="line">{"ts":"...","trace_id":"t-001","ev":"tool_end","tool":"query_logs","elapsed_ms":312,"resp_bytes":4821}</span><br><span class="line">{"ts":"...","trace_id":"t-001","ev":"tool_start","tool":"query_metrics","args":{"service":"payment"}}</span><br><span class="line">{"ts":"...","trace_id":"t-001","ev":"tool_end","tool":"query_metrics","elapsed_ms":188,"resp_bytes":1203}</span><br></pre></td></tr></tbody></table></figure>
 
 <p>有了这四行就能回答：调了几个工具、参数对不对、哪步慢、有没有空转。<strong>而这些信息现在系统里一条都查不到。</strong></p>
-<h3 id="Q11-具体怎么实现？"><a href="#Q11-具体怎么实现？" class="headerlink" title="Q11. 具体怎么实现？"></a><span id="q11"></span>Q11. 具体怎么实现？</h3><p>Eino 自带回调入口（<code>flow/agent/react/callback.go</code>）：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildAgentCallback</span><span class="params">(modelHandler *template.ModelCallbackHandler,</span></span></span><br><span class="line"><span class="params"><span class="function">	toolHandler *template.ToolCallbackHandler)</span></span> callbacks.Handler</span><br></pre></td></tr></table></figure>
+<h3 id="Q11-具体怎么实现？"><a href="#Q11-具体怎么实现？" class="headerlink" title="Q11. 具体怎么实现？" data-stellar-navigation=""></a><span id="q11"></span>Q11. 具体怎么实现？</h3><p>Eino 自带回调入口（<code>flow/agent/react/callback.go</code>）：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BuildAgentCallback</span><span class="params">(modelHandler *template.ModelCallbackHandler,</span></span></span><br><span class="line"><span class="params"><span class="function">	toolHandler *template.ToolCallbackHandler)</span></span> callbacks.Handler</span><br></pre></td></tr></tbody></table></figure>
 
-<p><code>ToolCallbackHandler</code> 四个钩子（<code>utils/callbacks/template.go</code>）：<code>OnStart</code> &#x2F; <code>OnEnd</code> &#x2F; <code>OnError</code> &#x2F; <code>OnEndWithStreamOutput</code>。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal/observability/trace.go</span></span><br><span class="line"><span class="keyword">type</span> ToolTracer <span class="keyword">struct</span> &#123;</span><br><span class="line">	mu  sync.Mutex</span><br><span class="line">	enc *json.Encoder   <span class="comment">// Encode 自动补 \n，天然 JSONL</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *ToolTracer)</span></span> Handler() callbacks.Handler &#123;</span><br><span class="line">	toolHandler := &amp;template.ToolCallbackHandler&#123;</span><br><span class="line">		OnStart: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, input *tool.CallbackInput)</span></span> context.Context &#123;</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;</span><br><span class="line">				<span class="string">&quot;ev&quot;</span>:   <span class="string">&quot;tool_start&quot;</span>,</span><br><span class="line">				<span class="string">&quot;tool&quot;</span>: info.Name,</span><br><span class="line">				<span class="string">&quot;args&quot;</span>: json.RawMessage(input.ArgumentsInJSON),</span><br><span class="line">			&#125;)</span><br><span class="line">			<span class="keyword">return</span> context.WithValue(ctx, startKey&#123;&#125;, time.Now())</span><br><span class="line">		&#125;,</span><br><span class="line">		OnEnd: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, output *tool.CallbackOutput)</span></span> context.Context &#123;</span><br><span class="line">			start, _ := ctx.Value(startKey&#123;&#125;).(time.Time)</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;</span><br><span class="line">				<span class="string">&quot;ev&quot;</span>: <span class="string">&quot;tool_end&quot;</span>, <span class="string">&quot;tool&quot;</span>: info.Name,</span><br><span class="line">				<span class="string">&quot;elapsed_ms&quot;</span>: time.Since(start).Milliseconds(),</span><br><span class="line">				<span class="string">&quot;resp_bytes&quot;</span>: <span class="built_in">len</span>(output.Response),</span><br><span class="line">			&#125;)</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		&#125;,</span><br><span class="line">		OnError: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, err <span class="type">error</span>)</span></span> context.Context &#123;</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any&#123;<span class="string">&quot;ev&quot;</span>: <span class="string">&quot;tool_error&quot;</span>, <span class="string">&quot;tool&quot;</span>: info.Name, <span class="string">&quot;err&quot;</span>: err.Error()&#125;)</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> react.BuildAgentCallback(<span class="literal">nil</span>, toolHandler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>ToolCallbackHandler</code> 四个钩子（<code>utils/callbacks/template.go</code>）：<code>OnStart</code> / <code>OnEnd</code> / <code>OnError</code> / <code>OnEndWithStreamOutput</code>。</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// internal/observability/trace.go</span></span><br><span class="line"><span class="keyword">type</span> ToolTracer <span class="keyword">struct</span> {</span><br><span class="line">	mu  sync.Mutex</span><br><span class="line">	enc *json.Encoder   <span class="comment">// Encode 自动补 \n，天然 JSONL</span></span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *ToolTracer)</span></span> Handler() callbacks.Handler {</span><br><span class="line">	toolHandler := &amp;template.ToolCallbackHandler{</span><br><span class="line">		OnStart: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, input *tool.CallbackInput)</span></span> context.Context {</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any{</span><br><span class="line">				<span class="string">"ev"</span>:   <span class="string">"tool_start"</span>,</span><br><span class="line">				<span class="string">"tool"</span>: info.Name,</span><br><span class="line">				<span class="string">"args"</span>: json.RawMessage(input.ArgumentsInJSON),</span><br><span class="line">			})</span><br><span class="line">			<span class="keyword">return</span> context.WithValue(ctx, startKey{}, time.Now())</span><br><span class="line">		},</span><br><span class="line">		OnEnd: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, output *tool.CallbackOutput)</span></span> context.Context {</span><br><span class="line">			start, _ := ctx.Value(startKey{}).(time.Time)</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any{</span><br><span class="line">				<span class="string">"ev"</span>: <span class="string">"tool_end"</span>, <span class="string">"tool"</span>: info.Name,</span><br><span class="line">				<span class="string">"elapsed_ms"</span>: time.Since(start).Milliseconds(),</span><br><span class="line">				<span class="string">"resp_bytes"</span>: <span class="built_in">len</span>(output.Response),</span><br><span class="line">			})</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		},</span><br><span class="line">		OnError: <span class="function"><span class="keyword">func</span><span class="params">(ctx context.Context, info *callbacks.RunInfo, err <span class="type">error</span>)</span></span> context.Context {</span><br><span class="line">			t.write(<span class="keyword">map</span>[<span class="type">string</span>]any{<span class="string">"ev"</span>: <span class="string">"tool_error"</span>, <span class="string">"tool"</span>: info.Name, <span class="string">"err"</span>: err.Error()})</span><br><span class="line">			<span class="keyword">return</span> ctx</span><br><span class="line">		},</span><br><span class="line">	}</span><br><span class="line">	<span class="keyword">return</span> react.BuildAgentCallback(<span class="literal">nil</span>, toolHandler)</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p>挂上去（改 <code>full_agent.go</code>，<code>Stream</code> 那条路径同理）：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result, err := a.graph.Invoke(ctx, userMsg, compose.WithCallbacks(a.tracer.Handler()))</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">result, err := a.graph.Invoke(ctx, userMsg, compose.WithCallbacks(a.tracer.Handler()))</span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>info.Name</code> 是工具名——<code>compose/tool_node.go</code> 传的就是 <code>task.name</code>，不是节点名。</p>
-<h3 id="Q12-实现时要注意什么？"><a href="#Q12-实现时要注意什么？" class="headerlink" title="Q12. 实现时要注意什么？"></a><span id="q12"></span>Q12. 实现时要注意什么？</h3><ul>
+<h3 id="Q12-实现时要注意什么？"><a href="#Q12-实现时要注意什么？" class="headerlink" title="Q12. 实现时要注意什么？" data-stellar-navigation=""></a><span id="q12"></span>Q12. 实现时要注意什么？</h3><ul>
 <li><strong>别在回调里做慢 IO。</strong> 这台机器是 40G 小盘，<code>OnEnd</code> 里直接 <code>f.Write</code> + <code>fsync</code> 会拖慢每次工具调用。用缓冲 writer + 定期 flush，或攒够 N 行再落。</li>
 <li><strong><code>resp_bytes</code> 只记长度别记全文。</strong> 工具返回的日志动辄几十 KB，全存文件很快爆。要全文另存，trace 里放引用。</li>
 <li><strong>这是评测的前置条件，但不只是为了评测。</strong> 线上排查「用户说答错了」时，能直接看到这一步调了什么、参数对不对，比看最终回答有用得多。</li>
 </ul>
 <p>一句话：<strong>function calling 已经在用了（协议层），但工具调用的事实只活在内存里那几秒——落盘就是在它消失前多写一行。</strong></p>
-<h2 id="四、串起来的因果链"><a href="#四、串起来的因果链" class="headerlink" title="四、串起来的因果链"></a>四、串起来的因果链</h2><ol>
+<h2 id="四、串起来的因果链"><a href="#四、串起来的因果链" class="headerlink" title="四、串起来的因果链" data-stellar-navigation=""></a>四、串起来的因果链</h2><ol>
 <li>模型协议里 tool_calls 是结构化 JSON → 所以<strong>能</strong>被机器比对（评测可行的前提）</li>
-<li>但结构化数据只活在内存里，Pilot 的 <code>ChatMessage</code> 只存 role&#x2F;content → <strong>所以现在做不到工具级审计</strong></li>
+<li>但结构化数据只活在内存里，Pilot 的 <code>ChatMessage</code> 只存 role/content → <strong>所以现在做不到工具级审计</strong></li>
 <li>要补 → 用 Eino 回调在工具执行前后各写一行 JSONL</li>
 <li>JSONL 而不是 JSON → 因为这是「一条条追加、一条条读」的数据，且要求断电只坏最后一行</li>
 <li>有了这些行 → 才能算工具选择准确率、参数正确率、耗时分布，才能做 Agent 评测</li>
 </ol>
-
-                
-            </div>
-            <hr/>
-
-            
-
-    <div class="reprint" id="reprint-statement">
-        
-            <div class="reprint__author">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-user">
-                        文章作者:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    <a href="/about" rel="external nofollow noreferrer">Qiu Yinlan</a>
-                </span>
-            </div>
-            <div class="reprint__type">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-link">
-                        文章链接:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    <a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/">https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/</a>
-                </span>
-            </div>
-            <div class="reprint__notice">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-copyright">
-                        版权声明:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    本博客所有文章除特別声明外，均采用
-                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
-                    许可协议。转载请注明来源
-                    <a href="/about" target="_blank">Qiu Yinlan</a>
-                    !
-                </span>
-            </div>
-        
-    </div>
-
-    <script async defer>
-      document.addEventListener("copy", function (e) {
-        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
-        M.toast({html: toastHTML})
-      });
-
-      function navToReprintStatement() {
-        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
-      }
-    </script>
-
-
-
-            <div class="tag_share" style="display: block;">
-                <div class="post-meta__tag-list" style="display: inline-block;">
-                    
-                        <div class="article-tag">
-                            
-                                <a href="/tags/agent/">
-                                    <span class="chip bg-color">agent</span>
-                                </a>
-                            
-                                <a href="/tags/llm/">
-                                    <span class="chip bg-color">llm</span>
-                                </a>
-                            
-                        </div>
-                    
-                </div>
-                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
-                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
-<div id="article-share">
-
-    
-    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
-    <script src="/libs/share/js/social-share.min.js"></script>
-    
-
-    
-
-</div>
-
-                </div>
-            </div>
-            
-                <style>
-    #reward {
-        margin: 40px 0;
-        text-align: center;
-    }
-
-    #reward .reward-link {
-        font-size: 1.4rem;
-        line-height: 38px;
-    }
-
-    #reward .btn-floating:hover {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    #rewardModal {
-        width: 320px;
-        height: 350px;
-    }
-
-    #rewardModal .reward-title {
-        margin: 15px auto;
-        padding-bottom: 5px;
-    }
-
-    #rewardModal .modal-content {
-        padding: 10px;
-    }
-
-    #rewardModal .close {
-        position: absolute;
-        right: 15px;
-        top: 15px;
-        color: rgba(0, 0, 0, 0.5);
-        font-size: 1.3rem;
-        line-height: 20px;
-        cursor: pointer;
-    }
-
-    #rewardModal .close:hover {
-        color: #ef5350;
-        transform: scale(1.3);
-        -moz-transform:scale(1.3);
-        -webkit-transform:scale(1.3);
-        -o-transform:scale(1.3);
-    }
-
-    #rewardModal .reward-tabs {
-        margin: 0 auto;
-        width: 210px;
-    }
-
-    .reward-tabs .tabs {
-        height: 38px;
-        margin: 10px auto;
-        padding-left: 0;
-    }
-
-    .reward-content ul {
-        padding-left: 0 !important;
-    }
-
-    .reward-tabs .tabs .tab {
-        height: 38px;
-        line-height: 38px;
-    }
-
-    .reward-tabs .tab a {
-        color: #fff;
-        background-color: #ccc;
-    }
-
-    .reward-tabs .tab a:hover {
-        background-color: #ccc;
-        color: #fff;
-    }
-
-    .reward-tabs .wechat-tab .active {
-        color: #fff !important;
-        background-color: #22AB38 !important;
-    }
-
-    .reward-tabs .alipay-tab .active {
-        color: #fff !important;
-        background-color: #019FE8 !important;
-    }
-
-    .reward-tabs .reward-img {
-        width: 210px;
-        height: 210px;
-    }
-</style>
-
-<div id="reward">
-    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
-
-    <!-- Modal Structure -->
-    <div id="rewardModal" class="modal">
-        <div class="modal-content">
-            <a class="close modal-close"><i class="fas fa-times"></i></a>
-            <h4 class="reward-title">你的赏识是我前进的动力</h4>
-            <div class="reward-content">
-                <div class="reward-tabs">
-                    <ul class="tabs row">
-                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
-                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
-                    </ul>
-                    <div id="alipay">
-                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
-                    </div>
-                    <div id="wechat">
-                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(function () {
-        $('.tabs').tabs();
-    });
-</script>
-
-            
-        </div>
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-<article id="prenext-posts" class="prev-next articles">
-    <div class="row article-row">
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
-            <div class="card">
-                <a href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/1.jpg" class="responsive-img" alt="Agent 架构、Eino 内部机制与多 Agent 编排">
-                        
-                        <span class="card-title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2026-11-08
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    技术
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/agent/">
-                        <span class="chip bg-color">agent</span>
-                    </a>
-                    
-                    <a href="/tags/go/">
-                        <span class="chip bg-color">go</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="从浮点数到向量检索：ES、BM25 与 Agent 评测">
-                        
-                        <span class="card-title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2026-11-06
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    技术
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/%E6%A3%80%E7%B4%A2/">
-                        <span class="chip bg-color">检索</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-    </div>
 </article>
-
-</div>
-
+<div class="article-tags slide-up"><a class="tag" href="/tags/agent/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>agent</a><a class="tag" href="/tags/llm/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>llm</a></div>
 
 
-<!-- 代码块功能依赖 -->
-<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
-
-<!-- 代码语言 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
-
-
-<!-- 代码块复制 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
-
-
-<!-- 代码块收缩 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
-
-
+  <div class="article-share slide-up" id="share">
+    <div class="body">
+      <div class="social-wrap dis-select"><a class="social share-item qrcode ui-interactive is-icon-only" onclick="util.toggle(&quot;share-qrcode&quot;)" aria-label="分享文章: QR Code" title="分享文章: QR Code"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M10.553 13.447c-.424-.424-.95-.596-1.535-.675c-.553-.074-1.25-.074-2.086-.074H5.827c-.58 0-1.065 0-1.459.037c-.411.04-.795.124-1.146.34c-.345.21-.634.5-.845.844c-.216.352-.3.735-.34 1.147C2 15.459 2 15.944 2 16.525v.068c0 .884 0 1.597.055 2.17c.056.592.175 1.108.459 1.571c.288.47.682.864 1.152 1.152c.463.284.979.403 1.57.46C5.81 22 6.524 22 7.407 22h.07c.58 0 1.064 0 1.458-.037c.412-.04.795-.124 1.147-.34c.344-.21.633-.5.844-.844c.216-.352.3-.736.34-1.147c.037-.394.037-.879.037-1.46v-1.104c0-.836 0-1.533-.074-2.086c-.079-.584-.251-1.111-.675-1.535m-1.62-11.41c.412.04.795.124 1.147.34c.344.21.633.5.844.845c.216.351.3.735.34 1.146c.037.394.037.879.037 1.46v1.104c0 .836 0 1.533-.074 2.086c-.079.584-.251 1.111-.675 1.535s-.95.596-1.535.675c-.553.074-1.25.074-2.086.074H5.827c-.58 0-1.065 0-1.459-.037c-.411-.04-.795-.124-1.146-.34a2.56 2.56 0 0 1-.845-.844c-.216-.352-.3-.735-.34-1.147C2 8.54 2 8.056 2 7.475v-.068c0-.884 0-1.597.055-2.17c.056-.592.175-1.108.459-1.571c.288-.47.682-.864 1.152-1.152c.463-.284.979-.403 1.57-.46C5.81 2 6.524 2 7.407 2h.07c.58 0 1.064 0 1.458.037M16.593 2h-.068c-.58 0-1.065 0-1.46.037c-.41.04-.794.124-1.146.34c-.344.21-.633.5-.844.845c-.216.351-.3.735-.34 1.146c-.037.394-.037.879-.037 1.46v1.104c0 .836 0 1.533.074 2.086c.079.584.251 1.111.675 1.535s.95.596 1.535.675c.553.074 1.25.074 2.086.074h1.105c.58 0 1.065 0 1.459-.037c.411-.04.795-.124 1.146-.34c.345-.21.634-.5.845-.844c.216-.352.3-.735.34-1.147C22 8.54 22 8.056 22 7.475v-.068c0-.884 0-1.597-.055-2.17c-.056-.592-.175-1.108-.459-1.571a3.5 3.5 0 0 0-1.152-1.152c-.463-.284-.979-.403-1.57-.46C18.19 2 17.477 2 16.594 2" opacity=".5"></path><path fill="currentColor" d="M14.093 21.302a.698.698 0 1 1-1.396 0v-2.79h1.396z" opacity=".4"></path><path fill="currentColor" d="M21.302 12.698a.7.7 0 0 0-.697.697v3.256H22v-3.256a.7.7 0 0 0-.698-.697" opacity=".5"></path><path fill="currentColor" d="M16.076 16.617c-.076.184-.076.417-.076.883s0 .699.076.883a1 1 0 0 0 .541.54c.184.077.417.077.883.077s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C18.199 16 17.966 16 17.5 16s-.699 0-.883.076a1 1 0 0 0-.54.541"></path><path fill="currentColor" d="M22 18.535v-.023h-1.396c0 .443 0 .74-.016.97c-.015.224-.043.333-.073.405a1.16 1.16 0 0 1-.629.63c-.072.029-.18.056-.405.072c-.23.015-.527.016-.97.016h-1.86V22h1.883c.414 0 .759 0 1.042-.02a2.6 2.6 0 0 0 .844-.175a2.56 2.56 0 0 0 1.384-1.384c.112-.27.156-.549.176-.844c.02-.283.02-.628.02-1.042" opacity=".7"></path><path fill="currentColor" d="M12.697 16.616v.035h1.396c0-.668 0-1.116.035-1.458c.034-.33.093-.482.16-.583a1.2 1.2 0 0 1 .321-.32c.101-.068.254-.128.584-.161c.342-.035.79-.036 1.458-.036h1.86v-1.395h-1.896c-.623 0-1.142 0-1.563.043c-.44.044-.85.142-1.218.388c-.28.187-.519.426-.706.706c-.246.368-.343.777-.388 1.217c-.043.421-.043.94-.043 1.564" opacity=".6"></path><path fill="currentColor" d="M5.508 18.69c.219.155.528.155 1.146.155c.619 0 .928 0 1.146-.155a.8.8 0 0 0 .2-.199c.154-.218.154-.527.154-1.146s0-.927-.155-1.146A.8.8 0 0 0 7.8 16c-.218-.155-.527-.155-1.146-.155s-.927 0-1.146.155a.8.8 0 0 0-.199.2c-.155.218-.155.527-.155 1.145c0 .619 0 .928.155 1.146a.8.8 0 0 0 .2.2M6.654 8.155c-.618 0-.927 0-1.146-.155a.8.8 0 0 1-.199-.2c-.155-.217-.155-.527-.155-1.145c0-.619 0-.928.155-1.146a.8.8 0 0 1 .2-.2c.218-.154.527-.154 1.145-.154c.619 0 .928 0 1.146.155a.8.8 0 0 1 .2.199c.154.218.154.527.154 1.146s0 .928-.155 1.146A.8.8 0 0 1 7.8 8c-.218.155-.527.155-1.146.155M16.2 8c.218.155.527.155 1.146.155s.927 0 1.146-.155a.8.8 0 0 0 .199-.199c.155-.218.155-.528.155-1.146c0-.619 0-.928-.155-1.146a.8.8 0 0 0-.2-.2c-.218-.154-.527-.154-1.145-.154c-.619 0-.928 0-1.146.155a.8.8 0 0 0-.2.199c-.154.218-.154.527-.154 1.146s0 .928.155 1.146A.8.8 0 0 0 16.2 8"></path></svg></span></a><a class="social share-item weibo ui-interactive is-icon-only" href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F&amp;title=JSON%E3%80%81JSONL%20%E4%B8%8E%20Function%20Calling%EF%BC%9AAgent%20%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;summary=%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E6%B5%81%E7%A8%8B%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89%E6%B5%81%E7%A8%8B%20A%EF%BC%9A%E4%B8%80%E6%AC%A1%20function%20calling%20%E5%BE%80%E8%BF%9412345678910111213%E2%91%A0%20Go%20%E8%BF%9B%E7%A8%8B%EF%BC%9A%E5%8F%91%20HTTP%20%E8%AF%B7%E6%B1%82%EF%BC%88messages%20%2B%2011%20%E4%B8%AA%E5%B7%A5%E5%85%B7%E7%9A%84%20schema%EF%BC%89%20%20%20%20%20%20%20%20%E2%86%93%E2%91%A1%20%E6%A8%A1%E5%9E%8B%EF%BC%9A%E8%BF%94..." target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Weibo" title="分享文章: Weibo"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.737 5.439l-.002.004zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.346.672-.24.239.09.315.36.18.601l.014-.028zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.57-.18-.405-.615.375-.977.42-1.804 0-2.404-.781-1.112-2.915-1.053-5.364-.03 0 0-.766.331-.571-.271.376-1.217.315-2.224-.27-2.809-1.338-1.337-4.869.045-7.888 3.08C1.309 10.87 0 13.273 0 15.348c0 3.981 5.099 6.395 10.086 6.395 6.536 0 10.888-3.801 10.888-6.82 0-1.822-1.547-2.854-2.915-3.284v.01zm1.908-5.092c-.766-.856-1.908-1.187-2.96-.962-.436.09-.706.511-.616.932.09.42.511.691.932.602.511-.105 1.067.044 1.442.465.376.421.466.977.316 1.473-.136.406.089.856.51.992.405.119.857-.105.992-.512.33-1.021.12-2.178-.646-3.035l.03.045zm2.418-2.195c-1.576-1.757-3.905-2.419-6.054-1.968-.496.104-.812.587-.706 1.081.104.496.586.813 1.082.707 1.532-.331 3.185.15 4.296 1.383 1.112 1.246 1.429 2.943.947 4.416-.165.48.106 1.007.586 1.157.479.165.991-.104 1.157-.586.675-2.088.241-4.478-1.338-6.235l.03.045z"></path></svg></span></a><a class="social share-item x ui-interactive is-icon-only" href="https://x.com/intent/tweet?text=JSON%E3%80%81JSONL%20%E4%B8%8E%20Function%20Calling%EF%BC%9AAgent%20%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: X" title="分享文章: X"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"></path></svg></span></a><a class="social share-item telegram ui-interactive is-icon-only" href="https://t.me/share/url?url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F&amp;text=JSON%E3%80%81JSONL%20%E4%B8%8E%20Function%20Calling%EF%BC%9AAgent%20%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9%20-%20hi%2Cit's%20Qiu%20Yinlan!" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Telegram" title="分享文章: Telegram"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024q-.159.037-5.061 3.345q-.72.495-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789q.04-.324.893-.663q5.247-2.286 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635"></path></svg></span></a><a class="social share-item whatsapp ui-interactive is-icon-only" href="https://wa.me/?text=JSON%E3%80%81JSONL%20%E4%B8%8E%20Function%20Calling%EF%BC%9AAgent%20%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9%20-%20hi%2Cit's%20Qiu%20Yinlan!%0Ahttps%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: WhatsApp" title="分享文章: WhatsApp"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52s.198-.298.298-.497c.099-.198.05-.371-.025-.52s-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51a13 13 0 0 0-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074s2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413s.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"></path></svg></span></a><a class="social share-item email ui-interactive is-icon-only" href="mailto:?subject=JSON%E3%80%81JSONL%20%E4%B8%8E%20Function%20Calling%EF%BC%9AAgent%20%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;body=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F" aria-label="分享文章: Email" title="分享文章: Email"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828C4.343 20 6.229 20 10 20h4c3.771 0 5.657 0 6.828-1.172C22 17.657 22 15.771 22 12s0-5.657-1.172-6.828C19.657 4 17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172m15.404 2.348a.75.75 0 0 1-.096 1.056l-2.196 1.83c-.887.739-1.605 1.338-2.24 1.746-.66.424-1.303.693-2.044.693s-1.384-.269-2.045-.693c-.634-.408-1.352-1.007-2.239-1.745L5.52 8.576a.75.75 0 1 1 .96-1.152l2.159 1.799c.933.777 1.58 1.315 2.128 1.667.529.34.888.455 1.233.455s.704-.115 1.233-.455c.547-.352 1.195-.89 2.128-1.667l2.159-1.8a.75.75 0 0 1 1.056.097" clip-rule="evenodd"></path></svg></span></a></div>
+      <div class="share-qrcode" id="share-qrcode" style="opacity:0;height:0"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F07%2FJSON-JSONL-%25E4%25B8%258E-Function-Calling-Agent-%25E7%259A%2584%25E8%25B0%2583%25E7%2594%25A8%25E4%25B8%258E%25E8%25BD%25A8%25E8%25BF%25B9%2F" onerror="this.onerror=null;this.src=&quot;/images/stellar-error.491ee870f4940739.svg&quot;"></div>
     </div>
-    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
-        <div class="toc-widget card" style="background-color: white;">
-            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
-            <div id="toc-content"></div>
-        </div>
-    </div>
+  </div>
+
+<div class="article-footer slide-up">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
 </div>
+    </section></div>
 
-<!-- TOC 悬浮按钮. -->
-
-<div id="floating-toc-btn" class="hide-on-med-and-down">
-    <a class="btn-floating btn-large bg-color">
-        <i class="fas fa-list-ul"></i>
-    </a>
-</div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note"><svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-left" aria-hidden="true"></svg> 较新文章</div><a href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" data-stellar-navigation="">Agent 架构、Eino 内部机制与多 Agent 编排</a></div><div class="item" id="next"><div class="note">较早文章 <svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-right" aria-hidden="true"></svg></div><a href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" data-stellar-navigation="">从浮点数到向量检索：ES、BM25 与 Agent 评测</a></div></section></div>
 
 
-<script src="/libs/tocbot/tocbot.min.js"></script>
-<script>
-    $(function () {
-        tocbot.init({
-            tocSelector: '#toc-content',
-            contentSelector: '#articleContent',
-            headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('0'),
-            headingSelector: 'h2, h3, h4'
-        });
 
-        // modify the toc link href to support Chinese.
-        let i = 0;
-        let tocHeading = 'toc-heading-';
-        $('#toc-content a').each(function () {
-            $(this).attr('href', '#' + tocHeading + (++i));
-        });
 
-        // modify the heading title id to support Chinese.
-        i = 0;
-        $('#articleContent').children('h2, h3, h4').each(function () {
-            $(this).attr('id', tocHeading + (++i));
-        });
 
-        // Set scroll toc fixed.
-        let tocHeight = parseInt($(window).height() * 0.4 - 64);
-        let $tocWidget = $('.toc-widget');
-        $(window).scroll(function () {
-            let scroll = $(window).scrollTop();
-            /* add post toc fixed. */
-            if (scroll > tocHeight) {
-                $tocWidget.addClass('toc-fixed');
-            } else {
-                $tocWidget.removeClass('toc-fixed');
-            }
-        });
 
-        
-        /* 修复文章卡片 div 的宽度. */
-        let fixPostCardWidth = function (srcId, targetId) {
-            let srcDiv = $('#' + srcId);
-            if (srcDiv.length === 0) {
-                return;
-            }
-
-            let w = srcDiv.width();
-            if (w >= 450) {
-                w = w + 21;
-            } else if (w >= 350 && w < 450) {
-                w = w + 18;
-            } else if (w >= 300 && w < 350) {
-                w = w + 16;
-            } else {
-                w = w + 14;
-            }
-            $('#' + targetId).width(w);
-        };
-
-        // 切换TOC目录展开收缩的相关操作.
-        const expandedClass = 'expanded';
-        let $tocAside = $('#toc-aside');
-        let $mainContent = $('#main-content');
-        $('#floating-toc-btn .btn-floating').click(function () {
-            if ($tocAside.hasClass(expandedClass)) {
-                $tocAside.removeClass(expandedClass).hide();
-                $mainContent.removeClass('l9');
-            } else {
-                $tocAside.addClass(expandedClass).show();
-                $mainContent.addClass('l9');
-            }
-            fixPostCardWidth('artDetail', 'prenext-posts');
-        });
-        
-    });
-</script>
-
-    
-
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notebooks/">全部笔记本</a><a href="/note/algo/">算法笔记</a></div><div class="sitemap-group"><span class="fs15">项目</span><a href="/wiki/">项目索引</a><a href="/wiki/pilot/">pilot</a><a href="/wiki/im/">infinitechatgo</a></div><div class="sitemap-group"><span class="fs15">浏览</span><a href="/archives/">文章归档</a><a href="/tags/">标签</a><a href="/about/">关于</a></div></div><div class="text"><p>本站由 <a href="/">Qiu Yinlan</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0">Stellar 2.0.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
 </main>
+<aside data-stellar-runtime-region="" id="rightbar-region" class="site-region site-region--rightbar" data-region="rightbar" aria-label="Rightbar"><div class="site-region__surface ui-drawer-surface"><div class="site-region__viewport"><div class="widgets widget-stack widget-stack--rightbar widget-stack--rightbar"><div class="widget-instance widget-instance--toc" data-widget-id="rightbar:1:toc" data-presentation="rightbar">
 
 
-
-
-    <footer class="page-footer bg-color">
-    
-        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
-<style>
-    .aplayer .aplayer-lrc p {
-        
-        display: none;
-        
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 16px !important;
-    }
-
-    .aplayer .aplayer-lrc p.aplayer-lrc-current {
-        
-        display: none;
-        
-        font-size: 15px;
-        color: #42b983;
-    }
-
-    
-    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
-        left: -66px !important;
-    }
-
-    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
-        left: 0px !important;
-    }
-
-    
-</style>
-<div class="">
-    
-    <div class="row">
-        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
-                   server="netease"
-                   type="playlist"
-                   id="503838841"
-                   fixed='true'
-                   autoplay='false'
-                   theme='#42b983'
-                   loop='all'
-                   order='random'
-                   preload='auto'
-                   volume='0.7'
-                   list-folded='true'
-        >
-        </meting-js>
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false">
+  
+    <div class="widget-header dis-select">
+      <span class="name">本文目录</span>
+      <button type="button" class="cap-action ui-interactive card-hover card-hover--spotlight" data-shell-action="toggle-toc" aria-label="Toggle table of contents" aria-pressed="false"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg></span></button>
     </div>
+  
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E6%B5%81%E7%A8%8B%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干流程速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9A%E4%B8%80%E6%AC%A1-function-calling-%E5%BE%80%E8%BF%94" data-stellar-navigation=""><span class="toc-text">流程 A：一次 function calling 往返</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E7%9F%A5%E8%AF%86%E5%BA%93%E5%85%A5%E5%BA%93%EF%BC%88%E5%86%99%E4%B8%80%E6%AC%A1%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 B：知识库入库（写一次）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-C%EF%BC%9A%E6%A3%80%E7%B4%A2%EF%BC%88%E8%AF%BB%E4%B8%80%E6%AC%A1%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 C：检索（读一次）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81JSON-%E4%B8%8E-JSONL" data-stellar-navigation=""><span class="toc-text">一、JSON 与 JSONL</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-JSON-%E5%92%8C-JSONL-%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. JSON 和 JSONL 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%97%A5%E5%BF%97-trace-%E8%AF%84%E6%B5%8B%E7%BB%93%E6%9E%9C%E9%83%BD%E7%94%A8-JSONL%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. 为什么日志 / trace / 评测结果都用 JSONL？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-Go-%E9%87%8C%E6%80%8E%E4%B9%88%E5%86%99%E3%80%81%E6%80%8E%E4%B9%88%E8%AF%BB-JSONL%EF%BC%9F%E6%9C%89%E5%93%AA%E4%BA%9B%E5%9D%91%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. Go 里怎么写、怎么读 JSONL？有哪些坑？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-%E6%80%8E%E4%B9%88%E9%80%89-JSON-%E8%BF%98%E6%98%AF-JSONL%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. 怎么选 JSON 还是 JSONL？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Function-Calling" data-stellar-navigation=""><span class="toc-text">二、Function Calling</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-Pilot-%E7%94%A8-function-calling-%E4%BA%86%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. Pilot 用 function calling 了吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-Schema-%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F%E6%98%AF%E6%A0%87%E5%87%86%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. Schema 是什么？是标准吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-function-calling-%E7%9A%84%E5%AE%9A%E4%B9%89%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. function calling 的定义是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-%E4%B8%80%E6%AC%A1%E8%AF%B7%E6%B1%82%E9%87%8C%EF%BC%8Cfunction-calling-%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E8%B5%B0%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. 一次请求里，function calling 到底怎么走的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-tool-calls-%E5%9B%9E%E7%BB%99%E8%B0%81%EF%BC%9F%E8%B0%81%E5%8E%BB%E6%89%A7%E8%A1%8C%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. tool_calls 回给谁？谁去执行？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%95%B0%E6%8D%AE%E6%B5%81%E5%90%91" data-stellar-navigation=""><span class="toc-text">数据流向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%8C%89%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E8%B5%B0%E4%B8%80%E9%81%8D" data-stellar-navigation=""><span class="toc-text">按执行顺序走一遍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%89%E4%B8%AA%E5%BF%85%E9%A1%BB%E6%BE%84%E6%B8%85%E7%9A%84%E7%82%B9" data-stellar-navigation=""><span class="toc-text">三个必须澄清的点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E4%B8%8D%E7%94%A8%E6%A1%86%E6%9E%B6%E7%9A%84%E8%AF%9D%EF%BC%8C%E4%BD%A0%E8%87%AA%E5%B7%B1%E5%B0%B1%E6%98%AF%E6%89%A7%E8%A1%8C%E8%80%85" data-stellar-navigation=""><span class="toc-text">不用框架的话，你自己就是执行者</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E5%AE%89%E5%85%A8%E8%BE%B9%E7%95%8C" data-stellar-navigation=""><span class="toc-text">安全边界</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81trace-%E8%90%BD%E7%9B%98" data-stellar-navigation=""><span class="toc-text">三、trace 落盘</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-%E3%80%8C%E8%90%BD%E7%9B%98%E3%80%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. 「落盘」是什么意思？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E5%85%B7%E4%BD%93%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 具体怎么实现？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E5%AE%9E%E7%8E%B0%E6%97%B6%E8%A6%81%E6%B3%A8%E6%84%8F%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 实现时要注意什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E4%B8%B2%E8%B5%B7%E6%9D%A5%E7%9A%84%E5%9B%A0%E6%9E%9C%E9%93%BE" data-stellar-navigation=""><span class="toc-text">四、串起来的因果链</span></a></li></ol></div>
+  <div class="widget-footer"><a class="top ui-interactive" onclick="util.scrollTop()"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M20.536 3.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464" opacity=".5"></path><path fill="currentColor" d="M9.53 12.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 9.56z"></path><path fill="currentColor" d="M9.53 16.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 13.56z"></path></svg></span><span>回到顶部</span></a></div>
+</widget>
+
+
+</div></div></div></div></aside>
+</div><button type="button" class="site-scrim" data-shell-action="dismiss-drawer" aria-label="Close navigation" tabindex="-1"></button><div data-stellar-runtime-region="" class="site-dock" role="group" aria-label="Layout panels">
+  <button type="button" class="site-dock__button site-dock__button--rightbar ui-interactive" aria-label="Open rightbar" aria-controls="rightbar-region" aria-expanded="false" data-shell-action="toggle-rightbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+  </button>
+  <button type="button" class="site-dock__button site-dock__button--leftbar ui-interactive" aria-label="Open leftbar" aria-controls="leftbar-region" aria-expanded="false" data-shell-action="toggle-leftbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"></path><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"></path></g></svg>
+  </button>
 </div>
 
-<script src="/libs/aplayer/APlayer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
-
+<dialog data-stellar-runtime-region="" class="search-dialog" id="site-search-dialog" aria-labelledby="site-search-title">
+  <div class="search-dialog__panel search-wrapper" id="site-search-wrapper" searching="false">
+    <div class="search-dialog__header">
+      <div class="search-form" role="search">
+        <span class="search-button" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"></path><circle cx="14" cy="11" r="4"></circle></g></svg></span>
+        <input type="search" class="search-input" id="site-search-input" aria-labelledby="site-search-title" placeholder="搜索">
+      </div>
+      <button type="button" class="search-dialog__close" data-shell-action="close-search" aria-label="关闭搜索">×</button>
+    </div>
     
-    <div class="container row center-align" style="margin-bottom: 0px !important;">
-        <div class="col s12 m8 l8 copy-right">
-            Copyright&nbsp;&copy;
-            
-                <span id="year">2019-2026</span>
-            
-            <span id="year">2019</span>
-            <a href="/about" target="_blank">Qiu Yinlan</a>
-            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
-            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
-            <br>
-            
-            
-            
-            
-            
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
-            </span>
-            
-            
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
-            </span>
-            
-            <br>
-            
-            <br>
-            
-        </div>
-        <div class="col s12 m4 l4 social-link social-statis">
-    <a href="https://github.com/qiuyinlan" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
-        <i class="fab fa-github"></i>
-    </a>
+      <div class="search-dialog__scope" role="radiogroup" aria-labelledby="site-search-title" hidden="">
+        <label class="search-dialog__scope-option" data-search-scope-option="all">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="all">
+          <span>全站</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="blog" hidden="">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="blog">
+          <span>博客</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="current" hidden="">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="current">
+          <span data-search-scope-current-label=""></span>
+        </label>
+      </div>
+    
+    <h2 class="search-dialog__title" id="site-search-title">站内搜索</h2>
+    <div class="search-result" id="site-search-result"></div>
+    <div class="search-no-result">没有找到内容！</div>
+  </div>
+</dialog>
+</div><div class="site-scripts">
+<script data-stellar-script="core" src="/js/stellar-icons.js?v=39c6ac17e854ffe2"></script>
 
-
-
-    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
-        <i class="fas fa-envelope-open"></i>
-    </a>
-
-
-
-
-
-
-
-    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
-        <i class="fab fa-qq"></i>
-    </a>
-
-
-
-
-
-
-
-    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
-        <i class="fas fa-rss"></i>
-    </a>
-
-</div>
-    </div>
-</footer>
-
-<div class="progress-bar"></div>
-
-
-    <!-- 搜索遮罩框 -->
-<div id="searchModal" class="modal">
-    <div class="modal-content">
-        <div class="search-header">
-            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
-            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
-                   class="search-input">
-        </div>
-        <div id="searchResult"></div>
-    </div>
-</div>
-
-<script type="text/javascript">
-$(function () {
-    var searchFunc = function (path, search_id, content_id) {
-        'use strict';
-        $.ajax({
-            url: path,
-            dataType: "xml",
-            success: function (xmlResponse) {
-                // get the contents from search data
-                var datas = $("entry", xmlResponse).map(function () {
-                    return {
-                        title: $("title", this).text(),
-                        content: $("content", this).text(),
-                        url: $("url", this).text()
-                    };
-                }).get();
-                var $input = document.getElementById(search_id);
-                var $resultContent = document.getElementById(content_id);
-                $input.addEventListener('input', function () {
-                    var str = '<ul class=\"search-result-list\">';
-                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
-                    $resultContent.innerHTML = "";
-                    if (this.value.trim().length <= 0) {
-                        return;
-                    }
-                    // perform local searching
-                    datas.forEach(function (data) {
-                        var isMatch = true;
-                        var data_title = data.title.trim().toLowerCase();
-                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
-                        var data_url = data.url;
-                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
-                        var index_title = -1;
-                        var index_content = -1;
-                        var first_occur = -1;
-                        // only match artiles with not empty titles and contents
-                        if (data_title !== '' && data_content !== '') {
-                            keywords.forEach(function (keyword, i) {
-                                index_title = data_title.indexOf(keyword);
-                                index_content = data_content.indexOf(keyword);
-                                if (index_title < 0 && index_content < 0) {
-                                    isMatch = false;
-                                } else {
-                                    if (index_content < 0) {
-                                        index_content = 0;
-                                    }
-                                    if (i === 0) {
-                                        first_occur = index_content;
-                                    }
-                                }
-                            });
-                        }
-                        // show search results
-                        if (isMatch) {
-                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
-                            var content = data.content.trim().replace(/<[^>]+>/g, "");
-                            if (first_occur >= 0) {
-                                // cut out 100 characters
-                                var start = first_occur - 20;
-                                var end = first_occur + 80;
-                                if (start < 0) {
-                                    start = 0;
-                                }
-                                if (start === 0) {
-                                    end = 100;
-                                }
-                                if (end > content.length) {
-                                    end = content.length;
-                                }
-                                var match_content = content.substr(start, end);
-                                // highlight all keywords
-                                keywords.forEach(function (keyword) {
-                                    var regS = new RegExp(keyword, "gi");
-                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
-                                });
-
-                                str += "<p class=\"search-result\">" + match_content + "...</p>"
-                            }
-                            str += "</li>";
-                        }
-                    });
-                    str += "</ul>";
-                    $resultContent.innerHTML = str;
-                });
-            }
-        });
-    };
-
-    searchFunc('/search.xml', 'searchInput', 'searchResult');
-});
+<script data-stellar-script="defines">
+  window.canonical = window.stellarClientData.canonical;
+  const ctx = window.stellarClientData.ctx;
+  window.canonical.param = {permalink: "https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/", checklink: ctx.services.video.js};
+  ctx.date_suffix = {"just":"刚刚","min":"分钟前","hour":"小时前","day":"天前"};
+  if (ctx.search) Object.assign(ctx.search, {"more":"更多","no_more":"没有更多了"});
+  const def = window.stellarClientData.def;
+  window.ctx = ctx;
+  window.def = def;
 </script>
 
-    <!-- 回到顶部按钮 -->
-<div id="backTop" class="top-scroll">
-    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
-        <i class="fas fa-arrow-up"></i>
-    </a>
+
+<!-- core: 迁移期 DOM/资源兼容工具；Extension 注册与生命周期由 ESM runtime 所有 -->
+<script data-stellar-script="core" src="/js/utils.js?v=2.0.0"></script>
+<script data-stellar-script="core" src="/js/main.js?v=2.0.0" defer=""></script>
+<script data-stellar-script="core" defer="" src="/js/profile.js?v=2.0.0"></script>
+
+
+
+
+
+<script data-stellar-script="core" type="application/json" id="stellar-runtime-config">{"version":1,"root":"/","policy":{"cache":{"enabled":true,"defaultTtl":3600,"ttl":{"giscus":600,"waline":600,"artalk":600,"memos":600,"memos-user":86400,"sites":86400,"friends":86400,"friends_and_posts":86400,"siteinfo":86400},"maxEntries":200},"request":{"retries":2,"timeoutMs":5000,"idleTimeoutMs":3000,"maxCacheEntryBytes":204800},"features":{"codeCopyToastMs":2500},"providers":{"linkPrefetch":"flying_pages","lightbox":"fancybox","diagrams":"mermaid"}},"extensions":[{"id":"pin-slider","module":"/js/runtime/extensions/pin-slider.js","scope":"region","when":{"selector":".pin-slider"},"config":{}},{"id":"page-controls","module":"/js/runtime/extensions/page-controls.js","scope":"region","when":{"always":true},"config":{"highlight":"/js/search/highlight.js","tagtree":"/js/tagtree.js"}},{"id":"partial-navigation","module":"/js/runtime/extensions/partial-navigation.js","scope":"document","when":{"always":true},"config":{}},{"id":"search","module":"/js/runtime/extensions/search.js","scope":"document","when":{"selector":".search-input"},"config":{"provider":"local","options":{"scope":"all","includeContent":true,"cacheTtlSeconds":86400},"assets":{"client":null,"provider":"/js/search/local-search.js","shortcut":"/js/search/shortcut.js"}}},{"id":"hero-parallax","module":"/js/runtime/extensions/hero-parallax.js","scope":"region","when":{"selector":".wiki-hero"},"config":{}},{"id":"hero-effect","module":"/js/runtime/extensions/hero-effect.js","scope":"region","when":{"selector":"canvas[data-hero-effect]"},"config":{}},{"id":"lazy-loading","module":"/js/runtime/extensions/lazy-loading.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"}},{"id":"deferred-icons","module":"/js/runtime/extensions/deferred-icons.js","scope":"region","when":{"selector":"svg.icon[data-icon]"},"config":{}},{"id":"dropdown","module":"/js/runtime/extensions/dropdown.js","scope":"region","when":{"selector":"details.dropdown"},"config":{}},{"id":"services","module":"/js/runtime/extensions/services.js","scope":"region","when":{"selector":"#artalk_container, #twikoo_container, #waline_container, .data-service, [class*='ds-'], a[cardlink], a[data-md-link][data-siteinfo-api], .site-card [data-siteinfo-api], .voice\u003eaudio, .video\u003evideo, .chat-file"},"config":{"marked":"https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js"}},{"id":"settings","module":"/js/runtime/extensions/settings.js","scope":"region","when":{"selector":".settings-page"},"config":{}},{"id":"link-prefetch","module":"/js/runtime/extensions/link-prefetch.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"}},{"id":"lightbox","module":"/js/runtime/extensions/lightbox.js","scope":"region","when":{"selector":"[data-fancybox]:not(.error), .with-fancybox, .ds-memos, .timenode p\u003eimg"},"config":{"enabled":true,"selector":".timenode p\u003eimg","assets":{"localCss":"/css/plugins/fancybox.css","js":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js","css":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"}}},{"id":"reveal","module":"/js/runtime/extensions/reveal.js","scope":"region","when":{"selector":".slide-up"},"config":{"enabled":true,"duration":800,"interval":200,"distance":8,"blur":4}},{"id":"code-copy","module":"/js/runtime/extensions/code-copy.js","scope":"region","when":{"selector":".code"},"config":{"assets":{"js":"/js/plugins/copycode.js"},"messages":{"label":"复制","copied":"复制成功","denied":"未获得剪贴板权限","unsupported":"当前浏览器不支持剪贴板或页面不是 HTTPS"}}},{"id":"adaptive-text","module":"/js/runtime/extensions/adaptive-text.js","scope":"region","when":{"selector":"[data-text-adaptive]"},"config":{"assets":{"colorJs":"/js/color.js","js":"/js/plugins/adaptive-text.js"}}},{"id":"swiper","module":"/js/runtime/extensions/swiper.js","scope":"region","when":{"selector":"#swiper-api"},"config":{"assets":{"localCss":"/css/plugins/swiper.css","js":"https://unpkg.com/swiper@10.3/swiper-bundle.min.js","css":"https://unpkg.com/swiper@10.3/swiper-bundle.min.css"}}}]}</script>
+<script data-stellar-script="core" type="module" src="/js/runtime/index.js?v=2.0.0&amp;runtime=1"></script>
+
+
+<!-- inject -->
+
+
+<script data-stellar-script="core" defer="" src="/js/navigation-init.js?v=2.0.0"></script>
 </div>
 
-
-    <script src="/libs/materialize/materialize.min.js"></script>
-    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
-    <script src="/libs/aos/aos.js"></script>
-    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
-    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
-    <script src="/js/matery.js"></script>
-
-    <!-- Baidu Analytics -->
-
-    <!-- Baidu Push -->
-
-<script>
-    (function () {
-        var bp = document.createElement('script');
-        var curProtocol = window.location.protocol.split(':')[0];
-        if (curProtocol === 'https') {
-            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-        } else {
-            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-        }
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(bp, s);
-    })();
-</script>
-
-    
-    <script src="/libs/others/clicklove.js" async="async"></script>
-    
-    
-    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
-    
-
-    
-
-    
-
-	
-    
-
-    
-
-    
-
-    
-    <script src="/libs/instantpage/instantpage.js" type="module"></script>
-    
-
-</body>
-
-</html>
+<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/","signature":"7ddd6974f8f2ed57214b784dc3905fb501d34ef49df33573545e81109779fb10"}</script></body></html>

@@ -1,470 +1,445 @@
-<!DOCTYPE HTML>
-<html lang="zh-CN">
-
-
-<head>
-    <meta charset="utf-8">
-    <meta name="keywords" content="Agent 架构、Eino 内部机制与多 Agent 编排, hi,it&#39;s Qiu Yinlan!">
-    <meta name="description" content="分享技术、生活和学习笔记">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="renderer" content="webkit|ie-stand|ie-comp">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-
-
-    <title>Agent 架构、Eino 内部机制与多 Agent 编排 | hi,it&#39;s Qiu Yinlan!</title>
-    <link rel="icon" type="image/png" href="/favicon.png">
-
-    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
-    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
-    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
-    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
-    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
-    <link rel="stylesheet" type="text/css" href="/css/matery.css">
-    <link rel="stylesheet" type="text/css" href="/css/my.css">
-
-    <script src="/libs/jquery/jquery.min.js"></script>
-
-<meta name="generator" content="Hexo 8.1.2"></head>
-
-
-
-
-<body>
-    <header class="navbar-fixed">
-    <nav id="headNav" class="bg-color nav-transparent">
-        <div id="navContainer" class="nav-wrapper container">
-            <div class="brand-logo">
-                <a href="/" class="waves-effect waves-light">
-                    
-                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
-                    
-                    <span class="logo-span">hi,it&#39;s Qiu Yinlan!</span>
-                </a>
-            </div>
-            
-
-<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
-<ul class="right nav-menu">
+<!DOCTYPE html><html lang="zh-CN"><head>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/" class="waves-effect waves-light">
-      
-      <i class="fas fa-home" style="zoom: 0.6;"></i>
-      
-      <span>首页</span>
-    </a>
-    
-  </li>
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0" theme-name="Stellar" theme-version="2.0.0">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/tags" class="waves-effect waves-light">
-      
-      <i class="fas fa-tags" style="zoom: 0.6;"></i>
-      
-      <span>标签</span>
-    </a>
-    
-  </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/categories" class="waves-effect waves-light">
-      
-      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
-      
-      <span>分类</span>
-    </a>
-    
-  </li>
+  <meta name="generator" content="Hexo 8.1.2">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/archives" class="waves-effect waves-light">
-      
-      <i class="fas fa-archive" style="zoom: 0.6;"></i>
-      
-      <span>归档</span>
-    </a>
-    
-  </li>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title data-stellar-page-meta="">Agent 架构、Eino 内部机制与多 Agent 编排 - hi,it's Qiu Yinlan!</title>
+  <script data-stellar-script="core">
+    (function () {
+      var key = 'stellar:v2:leftbar-state';
+      var fallback = "expanded";
+      try {
+        var value = localStorage.getItem(key);
+        document.documentElement.dataset.leftbarState = value === 'collapsed' || value === 'expanded' ? value : fallback;
+      } catch (error) {
+        document.documentElement.dataset.leftbarState = fallback;
+      }
+    })();
+  </script>
+
+  <meta name="description" content="零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行注册进" data-stellar-page-meta="">
+<meta property="og:type" content="article" data-stellar-page-meta="">
+<meta property="og:title" content="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-page-meta="">
+<meta property="og:url" content="https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" data-stellar-page-meta="">
+<meta property="og:site_name" content="hi,it's Qiu Yinlan!" data-stellar-page-meta="">
+<meta property="og:description" content="零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行注册进" data-stellar-page-meta="">
+<meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
+<meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
+<meta property="article:published_time" content="2026-11-08T13:00:00.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-09T01:22:13.000Z" data-stellar-page-meta="">
+<meta property="article:tag" content="agent" data-stellar-page-meta="">
+<meta property="article:tag" content="go" data-stellar-page-meta="">
+<meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-page-meta="">
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/about" class="waves-effect waves-light">
-      
-      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
-      
-      <span>关于</span>
-    </a>
-    
-  </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/contact" class="waves-effect waves-light">
-      
-      <i class="fas fa-comments" style="zoom: 0.6;"></i>
-      
-      <span>留言板</span>
-    </a>
-    
-  </li>
+  <meta name="keywords" content="agent,go" data-stellar-page-meta="">
+
+  <!-- feed -->
   
-  <li>
-    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
-      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
-    </a>
-  </li>
-</ul>
+
+  <link rel="preload" href="/css/main.css?v=2.0.0" as="style">
+  <link rel="stylesheet" href="/css/main.css?v=2.0.0">
+  <style>:root{--text-loading:"正在加载";--text-loading-error:"加载失败，请稍后重试。"}</style>
 
 
-<div id="mobile-nav" class="side-nav sidenav">
+  
 
-    <div class="mobile-head bg-color">
-        
-        <img src="/medias/logo.png" class="logo-img circle responsive-img">
-        
-        <div class="logo-name">hi,it&#39;s Qiu Yinlan!</div>
-        <div class="logo-desc">
-            
-            分享技术、生活和学习笔记
-            
-        </div>
-    </div>
+  
 
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-08T21:00:00+08:00","dateModified":"2026-11-09T09:22:13+08:00","datePublished":"2026-11-08T21:00:00+08:00","description":"零、主干速查（先看这个）流程 A：Eino ReAct 一次往返（谁发起、谁执行）1234567① Go 进程发请求（messages + 11 个工具 schema）② 模型返回 tool_calls（只输出 JSON，不执行任何东西）③ Eino ReAct 解析成 schema.Message④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错⑤ 执行...","headline":"Agent 架构、Eino 内部机制与多 Agent 编排","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"agent, go","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  
+
+  <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
+  <link rel="preload" as="script" href="/js/stellar-icons.js?v=39c6ac17e854ffe2">
+  
+  
+</head>
+<body data-page-type="content" data-page-layout="post" data-article-style="tech"><div data-stellar-runtime-region="" id="site-cover" class="site-cover"></div><div class="site-shell" id="start" data-regions="leftbar rightbar"><div class="site-workspace">
+<aside data-stellar-runtime-region="" id="leftbar-region" class="site-region site-region--leftbar" data-region="leftbar" aria-label="Leftbar"><div class="site-region__surface ui-surface"><div class="site-region__decoration" aria-hidden="true"></div><div class="site-region__viewport"><header class="site-region__header site-region__zone site-region__zone--top">
+    <div class="widget-instance widget-instance--brand" data-widget-id="leftbar:fixed:brand" data-presentation="leftbar" data-leftbar-rail="">
+<header class="brand-header brand-header--regular brand-header--site"><div class="brand-wrap"><a class="brand-image brand-image--avatar" href="/"><img no-lazy="" src="/favicon.png" alt="" onerror="this.onerror=null;this.src=&quot;/images/stellar-error.491ee870f4940739.svg&quot;"></a><a class="brand-title" href="/"><div class="brand-name">Qiu Yinlan</div><div class="brand-tagline cap">分享技术、生活和学习笔记</div></a></div><div class="brand-search">
+
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
     
+<button class="ui-collection__item ui-interactive card-hover card-hover--spotlight search-trigger has-hover-surface" type="button" title="搜索" aria-label="搜索" data-shell-action="open-search" data-search-instance="leftbar-brand-search" data-search-domain="blog" data-search-domain-label="博客" data-search-domain-blog="true">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"></path><circle cx="14" cy="11" r="4"></circle></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">搜索</span>
+      
+      
+    </span>
+  
+  <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
 
-    <ul class="menu-list mobile-menu-list">
-        
-        <li class="m-nav-item">
-	  
-		<a href="/" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-home"></i>
-			
-			首页
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/tags" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-tags"></i>
-			
-			标签
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/categories" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-bookmark"></i>
-			
-			分类
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/archives" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-archive"></i>
-			
-			归档
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/about" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-user-circle"></i>
-			
-			关于
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/contact" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-comments"></i>
-			
-			留言板
-		</a>
-          
-        </li>
-        
-        
-        <li><div class="divider"></div></li>
-        <li>
-            <a href="https://github.com/blinkfox/hexo-theme-matery" class="waves-effect waves-light" target="_blank">
-                <i class="fab fa-github-square fa-fw"></i>Fork Me
-            </a>
-        </li>
-        
-    </ul>
+  
+</button>
+
+  
 </div>
 
 
-        </div>
+</div></header>
+</div>
+  </header>
+  <div class="site-region__body site-region__zone site-region__zone--body">
+    <div class="widget-instance widget-instance--menu" data-widget-id="leftbar:fixed:menu" data-presentation="leftbar" data-leftbar-rail="">
 
-        
-            <style>
-    .nav-transparent .github-corner {
-        display: none !important;
-    }
 
-    .github-corner {
-        position: absolute;
-        z-index: 10;
-        top: 0;
-        right: 0;
-        border: 0;
-        transform: scale(1.1);
-    }
-
-    .github-corner svg {
-        color: #0f9d58;
-        fill: #fff;
-        height: 64px;
-        width: 64px;
-    }
-
-    .github-corner:hover .octo-arm {
-        animation: a 0.56s ease-in-out;
-    }
-
-    .github-corner .octo-arm {
-        animation: none;
-    }
-
-    @keyframes a {
-        0%,
-        to {
-            transform: rotate(0);
-        }
-        20%,
-        60% {
-            transform: rotate(-25deg);
-        }
-        40%,
-        80% {
-            transform: rotate(10deg);
-        }
-    }
-</style>
-
-<a href="https://github.com/blinkfox/hexo-theme-matery" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
-   data-tooltip="Fork Me" data-position="left" data-delay="50">
-    <svg viewBox="0 0 250 250" aria-hidden="true">
-        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
-        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
-              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
-        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
-              fill="currentColor" class="octo-body"></path>
-    </svg>
+<nav class="menu dis-select">
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-active is-themed" href="/" title="近期发布" aria-current="page" style="--item-theme:#1BCDFC;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.879 2.879C5 3.757 5 5.172 5 8v8c0 2.828 0 4.243.879 5.121C6.757 22 8.172 22 11 22h2c2.828 0 4.243 0 5.121-.879C19 20.243 19 18.828 19 16V8c0-2.828 0-4.243-.879-5.121C17.243 2 15.828 2 13 2h-2c-2.828 0-4.243 0-5.121.879M8.25 17a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75M9 12.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zM8.25 9A.75.75 0 0 1 9 8.25h6a.75.75 0 0 1 0 1.5H9A.75.75 0 0 1 8.25 9" clip-rule="evenodd"></path><path fill="currentColor" d="M5.235 4.058C5 4.941 5 6.177 5 8v8c0 1.823 0 3.058.235 3.942L5 19.924c-.975-.096-1.631-.313-2.121-.803C2 18.243 2 16.828 2 14v-4c0-2.829 0-4.243.879-5.121c.49-.49 1.146-.707 2.121-.803zm13.53 15.884C19 19.058 19 17.822 19 16V8c0-1.823 0-3.059-.235-3.942l.235.018c.975.096 1.631.313 2.121.803C22 5.757 22 7.17 22 9.999v4c0 2.83 0 4.243-.879 5.122c-.49.49-1.146.707-2.121.803z" opacity=".5"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">近期发布</span>
+      
+      
+    </span>
+  
+  
+  <span class="ui-collection__indicator"></span>
 </a>
-        
-    </nav>
 
-</header>
-
+  
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/notebooks/" title="笔记" style="--item-theme:#3DC550;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M14.25 4.48v3.057c0 .111 0 .27.02.406a.94.94 0 0 0 .445.683a.96.96 0 0 0 .783.072c.13-.04.272-.108.378-.159L17 8.005l1.124.534c.106.05.248.119.378.16a.96.96 0 0 0 .783-.073a.94.94 0 0 0 .444-.683c.021-.136.021-.295.021-.406V3.031q.17-.008.332-.013C21.154 2.98 22 3.86 22 4.933v11.21c0 1.112-.906 2.01-2.015 2.08c-.97.06-2.108.179-2.985.41c-1.082.286-1.99 1.068-3.373 1.436c-.626.167-1.324.257-1.627.323V5.174c.32-.079 1.382-.203 1.674-.371q.277-.162.576-.323m5.478 8.338a.75.75 0 0 1-.546.91l-4 1a.75.75 0 0 1-.364-1.456l4-1a.75.75 0 0 1 .91.546" clip-rule="evenodd"></path><path fill="currentColor" d="M18.25 3.151c-.62.073-1.23.18-1.75.336a8 8 0 0 0-.75.27v3.182l.75-.356l.008-.005a1.1 1.1 0 0 1 .492-.13q.071 0 .138.01c.175.029.315.1.354.12l.009.005l.749.356z"></path><path fill="currentColor" d="M12 5.214c-.334-.064-1.057-.161-1.718-.339C8.938 4.515 8.05 3.765 7 3.487c-.887-.234-2.041-.352-3.018-.412C2.886 3.007 2 3.9 2 4.998v11.146c0 1.11.906 2.01 2.015 2.079c.97.06 2.108.179 2.985.41c.486.129 1.216.431 1.873.726c1.005.451 2.052.797 3.127 1.034z" opacity=".5"></path><path fill="currentColor" d="M4.273 12.818a.75.75 0 0 1 .91-.545l4 1a.75.75 0 1 1-.365 1.455l-4-1a.75.75 0 0 1-.545-.91m.909-4.545a.75.75 0 1 0-.364 1.455l4 1a.75.75 0 0 0 .364-1.455z"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">笔记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/wiki/" title="项目" style="--item-theme:#F44336;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="m12 16.068l-3.771 3.905c-.54.559-.81.839-1.04.935c-.52.22-1.099.032-1.373-.448c-.12-.21-.158-.59-.232-1.35c-.043-.43-.064-.644-.128-.824a1.43 1.43 0 0 0-.835-.864c-.173-.067-.38-.089-.795-.133c-.734-.077-1.101-.116-1.305-.24c-.463-.284-.646-.883-.433-1.422c.094-.237.364-.517.904-1.076L5.456 12l1.238-1.238zl5.306-5.306L18.544 12l2.464 2.55c.54.56.81.84.904 1.076c.213.54.03 1.139-.433 1.423c-.204.124-.57.163-1.305.24c-.414.044-.622.066-.795.133c-.389.149-.69.462-.835.864c-.064.18-.085.394-.128.823c-.075.76-.112 1.14-.232 1.351c-.274.48-.853.669-1.374.448c-.228-.096-.498-.376-1.038-.935z" opacity=".5"></path><path fill="currentColor" fill-rule="evenodd" d="M12 16a7 7 0 1 0 0-14a7 7 0 0 0 0 14m0-10c-.284 0-.474.34-.854 1.023l-.098.176c-.108.194-.162.29-.246.354c-.085.064-.19.088-.4.135l-.19.044c-.738.167-1.107.25-1.195.532s.164.577.667 1.165l.13.152c.143.167.215.25.247.354s.021.215 0 .438l-.02.203c-.076.785-.114 1.178.115 1.352c.23.174.576.015 1.267-.303l.178-.082c.197-.09.295-.135.399-.135s.202.045.399.135l.178.082c.691.319 1.037.477 1.267.303s.191-.567.115-1.352l-.02-.203c-.021-.223-.032-.334 0-.438s.104-.187.247-.354l.13-.152c.503-.588.755-.882.667-1.165c-.088-.282-.457-.365-1.195-.532l-.19-.044c-.21-.047-.315-.07-.4-.135c-.084-.064-.138-.16-.246-.354l-.098-.176C12.474 6.34 12.284 6 12 6" clip-rule="evenodd"></path></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">项目</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="/archives/" title="归档" style="--item-theme:#7C4DFF;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M6.94028 2C7.35614 2 7.69326 2.32421 7.69326 2.72414V4.18487C8.36117 4.17241 9.10983 4.17241 9.95219 4.17241H13.9681C14.8104 4.17241 15.5591 4.17241 16.227 4.18487V2.72414C16.227 2.32421 16.5641 2 16.98 2C17.3958 2 17.733 2.32421 17.733 2.72414V4.24894C19.178 4.36022 20.1267 4.63333 20.8236 5.30359C21.5206 5.97385 21.8046 6.88616 21.9203 8.27586L22 9H2.92456H2V8.27586C2.11571 6.88616 2.3997 5.97385 3.09665 5.30359C3.79361 4.63333 4.74226 4.36022 6.1873 4.24894V2.72414C6.1873 2.32421 6.52442 2 6.94028 2Z"></path><path d="M21.9995 14.0001V12.0001C21.9995 11.161 21.9963 9.66527 21.9834 9H2.00917C1.99626 9.66527 1.99953 11.161 1.99953 12.0001V14.0001C1.99953 17.7713 1.99953 19.6569 3.1711 20.8285C4.34267 22.0001 6.22829 22.0001 9.99953 22.0001H13.9995C17.7708 22.0001 19.6564 22.0001 20.828 20.8285C21.9995 19.6569 21.9995 17.7713 21.9995 14.0001Z" opacity=".5"></path><path d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"></path><path d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"></path><path d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"></path><path d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"></path><path d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"></path><path d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"></path></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">归档</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/1.jpg')">
-    <div class="container" style="right: 0px;left: 0px;">
-        <div class="row">
-            <div class="col s12 m12 l12">
-                <div class="brand">
-                    <h1 class="description center-align post-title">Agent 架构、Eino 内部机制与多 Agent 编排</h1>
-                </div>
-            </div>
-        </div>
-    </div>
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/about/" title="关于">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20" opacity=".5"></path><path d="M12 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6m0 7.5c-3.04 0-5.5 1.57-5.5 3.5c0 .65.28 1.26.77 1.77A7.96 7.96 0 0 0 12 20.5a7.96 7.96 0 0 0 4.73-1.73c.49-.51.77-1.12.77-1.77c0-1.93-2.46-3.5-5.5-3.5"></path></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">关于</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
 </div>
 
+</nav>
 
+</div>
+    <div class="widgets widget-stack widget-stack--leftbar widget-stack--body"><div class="widget-instance widget-instance--recent" data-widget-id="leftbar:1:recent" data-presentation="leftbar">
 
-
-<main class="post-container content">
-
+<widget class="widget-wrapper slide-up recent-widget">
+  
+    <div class="widget-header dis-select">
+      <span class="name">最近更新</span>
+      
+    </div>
+  
+  <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
     
-    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
-<style>
-    #articleContent h1::before,
-    #articleContent h2::before,
-    #articleContent h3::before,
-    #articleContent h4::before,
-    #articleContent h5::before,
-    #articleContent h6::before {
-        display: block;
-        content: " ";
-        height: 100px;
-        margin-top: -100px;
-        visibility: hidden;
-    }
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" title="Agent 架构、Eino 内部机制与多 Agent 编排" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">A</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #articleContent :focus {
-        outline: none;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-fixed {
-        position: fixed;
-        top: 64px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" title="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">J</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget {
-        width: 345px;
-        padding-left: 20px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/" title="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">从</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget .toc-title {
-        padding: 35px 0 15px 17px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        line-height: 1.5rem;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E7%9A%84%E8%B7%AF%E7%94%B1%E8%BD%AC%E5%8F%91%E5%8F%91%E7%94%9F%E5%9C%A8%E5%93%AA%E4%B8%80%E5%B1%82/" title="HTTPS 的路由转发，发生在哪一层？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 的路由转发，发生在哪一层？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    .toc-widget ol {
-        padding: 0;
-        list-style: none;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2026/11/05/HTTPS-%E5%88%B0%E5%BA%95%E5%8A%A0%E5%AF%86%E4%BA%86%E4%BB%80%E4%B9%88/" title="HTTPS 到底加密了什么？" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">H</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">HTTPS 到底加密了什么？</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content {
-        padding-bottom: 30px;
-        overflow: auto;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/01/%E5%8D%9A%E5%AE%A2%E5%A4%B1%E8%B4%A5%E6%97%A5%E8%AE%B0/" title="博客失败日记" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">博</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">博客失败日记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content ol {
-        padding-left: 10px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/01/%E5%8D%9A%E5%AE%A2/" title="博客" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">博</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">博客</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content ol li {
-        padding-left: 10px;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/07/ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81/" title="ftp协议介绍及代码" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">F</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">ftp协议介绍及代码</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content .toc-link:hover {
-        color: #42b983;
-        font-weight: 700;
-        text-decoration: underline;
-    }
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/2025/06/07/5.26-6.1%E5%91%A8%E5%A4%8D%E7%9B%98/" title="5.26-6.1周复盘" data-stellar-navigation="">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">5</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">5.26-6.1周复盘</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
 
-    #toc-content .toc-link::before {
-        background-color: transparent;
-        max-height: 25px;
+  
+</div></div>
+  
+</widget>
 
-        position: absolute;
-        right: 23.5vw;
-        display: block;
-    }
 
-    #toc-content .is-active-link {
-        color: #42b983;
-    }
+</div></div>
+  </div>
+  <footer class="site-region__footer">
+    
+    <div class="site-region__system ui-collection" data-layout="inline" data-variant="nav" data-density="compact">
+      <div class="site-region__settings"><div class="widget-instance widget-instance--settings" data-widget-id="leftbar:fixed:settings" data-presentation="leftbar" data-leftbar-rail="">
+<a class="settings-widget ui-collection__item ui-interactive card-hover card-hover--spotlight" href="/settings/" data-profile-provider="" data-profile-identity-enabled="false" data-profile-fallback-avatar="https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/avatar/round/3442075.svg" data-settings-placement="leftbar" data-settings-label="设置" aria-label="设置" title="设置">
+  <span class="settings-widget__avatar" aria-hidden="true">
+    <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2Z" clip-rule="evenodd" opacity=".5"></path><path d="M12.4277 8.25C10.3567 8.25 8.67773 9.92893 8.67773 12C8.67773 14.0711 10.3567 15.75 12.4277 15.75C14.4988 15.75 16.1777 14.0711 16.1777 12C16.1777 9.92893 14.4988 8.25 12.4277 8.25Z"></path></g></svg></span>
+  </span>
+  <span class="settings-widget__name ui-collection__title">设置</span>
+</a>
+</div></div>
+      <button type="button" class="leftbar-state-toggle ui-collection__item ui-interactive card-hover card-hover--spotlight is-icon-only" aria-label="Collapse leftbar" aria-expanded="true" data-shell-action="toggle-leftbar"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.172 4.172C2 5.343 2 7.229 2 11v2c0 3.771 0 5.657 1.172 6.828S6.229 21 10 21h5V3h-5C6.229 3 4.343 3 3.172 4.172" clip-rule="evenodd" opacity=".5"></path><path fill="currentColor" d="M5.5 9.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm1 4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zM22 13v-2c0-3.771 0-5.657-1.172-6.828c-.974-.975-3.192-1.139-5.828-1.166v17.988c2.636-.027 4.854-.191 5.828-1.166C22 18.657 22 16.771 22 13"></path></svg></span></button>
+    </div>
+  </footer></div></div></aside>
+<main data-stellar-runtime-region="" class="site-main" id="main">
 
-    #floating-toc-btn {
-        position: fixed;
-        right: 15px;
-        bottom: 76px;
-        padding-top: 15px;
-        margin-bottom: 0;
-        z-index: 998;
-    }
 
-    #floating-toc-btn .btn-floating {
-        width: 48px;
-        height: 48px;
-    }
-
-    #floating-toc-btn .btn-floating i {
-        line-height: 48px;
-        font-size: 1.4rem;
-    }
-</style>
-<div class="row">
-    <div id="main-content" class="col s12 m12 l9">
-        <!-- 文章内容详情 -->
-<div id="artDetail">
-    <div class="card">
-        <div class="card-content article-info">
-            <div class="row tag-cate">
-                <div class="col s7">
-                    
-                    <div class="article-tag">
-                        
-                            <a href="/tags/agent/">
-                                <span class="chip bg-color">agent</span>
-                            </a>
-                        
-                            <a href="/tags/go/">
-                                <span class="chip bg-color">go</span>
-                            </a>
-                        
-                    </div>
-                    
-                </div>
-                <div class="col s5 right-align">
-                    
-                    <div class="post-cate">
-                        <i class="fas fa-bookmark fa-fw icon-category"></i>
-                        
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                技术
-                            </a>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="post-info">
-                
-                <div class="post-date info-break-policy">
-                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2026-11-08
-                </div>
-                
-
-                
-
-                
-
-                
-
-                
-            </div>
-        </div>
-        <hr class="clearfix">
-
+<div class="article-banner-wrap slide-up"><div class="article banner top">
+  <div class="content">
+    
+    <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+</div><div class="right"><span class="cap reading">7025 字 · 预计阅读 24 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-09T01:22:13.000Z">2026-11-09</time></span></div>
+</div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>Agent 架构、Eino 内部机制与多 Agent 编排</span></h1>
         
+      </div>
+    </div>
+    
+  </div>
+  </div></div>
+<article class="md-text content slide-up"><h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）" data-stellar-navigation=""></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）" data-stellar-navigation=""></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错</span><br><span class="line">⑤ 执行注册进来的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:"tool" + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></tbody></table></figure>
 
-        
-
-        <div class="card-content article-card-content">
-            <div id="articleContent">
-                <h2 id="零、主干速查（先看这个）"><a href="#零、主干速查（先看这个）" class="headerlink" title="零、主干速查（先看这个）"></a>零、主干速查（先看这个）</h2><h3 id="流程-A：Eino-ReAct-一次往返（谁发起、谁执行）"><a href="#流程-A：Eino-ReAct-一次往返（谁发起、谁执行）" class="headerlink" title="流程 A：Eino ReAct 一次往返（谁发起、谁执行）"></a>流程 A：Eino ReAct 一次往返（谁发起、谁执行）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错</span><br><span class="line">⑤ 执行注册进来的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:&quot;tool&quot; + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></table></figure>
-
-<h3 id="流程-B：多-Agent-排障编排"><a href="#流程-B：多-Agent-排障编排" class="headerlink" title="流程 B：多 Agent 排障编排"></a>流程 B：多 Agent 排障编排</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">query</span><br><span class="line">  → ① Planner 分诊（规则，不调模型）→ Plan</span><br><span class="line">  → ② 两路 goroutine 并行：Evidence / Knowledge</span><br><span class="line">  → ③ 按 roleOrder 稳定排序</span><br><span class="line">  → ④ Synthesizer（唯一一次模型调用）→ 三段式答案</span><br><span class="line">  → ⑤ Result&#123;Answer, Plan, Steps, Findings, Limitations&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="流程-B：多-Agent-排障编排"><a href="#流程-B：多-Agent-排障编排" class="headerlink" title="流程 B：多 Agent 排障编排" data-stellar-navigation=""></a>流程 B：多 Agent 排障编排</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">query</span><br><span class="line">  → ① Planner 分诊（规则，不调模型）→ Plan</span><br><span class="line">  → ② 两路 goroutine 并行：Evidence / Knowledge</span><br><span class="line">  → ③ 按 roleOrder 稳定排序</span><br><span class="line">  → ④ Synthesizer（唯一一次模型调用）→ 三段式答案</span><br><span class="line">  → ⑤ Result{Answer, Plan, Steps, Findings, Limitations}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>关键认知：四个角色里只有 Synthesizer 调模型，前三个是普通 Go 代码在查数据。</strong></p>
-<h2 id="一、Agent-框架与架构选型"><a href="#一、Agent-框架与架构选型" class="headerlink" title="一、Agent 框架与架构选型"></a>一、Agent 框架与架构选型</h2><h3 id="Q1-有哪些-Agent-开发框架？为什么用-LangGraph？"><a href="#Q1-有哪些-Agent-开发框架？为什么用-LangGraph？" class="headerlink" title="Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？"></a><span id="q1"></span>Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</h3><p><strong>按编排模型分四类：</strong></p>
+<h2 id="一、Agent-框架与架构选型"><a href="#一、Agent-框架与架构选型" class="headerlink" title="一、Agent 框架与架构选型" data-stellar-navigation=""></a>一、Agent 框架与架构选型</h2><h3 id="Q1-有哪些-Agent-开发框架？为什么用-LangGraph？"><a href="#Q1-有哪些-Agent-开发框架？为什么用-LangGraph？" class="headerlink" title="Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？" data-stellar-navigation=""></a><span id="q1"></span>Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</h3><p><strong>按编排模型分四类：</strong></p>
 <ul>
 <li><strong>Chain 式</strong>：LangChain（LCEL）、LlamaIndex、Semantic Kernel、Spring AI —— 线性流水线，流程一复杂就打补丁</li>
 <li><strong>Graph 式</strong>：LangGraph、<strong>Eino</strong>（字节）、Temporal —— 节点 + 边 + 分支 + 状态，复杂 Agent 的主流方向</li>
@@ -482,12 +457,12 @@
 <p><strong>Pilot 为什么用 Eino：</strong></p>
 <ol>
 <li><strong>语言栈</strong>：项目是 Go + GoFrame，LangGraph 是 Python，跨语言成本远大于收益</li>
-<li><strong>Go 生态没第二个这么全的</strong>：组件层（ChatModel &#x2F; Embedder &#x2F; Retriever &#x2F; Tool &#x2F; Lambda）+ 编排层（compose.Graph）+ Agent 层（react.NewAgent）+ 可观测（callbacks）</li>
+<li><strong>Go 生态没第二个这么全的</strong>：组件层（ChatModel / Embedder / Retriever / Tool / Lambda）+ 编排层（compose.Graph）+ Agent 层（react.NewAgent）+ 可观测（callbacks）</li>
 <li><strong>图编排收益确实用上了</strong>：<code>FullPilotAgent</code> 不直接拼 messages，而是把输入清洗、知识检索、Prompt 模板、ReAct Agent 编成一张可执行图（<code>full_agent.go</code>）</li>
 <li><strong>运维场景要可预测</strong>：同样输入走同样路径、结论能溯源，比多 Agent 自由对话更合适</li>
 </ol>
 <p><strong>顺带</strong>：Eino 其实也有 checkpoint（<code>compose/checkpoint.go</code>），所以「状态持久化」这块它不比 LangGraph 缺，差的主要是生态和 HITL 的成熟度。</p>
-<h3 id="Q2-ReAct-和-Plan-Execute-的使用场景？"><a href="#Q2-ReAct-和-Plan-Execute-的使用场景？" class="headerlink" title="Q2. ReAct 和 Plan-Execute 的使用场景？"></a><span id="q2"></span>Q2. ReAct 和 Plan-Execute 的使用场景？</h3><p><strong>核心问题只有一个：「下一步做什么」由谁决定、什么时候决定。</strong></p>
+<h3 id="Q2-ReAct-和-Plan-Execute-的使用场景？"><a href="#Q2-ReAct-和-Plan-Execute-的使用场景？" class="headerlink" title="Q2. ReAct 和 Plan-Execute 的使用场景？" data-stellar-navigation=""></a><span id="q2"></span>Q2. ReAct 和 Plan-Execute 的使用场景？</h3><p><strong>核心问题只有一个：「下一步做什么」由谁决定、什么时候决定。</strong></p>
 <p><strong>ReAct（边想边做）</strong></p>
 <ul>
 <li>结构：Thought → Action → Observation 循环，每轮重新判断</li>
@@ -505,11 +480,11 @@
 <ul>
 <li>根因未知、下一步依赖上一步结果 → <strong>ReAct</strong></li>
 <li>步骤结构清晰、彼此独立可并行 → <strong>Plan-Execute</strong></li>
-<li>要展示过程 &#x2F; 要控成本 → Plan-Execute</li>
+<li>要展示过程 / 要控成本 → Plan-Execute</li>
 <li>高危操作要审批 → 加 human-in-the-loop</li>
 </ul>
 <p><strong>Pilot 是分层混用</strong>：外层固定 Graph 编排 → 中层 Plan-Execute 排障流水线 → 内层 ReAct 补灵活探索。<strong>「确定性优先，灵活兜底」。</strong></p>
-<h3 id="Q3-有去中心化的-Agent-框架吗？用在哪？"><a href="#Q3-有去中心化的-Agent-框架吗？用在哪？" class="headerlink" title="Q3. 有去中心化的 Agent 框架吗？用在哪？"></a><span id="q3"></span>Q3. 有去中心化的 Agent 框架吗？用在哪？</h3><p><strong>先拆词，两种含义：</strong></p>
+<h3 id="Q3-有去中心化的-Agent-框架吗？用在哪？"><a href="#Q3-有去中心化的-Agent-框架吗？用在哪？" class="headerlink" title="Q3. 有去中心化的 Agent 框架吗？用在哪？" data-stellar-navigation=""></a><span id="q3"></span>Q3. 有去中心化的 Agent 框架吗？用在哪？</h3><p><strong>先拆词，两种含义：</strong></p>
 <ul>
 <li><strong>控制层面</strong>：没有中心编排者，Agent 之间对等协商</li>
 <li><strong>所有权层面</strong>：链上身份、自主结算、数据主权</li>
@@ -523,21 +498,21 @@
 <p><strong>真实场景</strong>：跨组织协作（供应链 A 公司采购 Agent 直接和 B 公司库存 Agent 谈判）、调用第三方能力、Agent 市场结算、数据主权（医疗金融不出本地）。</p>
 <p><strong>为什么没普及</strong>：责任归属不清、跨组织 trace 没法透传、prompt injection 会跨 Agent 传播、没有 killer use case、多一轮协商延迟翻倍。</p>
 <p><strong>Pilot 不需要</strong>：单组织内部、数据和工具都在自己基础设施里、有中心编排者、不需要跨组织信任和结算。<strong>去中心化解决的是「信任和所有权」，这些都不存在。</strong></p>
-<h3 id="Q4-Agent-之间是怎么交流的？"><a href="#Q4-Agent-之间是怎么交流的？" class="headerlink" title="Q4. Agent 之间是怎么交流的？"></a><span id="q4"></span>Q4. Agent 之间是怎么交流的？</h3><p><strong>分三层，从紧到松：</strong></p>
+<h3 id="Q4-Agent-之间是怎么交流的？"><a href="#Q4-Agent-之间是怎么交流的？" class="headerlink" title="Q4. Agent 之间是怎么交流的？" data-stellar-navigation=""></a><span id="q4"></span>Q4. Agent 之间是怎么交流的？</h3><p><strong>分三层，从紧到松：</strong></p>
 <ol>
 <li><strong>共享状态</strong>（同进程）：往同一个对象写。Eino 里就是 <code>state.Messages</code>，成本最低，Pilot 里 90% 的「交流」是这层</li>
-<li><strong>消息传递</strong>（同系统跨协程&#x2F;服务）：channel、HTTP&#x2F;gRPC、Kafka&#x2F;NATS</li>
+<li><strong>消息传递</strong>（同系统跨协程/服务）：channel、HTTP/gRPC、Kafka/NATS</li>
 <li><strong>协议调用</strong>（跨组织）：A2A、ANP，需要身份发现和信任</li>
 </ol>
 <p><strong>Pilot 里三种实例：</strong></p>
 <ul>
-<li>ReAct 内部 &#x3D; 共享 state，<strong>靠 <code>tool_call_id</code> 做调用与结果配对</strong></li>
-<li>排障流水线 &#x3D; 带缓冲 channel + WaitGroup，两个 executor 互相不知道对方存在</li>
-<li>Executor → Synthesizer &#x3D; <strong>结构化数据</strong>（<code>[]EvidenceItem</code> 带 ID、来源、分数），不是自然语言，所以结论能溯源</li>
+<li>ReAct 内部 = 共享 state，<strong>靠 <code>tool_call_id</code> 做调用与结果配对</strong></li>
+<li>排障流水线 = 带缓冲 channel + WaitGroup，两个 executor 互相不知道对方存在</li>
+<li>Executor → Synthesizer = <strong>结构化数据</strong>（<code>[]EvidenceItem</code> 带 ID、来源、分数），不是自然语言，所以结论能溯源</li>
 </ul>
 <p><strong>多 Agent 四种协作模式</strong>：黑板（共享存储）、<strong>Supervisor（主管转派，最可控最常用）</strong>、点对点、辩论。</p>
 <p><strong>真正难的四件事</strong>：上下文裁剪（每传一次复制一份，token 指数涨）、消息格式统一（OpenAI 那套是事实标准，跨框架转换最容易出 bug）、trace 穿透（<code>traceparent</code> 一路带）、超时与幂等（有写操作必须幂等）。</p>
-<h3 id="Q5-sub-agent-怎么实现？为什么要做？"><a href="#Q5-sub-agent-怎么实现？为什么要做？" class="headerlink" title="Q5. sub-agent 怎么实现？为什么要做？"></a><span id="q5"></span>Q5. sub-agent 怎么实现？为什么要做？</h3><p><strong>本质：把另一个完整的 Agent 包装成一个工具。</strong> 主 Agent 调它跟调 <code>query_logs</code> 没区别。</p>
+<h3 id="Q5-sub-agent-怎么实现？为什么要做？"><a href="#Q5-sub-agent-怎么实现？为什么要做？" class="headerlink" title="Q5. sub-agent 怎么实现？为什么要做？" data-stellar-navigation=""></a><span id="q5"></span>Q5. sub-agent 怎么实现？为什么要做？</h3><p><strong>本质：把另一个完整的 Agent 包装成一个工具。</strong> 主 Agent 调它跟调 <code>query_logs</code> 没区别。</p>
 <p><strong>实现两个「不」：</strong></p>
 <ul>
 <li><strong>不传主 Agent 的 messages</strong> —— 子 Agent 从零开始，只有任务描述</li>
@@ -553,19 +528,19 @@
 <p><strong>为什么要用：</strong></p>
 <ul>
 <li><strong>上下文爆炸</strong>是硬理由：RAG 塞 20 篇文档进主对话，每轮重发，第 10 轮就是几十万 token。子 Agent 啃完只回 500 字结论</li>
-<li>专业化（不同 prompt&#x2F;工具集&#x2F;模型）</li>
+<li>专业化（不同 prompt/工具集/模型）</li>
 <li>并行（互不依赖的子任务同时跑）</li>
 <li>失败隔离（子任务挂了降级，不是整体崩）</li>
 </ul>
 <p><strong>Pilot 的诚实说法</strong>：严格说没有完整 sub-agent，但排障流水线里两个 executor 已经是<strong>简化版</strong>——职责单一、上下文隔离、结果摘要化，<strong>区别只在于它们是确定流程而不是自主 Agent</strong>。</p>
 <p><strong>什么时候不该用</strong>：工具少于 10 个、任务单一、子任务极短。判断标准：<strong>子任务的上下文体积是否显著大于结论体积</strong>。</p>
-<h2 id="二、Eino-内部机制"><a href="#二、Eino-内部机制" class="headerlink" title="二、Eino 内部机制"></a>二、Eino 内部机制</h2><h3 id="Q6-Chain-不能循环吗？图可以？"><a href="#Q6-Chain-不能循环吗？图可以？" class="headerlink" title="Q6. Chain 不能循环吗？图可以？"></a><span id="q6"></span>Q6. Chain 不能循环吗？图可以？</h3><p><strong>不是「不能」，是「循环在图里是原生表达，在 Chain 里得自己手写」。</strong></p>
+<h2 id="二、Eino-内部机制"><a href="#二、Eino-内部机制" class="headerlink" title="二、Eino 内部机制" data-stellar-navigation=""></a>二、Eino 内部机制</h2><h3 id="Q6-Chain-不能循环吗？图可以？"><a href="#Q6-Chain-不能循环吗？图可以？" class="headerlink" title="Q6. Chain 不能循环吗？图可以？" data-stellar-navigation=""></a><span id="q6"></span>Q6. Chain 不能循环吗？图可以？</h3><p><strong>不是「不能」，是「循环在图里是原生表达，在 Chain 里得自己手写」。</strong></p>
 <ul>
 <li><strong>Chain 语义是 DAG</strong>：<code>A → B → C → 结束</code>，进度由<strong>位置</strong>决定，没有回边的概念</li>
 <li>要循环只能自己写 <code>for</code>，然后自己补三样：<strong>状态累积、终止条件、死循环保护</strong></li>
 </ul>
 <p><strong>图怎么表达循环</strong>：边允许指回前面（回边）。ReAct 内部就是：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ChatModel ─(有 ToolCalls)→ Tools ─(非 return_direct)→ 回到 ChatModel</span><br><span class="line">    └─(无 ToolCalls)→ END</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ChatModel ─(有 ToolCalls)→ Tools ─(非 return_direct)→ 回到 ChatModel</span><br><span class="line">    └─(无 ToolCalls)→ END</span><br></pre></td></tr></tbody></table></figure>
 
 <p>代码在 <code>react.go</code>（ChatModel 出去的分支）和另一处（Tools 出去的分支，<code>endNode = nodeKeyModel</code> 就是回边）。</p>
 <p><strong>有回边就必须有上限</strong>：</p>
@@ -575,19 +550,19 @@
 </ul>
 <p><strong>所有支持循环的图引擎都必然有这一步保护</strong>，否则模型一句「再查一次」就能让服务卡死。</p>
 <p><strong>真正差别是成本</strong>：Chain 手写循环要两百行 Go（状态、终止、计数、还没有可视化），用图是两个节点加两条边。</p>
-<h3 id="Q7-「图是状态机」是什么意思？Chain-不是吗？"><a href="#Q7-「图是状态机」是什么意思？Chain-不是吗？" class="headerlink" title="Q7. 「图是状态机」是什么意思？Chain 不是吗？"></a><span id="q7"></span>Q7. 「图是状态机」是什么意思？Chain 不是吗？</h3><p><strong>判据：下一步由「当前状态」决定 → 状态机；由「执行到第几步」决定 → 流水线。</strong></p>
+<h3 id="Q7-「图是状态机」是什么意思？Chain-不是吗？"><a href="#Q7-「图是状态机」是什么意思？Chain-不是吗？" class="headerlink" title="Q7. 「图是状态机」是什么意思？Chain 不是吗？" data-stellar-navigation=""></a><span id="q7"></span>Q7. 「图是状态机」是什么意思？Chain 不是吗？</h3><p><strong>判据：下一步由「当前状态」决定 → 状态机；由「执行到第几步」决定 → 流水线。</strong></p>
 <ul>
 <li><strong>Chain 是位置驱动</strong>：中间结果只是局部变量，散在栈上，框架看不见拿不到存不了</li>
 <li><strong>图是状态驱动</strong>：节点只负责处理，核心是那份<strong>共享的、显式的 state</strong></li>
 </ul>
-<p><strong>为什么显式 state 重要</strong>（不是术语游戏）：只有 state 可序列化，才有<strong>断点恢复、时间回溯、人工介入、可观测</strong>这四件事。Chain 里这些都做不了，因为「进度」&#x3D; 程序计数器，没法序列化一个函数的执行位置。</p>
+<p><strong>为什么显式 state 重要</strong>（不是术语游戏）：只有 state 可序列化，才有<strong>断点恢复、时间回溯、人工介入、可观测</strong>这四件事。Chain 里这些都做不了，因为「进度」= 程序计数器，没法序列化一个函数的执行位置。</p>
 <p><strong>Pilot 里两种图各占一边：</strong></p>
 <ul>
 <li>外层 <code>FullPilotAgent</code> 的图是 <strong>DAG</strong>（无环），只是「带分支的流水线」，强在分支和多前驱汇合（<code>AllPredecessor</code>）</li>
 <li>ReAct 内部的图<strong>才是真正的状态机</strong>：有回边、有状态累积、有终止条件</li>
 </ul>
-<h3 id="Q8-ReAct-的-state-结构体是什么？"><a href="#Q8-ReAct-的-state-结构体是什么？" class="headerlink" title="Q8. ReAct 的 state 结构体是什么？"></a><span id="q8"></span>Q8. ReAct 的 <code>state</code> 结构体是什么？</h3><p><code>flow/agent/react/react.go</code></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> &#123;</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Q8-ReAct-的-state-结构体是什么？"><a href="#Q8-ReAct-的-state-结构体是什么？" class="headerlink" title="Q8. ReAct 的 state 结构体是什么？" data-stellar-navigation=""></a><span id="q8"></span>Q8. ReAct 的 <code>state</code> 结构体是什么？</h3><p><code>flow/agent/react/react.go</code></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> state <span class="keyword">struct</span> {</span><br><span class="line">	Messages                 []*schema.Message</span><br><span class="line">	ReturnDirectlyToolCallID <span class="type">string</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong><code>Messages</code> —— 整个 Agent 的记忆</strong></p>
 <ul>
@@ -599,37 +574,37 @@
 <p>解决什么问题：某些工具的输出本身就是最终答案（<code>get_current_time</code>），再让模型加工一遍是浪费一次调用。</p>
 <p>两种写入方式：</p>
 <ul>
-<li>配置声明：<code>ToolReturnDirectly: map[string]struct{}{&quot;get_current_time&quot;: {}}</code></li>
+<li>配置声明：<code>ToolReturnDirectly: map[string]struct{}{"get_current_time": {}}</code></li>
 <li>工具运行时喊：<code>react.SetReturnDirectly(ctx)</code>（<code>react.go</code>）</li>
 </ul>
 <p>存 <code>tool_call_id</code> 而不是工具名，是因为<strong>并行调用时要精确标记是哪一次</strong>。</p>
 <p>读取它的就是 Tools 之后那个分支函数（<code>react.go</code>）：非空 → <code>direct_return</code> → END，空 → 回 ChatModel。</p>
 <p><strong>Pilot 现状</strong>：<code>ToolReturnDirectly</code> 是空 map（<code>full_agent.go</code>），这条路没启用。</p>
-<p><strong>一个细节印证「state 可序列化」</strong>：<code>react.go</code> 的 <code>schema.RegisterName[*state](&quot;_eino_react_state&quot;)</code>，注册类型名就是为了序列化&#x2F;checkpoint。</p>
-<h3 id="Q9-我现在到底是怎么停的？"><a href="#Q9-我现在到底是怎么停的？" class="headerlink" title="Q9. 我现在到底是怎么停的？"></a><span id="q9"></span>Q9. 我现在到底是怎么停的？</h3><p><strong>三条停止路径，只有一条读 state：</strong></p>
+<p><strong>一个细节印证「state 可序列化」</strong>：<code>react.go</code> 的 <code>schema.RegisterName[*state]("_eino_react_state")</code>，注册类型名就是为了序列化/checkpoint。</p>
+<h3 id="Q9-我现在到底是怎么停的？"><a href="#Q9-我现在到底是怎么停的？" class="headerlink" title="Q9. 我现在到底是怎么停的？" data-stellar-navigation=""></a><span id="q9"></span>Q9. 我现在到底是怎么停的？</h3><p><strong>三条停止路径，只有一条读 state：</strong></p>
 <p><strong>路径一（Pilot 走的就是这条，零 state）</strong></p>
 <p><code>modelPostBranchCondition</code>（<code>react.go</code>）只看<strong>模型输出的消息</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.ToolCalls) &gt; <span class="number">0</span> &#123; <span class="keyword">return</span> <span class="literal">true</span>, <span class="literal">nil</span> &#125;   <span class="comment">// 去 Tools</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.Content) == <span class="number">0</span> &#123; <span class="keyword">continue</span> &#125;            <span class="comment">// 空 chunk 跳过</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>, <span class="literal">nil</span>                                <span class="comment">// 有文字没工具 → END</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.ToolCalls) &gt; <span class="number">0</span> { <span class="keyword">return</span> <span class="literal">true</span>, <span class="literal">nil</span> }   <span class="comment">// 去 Tools</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span>(msg.Content) == <span class="number">0</span> { <span class="keyword">continue</span> }            <span class="comment">// 空 chunk 跳过</span></span><br><span class="line"><span class="keyword">return</span> <span class="literal">false</span>, <span class="literal">nil</span>                                <span class="comment">// 有文字没工具 → END</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>路径二（Pilot 未启用）</strong></p>
 <p><code>react.go</code> 的分支函数<strong>第一行就把输入流 <code>Close()</code> 掉，只读 state</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msgsStream.Close()</span><br><span class="line">compose.ProcessState[*state](ctx, <span class="function"><span class="keyword">func</span><span class="params">(_ context.Context, state *state)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(state.ReturnDirectlyToolCallID) &gt; <span class="number">0</span> &#123; endNode = nodeKeyDirectReturn &#125;</span><br><span class="line">	<span class="keyword">else</span> &#123; endNode = nodeKeyModel &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">msgsStream.Close()</span><br><span class="line">compose.ProcessState[*state](ctx, <span class="function"><span class="keyword">func</span><span class="params">(_ context.Context, state *state)</span></span> <span class="type">error</span> {</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(state.ReturnDirectlyToolCallID) &gt; <span class="number">0</span> { endNode = nodeKeyDirectReturn }</span><br><span class="line">	<span class="keyword">else</span> { endNode = nodeKeyModel }</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>为什么这个信息非得放 state</strong>：<code>role:&quot;tool&quot;</code> 的消息里只有 <code>tool_call_id</code> 和 <code>content</code>，装不下「我要求直接返回」这种执行期元信息。</p>
+<p><strong>为什么这个信息非得放 state</strong>：<code>role:"tool"</code> 的消息里只有 <code>tool_call_id</code> 和 <code>content</code>，装不下「我要求直接返回」这种执行期元信息。</p>
 <p><strong>路径三（跟 state 更没关系）</strong></p>
 <p><code>WithMaxRunSteps(25)</code>，pregel 引擎自己的步数计数，撞到就强制终止。</p>
 <p><strong>所以 Pilot 里 state 实际只承担「记忆」一个职责，「终止」由模型输出 + 步数上限两个外部机制负责。</strong></p>
 <p><strong>一个真坑</strong>：<code>modelPostBranchCondition</code> 先判 <code>ToolCalls</code> 再判 <code>Content</code>。流式输出时如果<strong>带文字的 chunk 先到</strong>，会被判定结束、工具根本没被调用。Eino 的 <code>NewAgent</code> 注释专门提了这点（Claude 这类模型），解法是自定义 <code>StreamToolCallChecker</code>。<strong>Pilot 用非流式 <code>Generate</code>，暂时没踩到；改流式就会遇到。</strong></p>
-<h3 id="Q10-Eino-为什么是中心化的？"><a href="#Q10-Eino-为什么是中心化的？" class="headerlink" title="Q10. Eino 为什么是中心化的？"></a><span id="q10"></span>Q10. Eino 为什么是中心化的？</h3><p><strong>中心化 ≠ 部署在一台机器。判据是：谁决定下一步、谁持有状态、节点能不能自主发起。</strong></p>
+<h3 id="Q10-Eino-为什么是中心化的？"><a href="#Q10-Eino-为什么是中心化的？" class="headerlink" title="Q10. Eino 为什么是中心化的？" data-stellar-navigation=""></a><span id="q10"></span>Q10. Eino 为什么是中心化的？</h3><p><strong>中心化 ≠ 部署在一台机器。判据是：谁决定下一步、谁持有状态、节点能不能自主发起。</strong></p>
 <p><strong>五个「中心」：</strong></p>
 <ol>
 <li><strong>编译期中心</strong>：<code>g.Compile()</code> 把图编成一个对象，结构静态固定（<code>full_agent.go</code>）</li>
-<li><strong>调度中心</strong>：pregel 引擎决定谁跑、按 <code>AllPredecessor</code> &#x2F; <code>AnyPredecessor</code> 判触发、统一计步（撞 <code>MaxRunSteps</code> 就停）</li>
+<li><strong>调度中心</strong>：pregel 引擎决定谁跑、按 <code>AllPredecessor</code> / <code>AnyPredecessor</code> 判触发、统一计步（撞 <code>MaxRunSteps</code> 就停）</li>
 <li><strong>状态中心</strong>：state 是引擎持有的全局对象，节点只能通过 <code>compose.ProcessState</code> 读写，<strong>节点之间不直接通信</strong></li>
 <li><strong>分支中心</strong>：<code>AddBranch</code> 的条件函数只返回节点名，由引擎去执行；<strong>节点不能自己跳转，只能”申请”</strong></li>
 <li><strong>执行单元无自主权</strong>：Tools 是被动执行器，工具之间不通信、不协商、不能主动发起</li>
 </ol>
-<p><strong>跟去中心化对照三条</strong>：谁决定下一步（引擎 vs 协商）、谁持有状态（引擎 vs 各自）、节点有身份吗（没有 vs DID&#x2F;Agent Card 可寻址）。</p>
+<p><strong>跟去中心化对照三条</strong>：谁决定下一步（引擎 vs 协商）、谁持有状态（引擎 vs 各自）、节点有身份吗（没有 vs DID/Agent Card 可寻址）。</p>
 <p><strong>最关键第三条</strong>：Pilot 那 11 个工具出了这个进程就不存在，没有任何一个能被外部”找到”再调用。</p>
 <p><strong>三个澄清</strong>：</p>
 <ul>
@@ -638,7 +613,7 @@
 <li>中心化 ≠ 不能并行（多 tool_calls 并行、两个 executor 并行）</li>
 </ul>
 <p><strong>收益</strong>：可预测、可测试、可观测、有硬上限、责任清晰。<strong>代价</strong>：单点、不支持跨组织、节点能力受限。<strong>这四条代价对「单组织内部排障」全都不构成问题，所以中心化是正解不是妥协。</strong></p>
-<h2 id="三、Go-并发：channel-收结果"><a href="#三、Go-并发：channel-收结果" class="headerlink" title="三、Go 并发：channel 收结果"></a>三、Go 并发：channel 收结果</h2><h3 id="Q11-为什么要用-WaitGroup？channel-不能替代吗？"><a href="#Q11-为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="Q11. 为什么要用 WaitGroup？channel 不能替代吗？"></a><span id="q11"></span>Q11. 为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
+<h2 id="三、Go-并发：channel-收结果"><a href="#三、Go-并发：channel-收结果" class="headerlink" title="三、Go 并发：channel 收结果" data-stellar-navigation=""></a>三、Go 并发：channel 收结果</h2><h3 id="Q11-为什么要用-WaitGroup？channel-不能替代吗？"><a href="#Q11-为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="Q11. 为什么要用 WaitGroup？channel 不能替代吗？" data-stellar-navigation=""></a><span id="q11"></span>Q11. 为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
 <p><strong>close 两条铁律</strong>：只能发送方调；只能在所有发送完成后调。</p>
 <p>多个 goroutine 都在发时，<strong>谁是最后一个？没人知道</strong> → 必须有个外部全局计数器，那就是 WaitGroup。</p>
 <p><strong>三个看起来能替代、其实不行的方案：</strong></p>
@@ -648,9 +623,9 @@
 <li>每个 goroutine 自己 close → 第一个关掉，第二个发送就 panic</li>
 </ul>
 <p><strong>纯 channel 也能做</strong>（done channel 收 N 次信号），但那是「自己实现一个功能更弱的 WaitGroup」。</p>
-<p><strong>本质分工</strong>：channel &#x3D; 数据通道，WaitGroup &#x3D; 生命周期同步。混在一起就得区分「这是结果还是完成信号」，代码变脏。</p>
+<p><strong>本质分工</strong>：channel = 数据通道，WaitGroup = 生命周期同步。混在一起就得区分「这是结果还是完成信号」，代码变脏。</p>
 <p><strong>更省事的选项</strong>：<code>errgroup</code>，内部就是 WaitGroup + 错误收集 + ctx 取消。对「两个分支任一失败就该整体失败」的排障流水线更合适。</p>
-<h3 id="Q12-计数器是-goroutine-跑完自动减一吗？"><a href="#Q12-计数器是-goroutine-跑完自动减一吗？" class="headerlink" title="Q12. 计数器是 goroutine 跑完自动减一吗？"></a><span id="q12"></span>Q12. 计数器是 goroutine 跑完自动减一吗？</h3><p><strong>不是。全靠手动</strong>：<code>wg.Add(1)</code> 加，<code>wg.Done()</code> 减（等价 <code>Add(-1)</code>），<code>wg.Wait()</code> 只是阻塞等归零。</p>
+<h3 id="Q12-计数器是-goroutine-跑完自动减一吗？"><a href="#Q12-计数器是-goroutine-跑完自动减一吗？" class="headerlink" title="Q12. 计数器是 goroutine 跑完自动减一吗？" data-stellar-navigation=""></a><span id="q12"></span>Q12. 计数器是 goroutine 跑完自动减一吗？</h3><p><strong>不是。全靠手动</strong>：<code>wg.Add(1)</code> 加，<code>wg.Done()</code> 减（等价 <code>Add(-1)</code>），<code>wg.Wait()</code> 只是阻塞等归零。</p>
 <p><strong>goroutine 退出，WaitGroup 一点感觉都没有</strong>——除非你在它退出前手动 <code>Done()</code>。</p>
 <p><strong>为什么写 <code>defer wg.Done()</code></strong>：一定执行（panic 也跑）、不用管几条 return 路径、放第一行读代码的人一眼看到。</p>
 <p><strong>三个经典 bug</strong>：</p>
@@ -660,33 +635,33 @@
 <li>Done 多调一次 → <code>panic: sync: negative WaitGroup counter</code></li>
 </ul>
 <p>Go 1.25 有 <code>wg.Go()</code> 自动 Add + defer Done，但 <strong>Pilot 的 go.mod 是 <code>go 1.24.10</code>，用不了</strong>。</p>
-<h3 id="Q13-为什么要带缓冲？无缓冲死锁是怎么回事？"><a href="#Q13-为什么要带缓冲？无缓冲死锁是怎么回事？" class="headerlink" title="Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？"></a><span id="q13"></span>Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</h3><p><strong>死锁本质是循环等待：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主协程：  wg.Wait() ──▶ 等 Done 归零</span><br><span class="line">                          ↑</span><br><span class="line">goroutine： results &lt;- x（堵住）→ 等接收者 ← 但接收者要等 Wait 返回</span><br></pre></td></tr></table></figure>
+<h3 id="Q13-为什么要带缓冲？无缓冲死锁是怎么回事？"><a href="#Q13-为什么要带缓冲？无缓冲死锁是怎么回事？" class="headerlink" title="Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？" data-stellar-navigation=""></a><span id="q13"></span>Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</h3><p><strong>死锁本质是循环等待：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主协程：  wg.Wait() ──▶ 等 Done 归零</span><br><span class="line">                          ↑</span><br><span class="line">goroutine： results &lt;- x（堵住）→ 等接收者 ← 但接收者要等 Wait 返回</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>主协程等 goroutine 结束，goroutine 等主协程接收，互相等。</strong></p>
 <p><strong>两条解法：</strong></p>
 <ul>
-<li><strong>路 A：让「发」不阻塞</strong> → 带缓冲（Pilot 的做法，容量 &#x3D; goroutine 数）</li>
+<li><strong>路 A：让「发」不阻塞</strong> → 带缓冲（Pilot 的做法，容量 = goroutine 数）</li>
 <li><strong>路 B：让「收」先发生</strong> → 先收 N 次再 Wait；或用 watcher 写法：</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; wg.Wait(); <span class="built_in">close</span>(results) &#125;()   <span class="comment">// 专人关门</span></span><br><span class="line"><span class="keyword">for</span> r := <span class="keyword">range</span> results &#123; ... &#125;              <span class="comment">// 主协程负责收</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> { wg.Wait(); <span class="built_in">close</span>(results) }()   <span class="comment">// 专人关门</span></span><br><span class="line"><span class="keyword">for</span> r := <span class="keyword">range</span> results { ... }              <span class="comment">// 主协程负责收</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>无缓冲 vs 带缓冲语义</strong>：无缓冲 &#x3D; 当面交接（双方必须同时在场）；带缓冲 &#x3D; 放快递柜（有格子就放，接收方随时来取）。</p>
+<p><strong>无缓冲 vs 带缓冲语义</strong>：无缓冲 = 当面交接（双方必须同时在场）；带缓冲 = 放快递柜（有格子就放，接收方随时来取）。</p>
 <p><strong>Pilot 选带缓冲的理由</strong>：收集方天然要在全部结束后才处理，没有「边收边处理」需求。</p>
 <p><strong>完整正确模式（<code>orchestrator.go</code>）</strong>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">outcomes := <span class="built_in">make</span>(<span class="keyword">chan</span> outcome, <span class="built_in">len</span>(roles))  <span class="comment">// 缓冲=角色数</span></span><br><span class="line"><span class="keyword">var</span> group sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, role := <span class="keyword">range</span> roles &#123;</span><br><span class="line">	group.Add(<span class="number">1</span>)                             <span class="comment">// 在 go 之前</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(role Role, executor Executor)</span></span> &#123;</span><br><span class="line">		<span class="keyword">defer</span> group.Done()</span><br><span class="line">		...</span><br><span class="line">		outcomes &lt;- outcome&#123;...&#125;</span><br><span class="line">	&#125;(role, executor)</span><br><span class="line">&#125;</span><br><span class="line">group.Wait()</span><br><span class="line"><span class="built_in">close</span>(outcomes)                              <span class="comment">// Wait 之后才 close</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">outcomes := <span class="built_in">make</span>(<span class="keyword">chan</span> outcome, <span class="built_in">len</span>(roles))  <span class="comment">// 缓冲=角色数</span></span><br><span class="line"><span class="keyword">var</span> group sync.WaitGroup</span><br><span class="line"><span class="keyword">for</span> _, role := <span class="keyword">range</span> roles {</span><br><span class="line">	group.Add(<span class="number">1</span>)                             <span class="comment">// 在 go 之前</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(role Role, executor Executor)</span></span> {</span><br><span class="line">		<span class="keyword">defer</span> group.Done()</span><br><span class="line">		...</span><br><span class="line">		outcomes &lt;- outcome{...}</span><br><span class="line">	}(role, executor)</span><br><span class="line">}</span><br><span class="line">group.Wait()</span><br><span class="line"><span class="built_in">close</span>(outcomes)                              <span class="comment">// Wait 之后才 close</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>两个坑</strong>：channel 不保证顺序（所以要按 <code>roleOrder</code> 排序）；验证方式 <code>go test -race</code>。</p>
-<h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）"></a>四、多 Agent 编排（核心）</h2><h3 id="Q14-多-Agent-编排是怎么跑的？"><a href="#Q14-多-Agent-编排是怎么跑的？" class="headerlink" title="Q14. 多 Agent 编排是怎么跑的？"></a><span id="q14"></span>Q14. 多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
+<h2 id="四、多-Agent-编排（核心）"><a href="#四、多-Agent-编排（核心）" class="headerlink" title="四、多 Agent 编排（核心）" data-stellar-navigation=""></a>四、多 Agent 编排（核心）</h2><h3 id="Q14-多-Agent-编排是怎么跑的？"><a href="#Q14-多-Agent-编排是怎么跑的？" class="headerlink" title="Q14. 多 Agent 编排是怎么跑的？" data-stellar-navigation=""></a><span id="q14"></span>Q14. 多 Agent 编排是怎么跑的？</h3><p><strong>先点破关键事实：四个角色里只有 Synthesizer 真的调了模型，另外两个是纯 Go 查询代码，Planner 是规则。所以它不「智能」，是流程编排。</strong></p>
 <p><strong>五个阶段：</strong></p>
 <p><strong>① 入口 <code>Orchestrator.Execute</code></strong>（<code>orchestrator.go</code>）</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plan := o.planner.Plan(query)                                        <span class="comment">// :58 分诊</span></span><br><span class="line">findings, branchSteps, limitations := o.executeBranches(...)         <span class="comment">// :71 并行</span></span><br><span class="line">answer, err := o.synthesizer.Synthesize(...)                         <span class="comment">// :75 收敛</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">plan := o.planner.Plan(query)                                        <span class="comment">// :58 分诊</span></span><br><span class="line">findings, branchSteps, limitations := o.executeBranches(...)         <span class="comment">// :71 并行</span></span><br><span class="line">answer, err := o.synthesizer.Synthesize(...)                         <span class="comment">// :75 收敛</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>Orchestrator</code> 只有四个字段：<code>planner</code>、<code>executors map[Role]Executor</code>、<code>synthesizer</code>、<strong><code>now func() time.Time</code>（为了测试注入时钟）</strong>。</p>
 <p><strong>② 分诊 <code>RulePlanner.Plan</code></strong>（<code>routing.go</code>）</p>
 <ul>
-<li>正则抽服务名（<code>routing.go</code>）：<code>service=payment</code> &#x2F; <code>service: payment</code>，抽不到用默认</li>
-<li>三层关键词决定选哪些角色：知识类 → <code>[Knowledge, Synthesis]</code>；可观测类&#x2F;故障类 → <code>[Triage, Evidence, Knowledge, Synthesis]</code>；都没命中 → <code>[Triage, Knowledge, Synthesis]</code></li>
+<li>正则抽服务名（<code>routing.go</code>）：<code>service=payment</code> / <code>service: payment</code>，抽不到用默认</li>
+<li>三层关键词决定选哪些角色：知识类 → <code>[Knowledge, Synthesis]</code>；可观测类/故障类 → <code>[Triage, Evidence, Knowledge, Synthesis]</code>；都没命中 → <code>[Triage, Knowledge, Synthesis]</code></li>
 <li>算 <code>SkippedRoles</code>：把没选中的显式列出来，<strong>表示”这里没查是因为不需要”</strong></li>
 </ul>
 <p><strong>③ 并行执行 <code>executeBranches</code></strong>（<code>orchestrator.go</code>）</p>
@@ -702,7 +677,7 @@
 <p><strong>「宁可给一份带缺口的证据摘要，也不编一个看起来很完整的答案。」</strong></p>
 <p><strong>数据结构（<code>model.go</code>）</strong>：</p>
 <ul>
-<li><code>Role</code>：triage &#x2F; evidence &#x2F; knowledge &#x2F; synthesis</li>
+<li><code>Role</code>：triage / evidence / knowledge / synthesis</li>
 <li><code>Plan</code>：Intent、Service、SelectedRoles、SkippedRoles、RoutingReason</li>
 <li><code>Finding</code>：Role、Summary、Evidence、Metadata</li>
 <li><strong><code>EvidenceItem</code>：ID、Source、Content、Score、Metadata</strong> ← 可溯源的关键</li>
@@ -715,17 +690,17 @@
 <ol>
 <li><strong>分诊用规则不用模型</strong>：路由错的代价 &gt; 慢一点；可测试（<code>routing_test.go</code>）、不抖动、省一次调用。代价是泛化弱，关键词硬枚举</li>
 <li><strong>分支隔离 + 显式降级</strong>：失败变成 <code>Limitation</code> 而不是抛错。<strong>降级不是隐藏问题，是把「哪些信息没拿到」显式交还用户</strong></li>
-<li><strong>三个 interface 注入</strong>：<code>Planner</code> &#x2F; <code>Executor</code> &#x2F; <code>Synthesizer</code> 全是接口，测试能塞假实现</li>
+<li><strong>三个 interface 注入</strong>：<code>Planner</code> / <code>Executor</code> / <code>Synthesizer</code> 全是接口，测试能塞假实现</li>
 </ol>
 <p><strong>跟 ReAct 的分工</strong>：问知识、单点问题走 ReAct；查故障、要证据链走多 Agent。</p>
 <p><strong>四条不足（主动说）</strong>：</p>
 <ol>
 <li>只并行了一层（evidence 内部查告警和查日志还是串行）</li>
-<li>角色粒度太粗（没有独立的指标分析&#x2F;链路分析角色）</li>
+<li>角色粒度太粗（没有独立的指标分析/链路分析角色）</li>
 <li>findings 没有跨角色消解（两份证据矛盾时让 Synthesizer 自己权衡，没做冲突检测）</li>
 <li>可观测只到角色级（工具级 span 没接进去）</li>
 </ol>
-<h2 id="五、语言选型"><a href="#五、语言选型" class="headerlink" title="五、语言选型"></a>五、语言选型</h2><h3 id="Q15-用-Go-写-Agent-有什么好处？"><a href="#Q15-用-Go-写-Agent-有什么好处？" class="headerlink" title="Q15. 用 Go 写 Agent 有什么好处？"></a><span id="q15"></span>Q15. 用 Go 写 Agent 有什么好处？</h3><p><strong>先承认：Go 不是写 Agent 的主流，主流是 Python。</strong></p>
+<h2 id="五、语言选型"><a href="#五、语言选型" class="headerlink" title="五、语言选型" data-stellar-navigation=""></a>五、语言选型</h2><h3 id="Q15-用-Go-写-Agent-有什么好处？"><a href="#Q15-用-Go-写-Agent-有什么好处？" class="headerlink" title="Q15. 用 Go 写 Agent 有什么好处？" data-stellar-navigation=""></a><span id="q15"></span>Q15. 用 Go 写 Agent 有什么好处？</h3><p><strong>先承认：Go 不是写 Agent 的主流，主流是 Python。</strong></p>
 <p><strong>Go 赢在：</strong></p>
 <ul>
 <li><strong>部署</strong>：单二进制，无运行时，镜像几十 MB（Python 几百 MB 起，加 CUDA 上 GB）</li>
@@ -733,7 +708,7 @@
 <li><strong>流式</strong>：SSE + channel + bufio 很干净，Eino 的 StreamReader 底层就是 channel</li>
 <li><strong>静态类型</strong>：工具参数是 struct，schema 由 tag 推导，编译期就能发现字段错误（Python 的 dict 要运行时才炸）</li>
 <li><strong>可观测</strong>：Prometheus 客户端本身就是 Go 写的，<code>/metrics</code> 零成本</li>
-<li><strong>中间件客户端成熟</strong>：ES&#x2F;Redis&#x2F;MySQL 都稳</li>
+<li><strong>中间件客户端成熟</strong>：ES/Redis/MySQL 都稳</li>
 </ul>
 <p><strong>Go 输在：</strong></p>
 <ul>
@@ -744,7 +719,7 @@
 </ul>
 <p><strong>正确判断是分层</strong>：Go 做服务层（网关、并发、工具执行、外部系统对接、可观测），Python 做模型层（训练、微调、评测、本地推理）。</p>
 <p><strong>什么情况别用 Go</strong>：要本地跑模型、要大量 prompt 实验、团队是算法背景。</p>
-<h3 id="Q16-这个项目有大量请求吗？是网关吗？"><a href="#Q16-这个项目有大量请求吗？是网关吗？" class="headerlink" title="Q16. 这个项目有大量请求吗？是网关吗？"></a><span id="q16"></span>Q16. 这个项目有大量请求吗？是网关吗？</h3><p><strong>不是网关，请求量也不大。</strong> 上一轮我说「高并发 IO 网关」是错的，纠正：</p>
+<h3 id="Q16-这个项目有大量请求吗？是网关吗？"><a href="#Q16-这个项目有大量请求吗？是网关吗？" class="headerlink" title="Q16. 这个项目有大量请求吗？是网关吗？" data-stellar-navigation=""></a><span id="q16"></span>Q16. 这个项目有大量请求吗？是网关吗？</h3><p><strong>不是网关，请求量也不大。</strong> 上一轮我说「高并发 IO 网关」是错的，纠正：</p>
 <ul>
 <li>网关的职责是<strong>转发</strong>，Pilot 没有下游业务服务可转发，<strong>它自己就是链路终点</strong></li>
 <li>真实场景是一个运维团队，QPS 个位数到几十</li>
@@ -752,25 +727,25 @@
 <p><strong>Go 的优势不是「扛 QPS」，是「扛驻留并发」</strong>：</p>
 <p>按 Little’s Law：<code>并发连接数 = QPS × 平均延迟</code></p>
 <ul>
-<li>普通接口：20 QPS × 0.05s &#x3D; 1 个并发</li>
-<li>Agent 接口：20 QPS × 15s &#x3D; <strong>300 个并发</strong></li>
+<li>普通接口：20 QPS × 0.05s = 1 个并发</li>
+<li>Agent 接口：20 QPS × 15s = <strong>300 个并发</strong></li>
 </ul>
 <p><strong>QPS 才 20，但同时 300 个连接挂着等 IO。</strong> 这才是 Go 真正赢的地方：300 个 goroutine 几十 MB，context 超时能掐断，SSE 长连接写得干净。</p>
 <p><strong>项目里真正「量大」的入口</strong>：知识库灌库（批量 embedding）、日志查询（一次几千条）、<code>/metrics</code> 抓取、<code>cmd/e2echeck</code>。</p>
 <p><strong>准确描述：低 QPS、高单请求成本、长连接驻留。</strong></p>
-<h2 id="六、面试口径提醒"><a href="#六、面试口径提醒" class="headerlink" title="六、面试口径提醒"></a>六、面试口径提醒</h2><ul>
+<h2 id="六、面试口径提醒"><a href="#六、面试口径提醒" class="headerlink" title="六、面试口径提醒" data-stellar-navigation=""></a>六、面试口径提醒</h2><ul>
 <li>别说「高并发网关」，会被问「你转发给谁」</li>
 <li>别说「多 Agent 是多个 Agent 互相聊天」，实际是「1 次模型调用 + 2 个数据查询 + 1 个规则路由」</li>
 <li>别说「有 sub-agent」，说「有 sub-agent 的隔离思想，但执行器是确定流程不是自主 Agent」</li>
 <li>去中心化那块：知道 A2A vs MCP 不是一回事，且明确说自己没有生产落地</li>
 <li>主动说出四条不足，比硬凑优点可信</li>
 </ul>
-<h2 id="七、工具调用到底怎么发生的（2026-11-09-补讲）"><a href="#七、工具调用到底怎么发生的（2026-11-09-补讲）" class="headerlink" title="七、工具调用到底怎么发生的（2026-11-09 补讲）"></a>七、工具调用到底怎么发生的（2026-11-09 补讲）</h2><blockquote>
+<h2 id="七、工具调用到底怎么发生的（2026-11-09-补讲）"><a href="#七、工具调用到底怎么发生的（2026-11-09-补讲）" class="headerlink" title="七、工具调用到底怎么发生的（2026-11-09 补讲）" data-stellar-navigation=""></a>七、工具调用到底怎么发生的（2026-11-09 补讲）</h2><blockquote>
 <p>讲的是「模型说要调工具」到「本地函数真的被执行」之间的<strong>协议层</strong>：消息怎么传、谁解析、工具怎么被找到。</p>
 </blockquote>
-<h3 id="Q17-模型”决定调工具”这件事，在协议层是什么？"><a href="#Q17-模型”决定调工具”这件事，在协议层是什么？" class="headerlink" title="Q17. 模型”决定调工具”这件事，在协议层是什么？"></a><span id="q17"></span>Q17. 模型”决定调工具”这件事，在协议层是什么？</h3><p><strong>一句话：是一条 <code>role=assistant</code>、<code>tool_calls</code> 非空的普通消息。不是动作，是内容。</strong></p>
+<h3 id="Q17-模型”决定调工具”这件事，在协议层是什么？"><a href="#Q17-模型”决定调工具”这件事，在协议层是什么？" class="headerlink" title="Q17. 模型”决定调工具”这件事，在协议层是什么？" data-stellar-navigation=""></a><span id="q17"></span>Q17. 模型”决定调工具”这件事，在协议层是什么？</h3><p><strong>一句话：是一条 <code>role=assistant</code>、<code>tool_calls</code> 非空的普通消息。不是动作，是内容。</strong></p>
 <p>chat 接口只有一个请求体、一个数组：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;model&quot;</span><span class="punctuation">:</span> <span class="string">&quot;...&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;messages&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">&quot;tools&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"model"</span><span class="punctuation">:</span> <span class="string">"..."</span><span class="punctuation">,</span> <span class="attr">"messages"</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">,</span> <span class="attr">"tools"</span><span class="punctuation">:</span> <span class="punctuation">[</span> ... <span class="punctuation">]</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><code>messages</code> 里每条都是消息，唯一区分的是 <code>role</code>：</p>
 <ul>
@@ -780,19 +755,19 @@
 <li><code>tool</code> → 工具执行完的结果</li>
 </ul>
 <p>模型吐出来的东西长这样：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;role&quot;</span><span class="punctuation">:</span><span class="string">&quot;assistant&quot;</span><span class="punctuation">,</span><span class="attr">&quot;content&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">&quot;tool_calls&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;id&quot;</span><span class="punctuation">:</span><span class="string">&quot;call_abc123&quot;</span><span class="punctuation">,</span><span class="attr">&quot;type&quot;</span><span class="punctuation">:</span><span class="string">&quot;function&quot;</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">&quot;function&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;query_alerts&quot;</span><span class="punctuation">,</span><span class="attr">&quot;arguments&quot;</span><span class="punctuation">:</span><span class="string">&quot;&#123;\&quot;status\&quot;:\&quot;firing\&quot;&#125;&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"content"</span><span class="punctuation">:</span><span class="literal"><span class="keyword">null</span></span><span class="punctuation">,</span></span><br><span class="line"> <span class="attr">"tool_calls"</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">{</span><span class="attr">"id"</span><span class="punctuation">:</span><span class="string">"call_abc123"</span><span class="punctuation">,</span><span class="attr">"type"</span><span class="punctuation">:</span><span class="string">"function"</span><span class="punctuation">,</span></span><br><span class="line">   <span class="attr">"function"</span><span class="punctuation">:</span><span class="punctuation">{</span><span class="attr">"name"</span><span class="punctuation">:</span><span class="string">"query_alerts"</span><span class="punctuation">,</span><span class="attr">"arguments"</span><span class="punctuation">:</span><span class="string">"{\"status\":\"firing\"}"</span><span class="punctuation">}</span><span class="punctuation">}</span><span class="punctuation">]</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>关键：<code>arguments</code> 的值是字符串，字符串里装的才是 JSON。</strong> Eino 的 <code>FunctionCall.Arguments</code> 同样是 <code>string</code>（注释写 “in JSON format”），SDK 这一层<strong>不做解析</strong>。</p>
-<h3 id="Q18-为什么非要搞成消息？因为-HTTP-是无状态的"><a href="#Q18-为什么非要搞成消息？因为-HTTP-是无状态的" class="headerlink" title="Q18. 为什么非要搞成消息？因为 HTTP 是无状态的"></a><span id="q18"></span>Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</h3><p>服务端不记得上一轮说过什么，所以每次请求必须把全部上下文重发一遍。”我想调函数”和”函数结果回来了”这两件事，也只能变成数组里的元素——否则模型下一轮根本不知道发生过什么。</p>
+<h3 id="Q18-为什么非要搞成消息？因为-HTTP-是无状态的"><a href="#Q18-为什么非要搞成消息？因为-HTTP-是无状态的" class="headerlink" title="Q18. 为什么非要搞成消息？因为 HTTP 是无状态的" data-stellar-navigation=""></a><span id="q18"></span>Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</h3><p>服务端不记得上一轮说过什么，所以每次请求必须把全部上下文重发一遍。”我想调函数”和”函数结果回来了”这两件事，也只能变成数组里的元素——否则模型下一轮根本不知道发生过什么。</p>
 <p>由此得出一个反直觉但重要的推论：</p>
-<p><strong>所谓 Agent 循环 &#x3D; 往同一个数组里追加消息、反复 POST。</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">① POST（带 tools schema）→ 响应里多一条 assistant(tool_calls)</span><br><span class="line">② 本地执行工具 → 数组里多一条 tool</span><br><span class="line">③ 再 POST（数组变长了）→ 多一条 assistant(文本回答)</span><br></pre></td></tr></table></figure>
+<p><strong>所谓 Agent 循环 = 往同一个数组里追加消息、反复 POST。</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">① POST（带 tools schema）→ 响应里多一条 assistant(tool_calls)</span><br><span class="line">② 本地执行工具 → 数组里多一条 tool</span><br><span class="line">③ 再 POST（数组变长了）→ 多一条 assistant(文本回答)</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>一轮工具调用 &#x3D; 两次模型请求。</strong> 这也解释了为什么工具返回的长文本会烧 token：整段结果都要塞进数组、每轮重读。</p>
+<p><strong>一轮工具调用 = 两次模型请求。</strong> 这也解释了为什么工具返回的长文本会烧 token：整段结果都要塞进数组、每轮重读。</p>
 <p>Eino 的 <code>schema.Message</code> 就是照这个协议设计的，一个 struct 通吃四种角色：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Message <span class="keyword">struct</span> &#123;</span><br><span class="line">    Role       RoleType    <span class="comment">// system / user / assistant / tool</span></span><br><span class="line">    Content    <span class="type">string</span></span><br><span class="line">    ToolCalls  []ToolCall  <span class="comment">// 只有 assistant 会有</span></span><br><span class="line">    ToolCallID <span class="type">string</span>      <span class="comment">// 只有 tool 会有，指回是哪次调用</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Message <span class="keyword">struct</span> {</span><br><span class="line">    Role       RoleType    <span class="comment">// system / user / assistant / tool</span></span><br><span class="line">    Content    <span class="type">string</span></span><br><span class="line">    ToolCalls  []ToolCall  <span class="comment">// 只有 assistant 会有</span></span><br><span class="line">    ToolCallID <span class="type">string</span>      <span class="comment">// 只有 tool 会有，指回是哪次调用</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="Q19-工具怎么被找到？参数放在哪？"><a href="#Q19-工具怎么被找到？参数放在哪？" class="headerlink" title="Q19. 工具怎么被找到？参数放在哪？"></a><span id="q19"></span>Q19. 工具怎么被找到？参数放在哪？</h3><p><strong>先点破：没有任何全局变量或注册表存参数。参数只在栈上活一瞬间。</strong></p>
+<h3 id="Q19-工具怎么被找到？参数放在哪？"><a href="#Q19-工具怎么被找到？参数放在哪？" class="headerlink" title="Q19. 工具怎么被找到？参数放在哪？" data-stellar-navigation=""></a><span id="q19"></span>Q19. 工具怎么被找到？参数放在哪？</h3><p><strong>先点破：没有任何全局变量或注册表存参数。参数只在栈上活一瞬间。</strong></p>
 <p>执行顺序：</p>
 <ol>
 <li><strong>建表（启动时）</strong>：ToolsNode 把每个工具的名字和下标存进 map（<code>indexes[toolName] = idx</code>）</li>
@@ -800,40 +775,40 @@
 <li><strong>透传</strong>：把 <code>toolCall.Function.Arguments</code> <strong>原样</strong>（还是字符串）传给 <code>InvokableRun</code></li>
 <li><strong>最后一刻才反序列化</strong>：<code>InferOptionableTool</code> 返回的是泛型包装器 <code>invokableTool[T,D]</code>，它的 <code>InvokableRun</code> 做三件事：</li>
 </ol>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> inst T</span><br><span class="line">sonic.UnmarshalString(arguments, &amp;inst)  <span class="comment">// ← 这里才变 struct</span></span><br><span class="line">resp, err := i.Fn(ctx, inst, opts...)     <span class="comment">// ← 调用注册进来的闭包</span></span><br><span class="line">output, err = marshalString(resp)         <span class="comment">// ← 返回值再转回字符串</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> inst T</span><br><span class="line">sonic.UnmarshalString(arguments, &amp;inst)  <span class="comment">// ← 这里才变 struct</span></span><br><span class="line">resp, err := i.Fn(ctx, inst, opts...)     <span class="comment">// ← 调用注册进来的闭包</span></span><br><span class="line">output, err = marshalString(resp)         <span class="comment">// ← 返回值再转回字符串</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>所以你闭包里的 <code>input *QueryAlertsInput</code> 是包装器塞进来的，<strong>代码全程看不到 JSON 字符串</strong>。</p>
 <ol start="5">
 <li><strong>结果包装</strong>：返回的 string 被包成 <code>ToolMessage(content, toolCallID)</code>。<code>toolCallID</code> 是<strong>配对钥匙</strong>——一次可能并发调多个工具，模型靠这个 id 对上结果是哪次调用的。</li>
 </ol>
-<p><strong><code>QueryAlertsInput</code> 这个 struct 被用了两次</strong>：启动时反射成 JSONSchema 发给模型（告诉它有哪些字段），运行时承接模型给的参数（反序列化的目标）。这是 <code>jsonschema:&quot;description=...&quot;</code> 这类 tag 的真正作用。</p>
-<h3 id="Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？"><a href="#Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？" class="headerlink" title="Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？"></a><span id="q20"></span>Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</h3><p><strong>先纠正事实：项目里不是两个 Agent 实现，是三个。</strong></p>
+<p><strong><code>QueryAlertsInput</code> 这个 struct 被用了两次</strong>：启动时反射成 JSONSchema 发给模型（告诉它有哪些字段），运行时承接模型给的参数（反序列化的目标）。这是 <code>jsonschema:"description=..."</code> 这类 tag 的真正作用。</p>
+<h3 id="Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？"><a href="#Q20-那两个-Agent-是怎么分工的？一个走工具调用，一个不走？" class="headerlink" title="Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？" data-stellar-navigation=""></a><span id="q20"></span>Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</h3><p><strong>先纠正事实：项目里不是两个 Agent 实现，是三个。</strong></p>
 <ul>
 <li><code>FullPilotAgent</code> — Eino ReAct 图 + 11 个注册工具，<strong>走 tool calling</strong></li>
 <li><code>SimplePilotAgent</code> — 手搓 messages、无任何工具，<strong>全项目无人调用</strong>（早期快速启动遗留）</li>
 <li><code>Orchestrator</code>（multiagent）— 角色化工作流，<strong>不走 tool calling</strong></li>
 </ul>
-<p>“multiagent 没用 Eino”这句也不准：它没用 Eino 的<strong>编排</strong>（react &#x2F; compose），但用了 <code>schema.Message</code> 和 eino-ext 的 ChatModel。准确说法是”不用 Eino 的编排，只用它的消息结构和模型客户端”。</p>
+<p>“multiagent 没用 Eino”这句也不准：它没用 Eino 的<strong>编排</strong>（react / compose），但用了 <code>schema.Message</code> 和 eino-ext 的 ChatModel。准确说法是”不用 Eino 的编排，只用它的消息结构和模型客户端”。</p>
 <p><strong>它怎么”处理工具”？答案是：根本不处理。</strong></p>
 <p>模型拿到的请求里<strong>没有 <code>tools</code> 参数</strong>，没有机会申请调工具。取数全由写死的 Go 代码完成，模型只在最后一步综合一次。</p>
 <p><strong>关键分界：它复用的是 <code>collector</code>，不是”工具”。</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">工具路线：模型 → ToolsNode → 工具闭包 → collector.GetAlerts → client → HTTP</span><br><span class="line">工作流：  RulePlanner → EvidenceExecutor.Execute → collector.GetAlerts → client → HTTP</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">工具路线：模型 → ToolsNode → 工具闭包 → collector.GetAlerts → client → HTTP</span><br><span class="line">工作流：  RulePlanner → EvidenceExecutor.Execute → collector.GetAlerts → client → HTTP</span><br></pre></td></tr></tbody></table></figure>
 
 <p>两条路在 collector 汇合，但工作流<strong>绕过了整个工具层</strong>。工具层干的活全是给模型用的（拼 schema、反序列化、把结果拼成人读文本再 marshal），工作流里没人读那份文本，所以整层不需要。</p>
 <p>绕过之后必须自己补三样：</p>
 <ul>
-<li><strong>参数变常量</strong>：写死 <code>{&quot;service&quot;: plan.Service, &quot;status&quot;: &quot;firing&quot;}</code>、<code>now-30m</code>、<code>limit 10</code>。没有模型，参数只能靠人定死。</li>
+<li><strong>参数变常量</strong>：写死 <code>{"service": plan.Service, "status": "firing"}</code>、<code>now-30m</code>、<code>limit 10</code>。没有模型，参数只能靠人定死。</li>
 <li><strong>编排和容错手写</strong>：goroutine 并发 + 分支隔离 + 失败降级成 <code>Limitation</code>，这套在 tool calling 里是循环天然做掉的。</li>
-<li><strong>输出改结构体</strong>：返回 <code>Finding</code> &#x2F; <code>EvidenceItem</code> 而不是拼文本，因为下游要综合、要溯源。</li>
+<li><strong>输出改结构体</strong>：返回 <code>Finding</code> / <code>EvidenceItem</code> 而不是拼文本，因为下游要综合、要溯源。</li>
 </ul>
-<p><strong>所以一句话收口：tool calling &#x3D; 函数 + 一层”让模型选函数、给参数”的协议外壳。去掉外壳，剩下的就是普通函数调用。</strong></p>
-<h3 id="Q21-什么时候必须加这层外壳？（判据）"><a href="#Q21-什么时候必须加这层外壳？（判据）" class="headerlink" title="Q21. 什么时候必须加这层外壳？（判据）"></a><span id="q21"></span>Q21. 什么时候必须加这层外壳？（判据）</h3><p>看一句：<strong>“该调哪个函数、参数填什么”能不能穷举。</strong></p>
+<p><strong>所以一句话收口：tool calling = 函数 + 一层”让模型选函数、给参数”的协议外壳。去掉外壳，剩下的就是普通函数调用。</strong></p>
+<h3 id="Q21-什么时候必须加这层外壳？（判据）"><a href="#Q21-什么时候必须加这层外壳？（判据）" class="headerlink" title="Q21. 什么时候必须加这层外壳？（判据）" data-stellar-navigation=""></a><span id="q21"></span>Q21. 什么时候必须加这层外壳？（判据）</h3><p>看一句：<strong>“该调哪个函数、参数填什么”能不能穷举。</strong></p>
 <ul>
 <li>不能穷举（用户可能问任何事）→ 必须加壳，让模型自己选。FullAgent 就是这种。</li>
 <li>能穷举（故障分析就那几条查法：查告警、查日志、查知识库）→ 加壳只换来不确定性和 token 成本。Orchestrator 就是这种。</li>
 </ul>
 <p>配套的取舍：</p>
-<table>
+<div class="md-table-scroll"><table>
 <thead>
 <tr>
 <th></th>
@@ -871,771 +846,131 @@
 <td>弱</td>
 <td>强（Evidence 带 ID + Source）</td>
 </tr>
-</tbody></table>
+</tbody></table></div>
 <p><strong>面试注意</strong>：被问”你项目里 Agent 怎么调工具”，必须先说清是哪个入口。笼统说”都是 ReAct 工具调用”，对方一看代码就知道没读透。</p>
-<h3 id="本节要点流水（自测用）"><a href="#本节要点流水（自测用）" class="headerlink" title="本节要点流水（自测用）"></a>本节要点流水（自测用）</h3><ul>
+<h3 id="本节要点流水（自测用）"><a href="#本节要点流水（自测用）" class="headerlink" title="本节要点流水（自测用）" data-stellar-navigation=""></a>本节要点流水（自测用）</h3><ul>
 <li>工具调用在协议层就是一条 assistant 消息带 <code>tool_calls</code> 字段，<code>arguments</code> 是 JSON <strong>字符串</strong></li>
-<li>一轮工具调用 &#x3D; 两次模型请求；Agent 的”记忆”就是那个不断变长的 messages 数组</li>
+<li>一轮工具调用 = 两次模型请求；Agent 的”记忆”就是那个不断变长的 messages 数组</li>
 <li>Eino：启动建 name→index 表，运行时按名字查表，参数字符串原样透传，<strong>到 <code>InvokableRun</code> 里才反序列化</strong></li>
 <li>参数不存任何地方，只在栈上；结果靠 <code>toolCallID</code> 和请求配对</li>
 <li>工作流复用 collector 而不是工具，因为工具层是专门为”给模型看”服务的</li>
 <li>判据：能不能穷举”查什么”，能穷举就别加壳</li>
 </ul>
-
-                
-            </div>
-            <hr/>
-
-            
-
-    <div class="reprint" id="reprint-statement">
-        
-            <div class="reprint__author">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-user">
-                        文章作者:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    <a href="/about" rel="external nofollow noreferrer">Qiu Yinlan</a>
-                </span>
-            </div>
-            <div class="reprint__type">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-link">
-                        文章链接:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    <a href="https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/">https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/</a>
-                </span>
-            </div>
-            <div class="reprint__notice">
-                <span class="reprint-meta" style="font-weight: bold;">
-                    <i class="fas fa-copyright">
-                        版权声明:
-                    </i>
-                </span>
-                <span class="reprint-info">
-                    本博客所有文章除特別声明外，均采用
-                    <a href="https://creativecommons.org/licenses/by/4.0/deed.zh" rel="external nofollow noreferrer" target="_blank">CC BY 4.0</a>
-                    许可协议。转载请注明来源
-                    <a href="/about" target="_blank">Qiu Yinlan</a>
-                    !
-                </span>
-            </div>
-        
-    </div>
-
-    <script async defer>
-      document.addEventListener("copy", function (e) {
-        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
-        M.toast({html: toastHTML})
-      });
-
-      function navToReprintStatement() {
-        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
-      }
-    </script>
-
-
-
-            <div class="tag_share" style="display: block;">
-                <div class="post-meta__tag-list" style="display: inline-block;">
-                    
-                        <div class="article-tag">
-                            
-                                <a href="/tags/agent/">
-                                    <span class="chip bg-color">agent</span>
-                                </a>
-                            
-                                <a href="/tags/go/">
-                                    <span class="chip bg-color">go</span>
-                                </a>
-                            
-                        </div>
-                    
-                </div>
-                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
-                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
-<div id="article-share">
-
-    
-    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
-    <script src="/libs/share/js/social-share.min.js"></script>
-    
-
-    
-
-</div>
-
-                </div>
-            </div>
-            
-                <style>
-    #reward {
-        margin: 40px 0;
-        text-align: center;
-    }
-
-    #reward .reward-link {
-        font-size: 1.4rem;
-        line-height: 38px;
-    }
-
-    #reward .btn-floating:hover {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    #rewardModal {
-        width: 320px;
-        height: 350px;
-    }
-
-    #rewardModal .reward-title {
-        margin: 15px auto;
-        padding-bottom: 5px;
-    }
-
-    #rewardModal .modal-content {
-        padding: 10px;
-    }
-
-    #rewardModal .close {
-        position: absolute;
-        right: 15px;
-        top: 15px;
-        color: rgba(0, 0, 0, 0.5);
-        font-size: 1.3rem;
-        line-height: 20px;
-        cursor: pointer;
-    }
-
-    #rewardModal .close:hover {
-        color: #ef5350;
-        transform: scale(1.3);
-        -moz-transform:scale(1.3);
-        -webkit-transform:scale(1.3);
-        -o-transform:scale(1.3);
-    }
-
-    #rewardModal .reward-tabs {
-        margin: 0 auto;
-        width: 210px;
-    }
-
-    .reward-tabs .tabs {
-        height: 38px;
-        margin: 10px auto;
-        padding-left: 0;
-    }
-
-    .reward-content ul {
-        padding-left: 0 !important;
-    }
-
-    .reward-tabs .tabs .tab {
-        height: 38px;
-        line-height: 38px;
-    }
-
-    .reward-tabs .tab a {
-        color: #fff;
-        background-color: #ccc;
-    }
-
-    .reward-tabs .tab a:hover {
-        background-color: #ccc;
-        color: #fff;
-    }
-
-    .reward-tabs .wechat-tab .active {
-        color: #fff !important;
-        background-color: #22AB38 !important;
-    }
-
-    .reward-tabs .alipay-tab .active {
-        color: #fff !important;
-        background-color: #019FE8 !important;
-    }
-
-    .reward-tabs .reward-img {
-        width: 210px;
-        height: 210px;
-    }
-</style>
-
-<div id="reward">
-    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
-
-    <!-- Modal Structure -->
-    <div id="rewardModal" class="modal">
-        <div class="modal-content">
-            <a class="close modal-close"><i class="fas fa-times"></i></a>
-            <h4 class="reward-title">你的赏识是我前进的动力</h4>
-            <div class="reward-content">
-                <div class="reward-tabs">
-                    <ul class="tabs row">
-                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
-                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
-                    </ul>
-                    <div id="alipay">
-                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
-                    </div>
-                    <div id="wechat">
-                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(function () {
-        $('.tabs').tabs();
-    });
-</script>
-
-            
-        </div>
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-<article id="prenext-posts" class="prev-next articles">
-    <div class="row article-row">
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
-            <div class="card">
-                <a href="/2026/11/09/LeetCode-141-%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8-%E5%BF%AB%E6%85%A2%E6%8C%87%E9%92%88%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%85%E7%9B%B8%E9%81%87/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/14.jpg" class="responsive-img" alt="LeetCode 141. 环形链表：快慢指针为什么必相遇">
-                        
-                        <span class="card-title">LeetCode 141. 环形链表：快慢指针为什么必相遇</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2026-11-09
-                        </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    技术
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/go/">
-                        <span class="chip bg-color">go</span>
-                    </a>
-                    
-                    <a href="/tags/%E7%AE%97%E6%B3%95/">
-                        <span class="chip bg-color">算法</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-        
-        <div class="article col s12 m6" data-aos="fade-up">
-            <div class="article-badge right-badge text-color">
-                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
-            </div>
-            <div class="card">
-                <a href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/">
-                    <div class="card-image">
-                        
-                        
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="JSON、JSONL 与 Function Calling：Agent 的调用与轨迹">
-                        
-                        <span class="card-title">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</span>
-                    </div>
-                </a>
-                <div class="card-content article-content">
-                    <div class="summary block-with-text">
-                        
-                            
-                        
-                    </div>
-                    <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2026-11-07
-                            </span>
-                        <span class="publish-author">
-                            
-                            <i class="fas fa-bookmark fa-fw icon-category"></i>
-                            
-                            <a href="/categories/%E6%8A%80%E6%9C%AF/" class="post-category">
-                                    技术
-                                </a>
-                            
-                            
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="card-action article-tags">
-                    
-                    <a href="/tags/agent/">
-                        <span class="chip bg-color">agent</span>
-                    </a>
-                    
-                    <a href="/tags/llm/">
-                        <span class="chip bg-color">llm</span>
-                    </a>
-                    
-                </div>
-                
-            </div>
-        </div>
-        
-    </div>
 </article>
-
-</div>
-
+<div class="article-tags slide-up"><a class="tag" href="/tags/agent/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>agent</a><a class="tag" href="/tags/go/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>go</a></div>
 
 
-<!-- 代码块功能依赖 -->
-<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
-
-<!-- 代码语言 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
-
-
-<!-- 代码块复制 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
-
-
-<!-- 代码块收缩 -->
-
-<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
-
-
+  <div class="article-share slide-up" id="share">
+    <div class="body">
+      <div class="social-wrap dis-select"><a class="social share-item qrcode ui-interactive is-icon-only" onclick="util.toggle(&quot;share-qrcode&quot;)" aria-label="分享文章: QR Code" title="分享文章: QR Code"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M10.553 13.447c-.424-.424-.95-.596-1.535-.675c-.553-.074-1.25-.074-2.086-.074H5.827c-.58 0-1.065 0-1.459.037c-.411.04-.795.124-1.146.34c-.345.21-.634.5-.845.844c-.216.352-.3.735-.34 1.147C2 15.459 2 15.944 2 16.525v.068c0 .884 0 1.597.055 2.17c.056.592.175 1.108.459 1.571c.288.47.682.864 1.152 1.152c.463.284.979.403 1.57.46C5.81 22 6.524 22 7.407 22h.07c.58 0 1.064 0 1.458-.037c.412-.04.795-.124 1.147-.34c.344-.21.633-.5.844-.844c.216-.352.3-.736.34-1.147c.037-.394.037-.879.037-1.46v-1.104c0-.836 0-1.533-.074-2.086c-.079-.584-.251-1.111-.675-1.535m-1.62-11.41c.412.04.795.124 1.147.34c.344.21.633.5.844.845c.216.351.3.735.34 1.146c.037.394.037.879.037 1.46v1.104c0 .836 0 1.533-.074 2.086c-.079.584-.251 1.111-.675 1.535s-.95.596-1.535.675c-.553.074-1.25.074-2.086.074H5.827c-.58 0-1.065 0-1.459-.037c-.411-.04-.795-.124-1.146-.34a2.56 2.56 0 0 1-.845-.844c-.216-.352-.3-.735-.34-1.147C2 8.54 2 8.056 2 7.475v-.068c0-.884 0-1.597.055-2.17c.056-.592.175-1.108.459-1.571c.288-.47.682-.864 1.152-1.152c.463-.284.979-.403 1.57-.46C5.81 2 6.524 2 7.407 2h.07c.58 0 1.064 0 1.458.037M16.593 2h-.068c-.58 0-1.065 0-1.46.037c-.41.04-.794.124-1.146.34c-.344.21-.633.5-.844.845c-.216.351-.3.735-.34 1.146c-.037.394-.037.879-.037 1.46v1.104c0 .836 0 1.533.074 2.086c.079.584.251 1.111.675 1.535s.95.596 1.535.675c.553.074 1.25.074 2.086.074h1.105c.58 0 1.065 0 1.459-.037c.411-.04.795-.124 1.146-.34c.345-.21.634-.5.845-.844c.216-.352.3-.735.34-1.147C22 8.54 22 8.056 22 7.475v-.068c0-.884 0-1.597-.055-2.17c-.056-.592-.175-1.108-.459-1.571a3.5 3.5 0 0 0-1.152-1.152c-.463-.284-.979-.403-1.57-.46C18.19 2 17.477 2 16.594 2" opacity=".5"></path><path fill="currentColor" d="M14.093 21.302a.698.698 0 1 1-1.396 0v-2.79h1.396z" opacity=".4"></path><path fill="currentColor" d="M21.302 12.698a.7.7 0 0 0-.697.697v3.256H22v-3.256a.7.7 0 0 0-.698-.697" opacity=".5"></path><path fill="currentColor" d="M16.076 16.617c-.076.184-.076.417-.076.883s0 .699.076.883a1 1 0 0 0 .541.54c.184.077.417.077.883.077s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C18.199 16 17.966 16 17.5 16s-.699 0-.883.076a1 1 0 0 0-.54.541"></path><path fill="currentColor" d="M22 18.535v-.023h-1.396c0 .443 0 .74-.016.97c-.015.224-.043.333-.073.405a1.16 1.16 0 0 1-.629.63c-.072.029-.18.056-.405.072c-.23.015-.527.016-.97.016h-1.86V22h1.883c.414 0 .759 0 1.042-.02a2.6 2.6 0 0 0 .844-.175a2.56 2.56 0 0 0 1.384-1.384c.112-.27.156-.549.176-.844c.02-.283.02-.628.02-1.042" opacity=".7"></path><path fill="currentColor" d="M12.697 16.616v.035h1.396c0-.668 0-1.116.035-1.458c.034-.33.093-.482.16-.583a1.2 1.2 0 0 1 .321-.32c.101-.068.254-.128.584-.161c.342-.035.79-.036 1.458-.036h1.86v-1.395h-1.896c-.623 0-1.142 0-1.563.043c-.44.044-.85.142-1.218.388c-.28.187-.519.426-.706.706c-.246.368-.343.777-.388 1.217c-.043.421-.043.94-.043 1.564" opacity=".6"></path><path fill="currentColor" d="M5.508 18.69c.219.155.528.155 1.146.155c.619 0 .928 0 1.146-.155a.8.8 0 0 0 .2-.199c.154-.218.154-.527.154-1.146s0-.927-.155-1.146A.8.8 0 0 0 7.8 16c-.218-.155-.527-.155-1.146-.155s-.927 0-1.146.155a.8.8 0 0 0-.199.2c-.155.218-.155.527-.155 1.145c0 .619 0 .928.155 1.146a.8.8 0 0 0 .2.2M6.654 8.155c-.618 0-.927 0-1.146-.155a.8.8 0 0 1-.199-.2c-.155-.217-.155-.527-.155-1.145c0-.619 0-.928.155-1.146a.8.8 0 0 1 .2-.2c.218-.154.527-.154 1.145-.154c.619 0 .928 0 1.146.155a.8.8 0 0 1 .2.199c.154.218.154.527.154 1.146s0 .928-.155 1.146A.8.8 0 0 1 7.8 8c-.218.155-.527.155-1.146.155M16.2 8c.218.155.527.155 1.146.155s.927 0 1.146-.155a.8.8 0 0 0 .199-.199c.155-.218.155-.528.155-1.146c0-.619 0-.928-.155-1.146a.8.8 0 0 0-.2-.2c-.218-.154-.527-.154-1.145-.154c-.619 0-.928 0-1.146.155a.8.8 0 0 0-.2.199c-.154.218-.154.527-.154 1.146s0 .928.155 1.146A.8.8 0 0 0 16.2 8"></path></svg></span></a><a class="social share-item weibo ui-interactive is-icon-only" href="https://service.weibo.com/share/share.php?url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F&amp;title=Agent%20%E6%9E%B6%E6%9E%84%E3%80%81Eino%20%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A%20Agent%20%E7%BC%96%E6%8E%92%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;summary=%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89%E6%B5%81%E7%A8%8B%20A%EF%BC%9AEino%20ReAct%20%E4%B8%80%E6%AC%A1%E5%BE%80%E8%BF%94%EF%BC%88%E8%B0%81%E5%8F%91%E8%B5%B7%E3%80%81%E8%B0%81%E6%89%A7%E8%A1%8C%EF%BC%891234567%E2%91%A0%20Go%20%E8%BF%9B%E7%A8%8B%E5%8F%91%E8%AF%B7%E6%B1%82%EF%BC%88messages%20%2B%2011%20%E4%B8%AA%E5%B7%A5%E5%85%B7%20schema%EF%BC%89%E2%91%A1%20%E6%A8%A1%E5%9E%8B%E8%BF%94%E5%9B%9E%20tool_calls%EF%BC%88%E5%8F%AA%E8%BE%93%E5%87%BA%20JSON%EF%BC%8C%E4%B8%8D%E6%89%A7%E8%A1%8C%E4%BB%BB%E4%BD%95%E4%B8%9C..." target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Weibo" title="分享文章: Weibo"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.737 5.439l-.002.004zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.346.672-.24.239.09.315.36.18.601l.014-.028zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.57-.18-.405-.615.375-.977.42-1.804 0-2.404-.781-1.112-2.915-1.053-5.364-.03 0 0-.766.331-.571-.271.376-1.217.315-2.224-.27-2.809-1.338-1.337-4.869.045-7.888 3.08C1.309 10.87 0 13.273 0 15.348c0 3.981 5.099 6.395 10.086 6.395 6.536 0 10.888-3.801 10.888-6.82 0-1.822-1.547-2.854-2.915-3.284v.01zm1.908-5.092c-.766-.856-1.908-1.187-2.96-.962-.436.09-.706.511-.616.932.09.42.511.691.932.602.511-.105 1.067.044 1.442.465.376.421.466.977.316 1.473-.136.406.089.856.51.992.405.119.857-.105.992-.512.33-1.021.12-2.178-.646-3.035l.03.045zm2.418-2.195c-1.576-1.757-3.905-2.419-6.054-1.968-.496.104-.812.587-.706 1.081.104.496.586.813 1.082.707 1.532-.331 3.185.15 4.296 1.383 1.112 1.246 1.429 2.943.947 4.416-.165.48.106 1.007.586 1.157.479.165.991-.104 1.157-.586.675-2.088.241-4.478-1.338-6.235l.03.045z"></path></svg></span></a><a class="social share-item x ui-interactive is-icon-only" href="https://x.com/intent/tweet?text=Agent%20%E6%9E%B6%E6%9E%84%E3%80%81Eino%20%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A%20Agent%20%E7%BC%96%E6%8E%92%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: X" title="分享文章: X"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"></path></svg></span></a><a class="social share-item telegram ui-interactive is-icon-only" href="https://t.me/share/url?url=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F&amp;text=Agent%20%E6%9E%B6%E6%9E%84%E3%80%81Eino%20%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A%20Agent%20%E7%BC%96%E6%8E%92%20-%20hi%2Cit's%20Qiu%20Yinlan!" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Telegram" title="分享文章: Telegram"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024q-.159.037-5.061 3.345q-.72.495-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789q.04-.324.893-.663q5.247-2.286 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635"></path></svg></span></a><a class="social share-item whatsapp ui-interactive is-icon-only" href="https://wa.me/?text=Agent%20%E6%9E%B6%E6%9E%84%E3%80%81Eino%20%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A%20Agent%20%E7%BC%96%E6%8E%92%20-%20hi%2Cit's%20Qiu%20Yinlan!%0Ahttps%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: WhatsApp" title="分享文章: WhatsApp"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52s.198-.298.298-.497c.099-.198.05-.371-.025-.52s-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51a13 13 0 0 0-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074s2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413s.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"></path></svg></span></a><a class="social share-item email ui-interactive is-icon-only" href="mailto:?subject=Agent%20%E6%9E%B6%E6%9E%84%E3%80%81Eino%20%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A%20Agent%20%E7%BC%96%E6%8E%92%20-%20hi%2Cit's%20Qiu%20Yinlan!&amp;body=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F" aria-label="分享文章: Email" title="分享文章: Email"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828C4.343 20 6.229 20 10 20h4c3.771 0 5.657 0 6.828-1.172C22 17.657 22 15.771 22 12s0-5.657-1.172-6.828C19.657 4 17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172m15.404 2.348a.75.75 0 0 1-.096 1.056l-2.196 1.83c-.887.739-1.605 1.338-2.24 1.746-.66.424-1.303.693-2.044.693s-1.384-.269-2.045-.693c-.634-.408-1.352-1.007-2.239-1.745L5.52 8.576a.75.75 0 1 1 .96-1.152l2.159 1.799c.933.777 1.58 1.315 2.128 1.667.529.34.888.455 1.233.455s.704-.115 1.233-.455c.547-.352 1.195-.89 2.128-1.667l2.159-1.8a.75.75 0 0 1 1.056.097" clip-rule="evenodd"></path></svg></span></a></div>
+      <div class="share-qrcode" id="share-qrcode" style="opacity:0;height:0"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F08%2FAgent-%25E6%259E%25B6%25E6%259E%2584-Eino-%25E5%2586%2585%25E9%2583%25A8%25E6%259C%25BA%25E5%2588%25B6%25E4%25B8%258E%25E5%25A4%259A-Agent-%25E7%25BC%2596%25E6%258E%2592%2F" onerror="this.onerror=null;this.src=&quot;/images/stellar-error.491ee870f4940739.svg&quot;"></div>
     </div>
-    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
-        <div class="toc-widget card" style="background-color: white;">
-            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
-            <div id="toc-content"></div>
-        </div>
-    </div>
+  </div>
+
+<div class="article-footer slide-up">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
 </div>
+    </section></div>
 
-<!-- TOC 悬浮按钮. -->
-
-<div id="floating-toc-btn" class="hide-on-med-and-down">
-    <a class="btn-floating btn-large bg-color">
-        <i class="fas fa-list-ul"></i>
-    </a>
-</div>
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note"><svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-left" aria-hidden="true"></svg> 较新文章</div><a href="/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/" data-stellar-navigation="">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</a></div><div class="item" id="next"><div class="note">较早文章 <svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-right" aria-hidden="true"></svg></div><a href="/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-stellar-navigation="">JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</a></div></section></div>
 
 
-<script src="/libs/tocbot/tocbot.min.js"></script>
-<script>
-    $(function () {
-        tocbot.init({
-            tocSelector: '#toc-content',
-            contentSelector: '#articleContent',
-            headingsOffset: -($(window).height() * 0.4 - 45),
-            collapseDepth: Number('0'),
-            headingSelector: 'h2, h3, h4'
-        });
 
-        // modify the toc link href to support Chinese.
-        let i = 0;
-        let tocHeading = 'toc-heading-';
-        $('#toc-content a').each(function () {
-            $(this).attr('href', '#' + tocHeading + (++i));
-        });
 
-        // modify the heading title id to support Chinese.
-        i = 0;
-        $('#articleContent').children('h2, h3, h4').each(function () {
-            $(this).attr('id', tocHeading + (++i));
-        });
 
-        // Set scroll toc fixed.
-        let tocHeight = parseInt($(window).height() * 0.4 - 64);
-        let $tocWidget = $('.toc-widget');
-        $(window).scroll(function () {
-            let scroll = $(window).scrollTop();
-            /* add post toc fixed. */
-            if (scroll > tocHeight) {
-                $tocWidget.addClass('toc-fixed');
-            } else {
-                $tocWidget.removeClass('toc-fixed');
-            }
-        });
 
-        
-        /* 修复文章卡片 div 的宽度. */
-        let fixPostCardWidth = function (srcId, targetId) {
-            let srcDiv = $('#' + srcId);
-            if (srcDiv.length === 0) {
-                return;
-            }
-
-            let w = srcDiv.width();
-            if (w >= 450) {
-                w = w + 21;
-            } else if (w >= 350 && w < 450) {
-                w = w + 18;
-            } else if (w >= 300 && w < 350) {
-                w = w + 16;
-            } else {
-                w = w + 14;
-            }
-            $('#' + targetId).width(w);
-        };
-
-        // 切换TOC目录展开收缩的相关操作.
-        const expandedClass = 'expanded';
-        let $tocAside = $('#toc-aside');
-        let $mainContent = $('#main-content');
-        $('#floating-toc-btn .btn-floating').click(function () {
-            if ($tocAside.hasClass(expandedClass)) {
-                $tocAside.removeClass(expandedClass).hide();
-                $mainContent.removeClass('l9');
-            } else {
-                $tocAside.addClass(expandedClass).show();
-                $mainContent.addClass('l9');
-            }
-            fixPostCardWidth('artDetail', 'prenext-posts');
-        });
-        
-    });
-</script>
-
-    
-
+<footer class="page-footer slide-up footnote"><hr><div class="sitemap" style="column-count:3;"><div class="sitemap-group"><span class="fs15">笔记</span><a href="/notebooks/">全部笔记本</a><a href="/note/algo/">算法笔记</a></div><div class="sitemap-group"><span class="fs15">项目</span><a href="/wiki/">项目索引</a><a href="/wiki/pilot/">pilot</a><a href="/wiki/im/">infinitechatgo</a></div><div class="sitemap-group"><span class="fs15">浏览</span><a href="/archives/">文章归档</a><a href="/tags/">标签</a><a href="/about/">关于</a></div></div><div class="text"><p>本站由 <a href="/">Qiu Yinlan</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0">Stellar 2.0.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
 </main>
+<aside data-stellar-runtime-region="" id="rightbar-region" class="site-region site-region--rightbar" data-region="rightbar" aria-label="Rightbar"><div class="site-region__surface ui-drawer-surface"><div class="site-region__viewport"><div class="widgets widget-stack widget-stack--rightbar widget-stack--rightbar"><div class="widget-instance widget-instance--toc" data-widget-id="rightbar:1:toc" data-presentation="rightbar">
 
 
-
-
-    <footer class="page-footer bg-color">
-    
-        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
-<style>
-    .aplayer .aplayer-lrc p {
-        
-        display: none;
-        
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 16px !important;
-    }
-
-    .aplayer .aplayer-lrc p.aplayer-lrc-current {
-        
-        display: none;
-        
-        font-size: 15px;
-        color: #42b983;
-    }
-
-    
-    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
-        left: -66px !important;
-    }
-
-    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
-        left: 0px !important;
-    }
-
-    
-</style>
-<div class="">
-    
-    <div class="row">
-        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
-                   server="netease"
-                   type="playlist"
-                   id="503838841"
-                   fixed='true'
-                   autoplay='false'
-                   theme='#42b983'
-                   loop='all'
-                   order='random'
-                   preload='auto'
-                   volume='0.7'
-                   list-folded='true'
-        >
-        </meting-js>
+<widget class="widget-wrapper slide-up toc" id="data-toc" collapse="false">
+  
+    <div class="widget-header dis-select">
+      <span class="name">本文目录</span>
+      <button type="button" class="cap-action ui-interactive card-hover card-hover--spotlight" data-shell-action="toggle-toc" aria-label="Toggle table of contents" aria-pressed="false"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg></span></button>
     </div>
+  
+  <div class="widget-body"><ol class="toc ui-collection-adapter"><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E9%9B%B6%E3%80%81%E4%B8%BB%E5%B9%B2%E9%80%9F%E6%9F%A5%EF%BC%88%E5%85%88%E7%9C%8B%E8%BF%99%E4%B8%AA%EF%BC%89" data-stellar-navigation=""><span class="toc-text">零、主干速查（先看这个）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-A%EF%BC%9AEino-ReAct-%E4%B8%80%E6%AC%A1%E5%BE%80%E8%BF%94%EF%BC%88%E8%B0%81%E5%8F%91%E8%B5%B7%E3%80%81%E8%B0%81%E6%89%A7%E8%A1%8C%EF%BC%89" data-stellar-navigation=""><span class="toc-text">流程 A：Eino ReAct 一次往返（谁发起、谁执行）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%B5%81%E7%A8%8B-B%EF%BC%9A%E5%A4%9A-Agent-%E6%8E%92%E9%9A%9C%E7%BC%96%E6%8E%92" data-stellar-navigation=""><span class="toc-text">流程 B：多 Agent 排障编排</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%80%E3%80%81Agent-%E6%A1%86%E6%9E%B6%E4%B8%8E%E6%9E%B6%E6%9E%84%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">一、Agent 框架与架构选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q1-%E6%9C%89%E5%93%AA%E4%BA%9B-Agent-%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-LangGraph%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q1. 有哪些 Agent 开发框架？为什么用 LangGraph？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q2-ReAct-%E5%92%8C-Plan-Execute-%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q2. ReAct 和 Plan-Execute 的使用场景？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q3-%E6%9C%89%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84-Agent-%E6%A1%86%E6%9E%B6%E5%90%97%EF%BC%9F%E7%94%A8%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q3. 有去中心化的 Agent 框架吗？用在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q4-Agent-%E4%B9%8B%E9%97%B4%E6%98%AF%E6%80%8E%E4%B9%88%E4%BA%A4%E6%B5%81%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q4. Agent 之间是怎么交流的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q5-sub-agent-%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%EF%BC%9F%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9A%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q5. sub-agent 怎么实现？为什么要做？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%8C%E3%80%81Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6" data-stellar-navigation=""><span class="toc-text">二、Eino 内部机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q6-Chain-%E4%B8%8D%E8%83%BD%E5%BE%AA%E7%8E%AF%E5%90%97%EF%BC%9F%E5%9B%BE%E5%8F%AF%E4%BB%A5%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q6. Chain 不能循环吗？图可以？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q7-%E3%80%8C%E5%9B%BE%E6%98%AF%E7%8A%B6%E6%80%81%E6%9C%BA%E3%80%8D%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D%EF%BC%9FChain-%E4%B8%8D%E6%98%AF%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q7. 「图是状态机」是什么意思？Chain 不是吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q8-ReAct-%E7%9A%84-state-%E7%BB%93%E6%9E%84%E4%BD%93%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q8. ReAct 的 state 结构体是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q9-%E6%88%91%E7%8E%B0%E5%9C%A8%E5%88%B0%E5%BA%95%E6%98%AF%E6%80%8E%E4%B9%88%E5%81%9C%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q9. 我现在到底是怎么停的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q10-Eino-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E5%BF%83%E5%8C%96%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q10. Eino 为什么是中心化的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%89%E3%80%81Go-%E5%B9%B6%E5%8F%91%EF%BC%9Achannel-%E6%94%B6%E7%BB%93%E6%9E%9C" data-stellar-navigation=""><span class="toc-text">三、Go 并发：channel 收结果</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q11-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8-WaitGroup%EF%BC%9Fchannel-%E4%B8%8D%E8%83%BD%E6%9B%BF%E4%BB%A3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q11. 为什么要用 WaitGroup？channel 不能替代吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q12-%E8%AE%A1%E6%95%B0%E5%99%A8%E6%98%AF-goroutine-%E8%B7%91%E5%AE%8C%E8%87%AA%E5%8A%A8%E5%87%8F%E4%B8%80%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q12. 计数器是 goroutine 跑完自动减一吗？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q13-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%B8%A6%E7%BC%93%E5%86%B2%EF%BC%9F%E6%97%A0%E7%BC%93%E5%86%B2%E6%AD%BB%E9%94%81%E6%98%AF%E6%80%8E%E4%B9%88%E5%9B%9E%E4%BA%8B%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q13. 为什么要带缓冲？无缓冲死锁是怎么回事？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%9B%9B%E3%80%81%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%EF%BC%88%E6%A0%B8%E5%BF%83%EF%BC%89" data-stellar-navigation=""><span class="toc-text">四、多 Agent 编排（核心）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q14-%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92%E6%98%AF%E6%80%8E%E4%B9%88%E8%B7%91%E7%9A%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q14. 多 Agent 编排是怎么跑的？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%BA%94%E3%80%81%E8%AF%AD%E8%A8%80%E9%80%89%E5%9E%8B" data-stellar-navigation=""><span class="toc-text">五、语言选型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q15-%E7%94%A8-Go-%E5%86%99-Agent-%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q15. 用 Go 写 Agent 有什么好处？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q16-%E8%BF%99%E4%B8%AA%E9%A1%B9%E7%9B%AE%E6%9C%89%E5%A4%A7%E9%87%8F%E8%AF%B7%E6%B1%82%E5%90%97%EF%BC%9F%E6%98%AF%E7%BD%91%E5%85%B3%E5%90%97%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q16. 这个项目有大量请求吗？是网关吗？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E5%85%AD%E3%80%81%E9%9D%A2%E8%AF%95%E5%8F%A3%E5%BE%84%E6%8F%90%E9%86%92" data-stellar-navigation=""><span class="toc-text">六、面试口径提醒</span></a></li><li class="toc-item toc-level-2"><a class="toc-link ui-interactive" href="#%E4%B8%83%E3%80%81%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%E5%88%B0%E5%BA%95%E6%80%8E%E4%B9%88%E5%8F%91%E7%94%9F%E7%9A%84%EF%BC%882026-11-09-%E8%A1%A5%E8%AE%B2%EF%BC%89" data-stellar-navigation=""><span class="toc-text">七、工具调用到底怎么发生的（2026-11-09 补讲）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q17-%E6%A8%A1%E5%9E%8B%E2%80%9D%E5%86%B3%E5%AE%9A%E8%B0%83%E5%B7%A5%E5%85%B7%E2%80%9D%E8%BF%99%E4%BB%B6%E4%BA%8B%EF%BC%8C%E5%9C%A8%E5%8D%8F%E8%AE%AE%E5%B1%82%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q17. 模型”决定调工具”这件事，在协议层是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q18-%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9D%9E%E8%A6%81%E6%90%9E%E6%88%90%E6%B6%88%E6%81%AF%EF%BC%9F%E5%9B%A0%E4%B8%BA-HTTP-%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%E7%9A%84" data-stellar-navigation=""><span class="toc-text">Q18. 为什么非要搞成消息？因为 HTTP 是无状态的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q19-%E5%B7%A5%E5%85%B7%E6%80%8E%E4%B9%88%E8%A2%AB%E6%89%BE%E5%88%B0%EF%BC%9F%E5%8F%82%E6%95%B0%E6%94%BE%E5%9C%A8%E5%93%AA%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q19. 工具怎么被找到？参数放在哪？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q20-%E9%82%A3%E4%B8%A4%E4%B8%AA-Agent-%E6%98%AF%E6%80%8E%E4%B9%88%E5%88%86%E5%B7%A5%E7%9A%84%EF%BC%9F%E4%B8%80%E4%B8%AA%E8%B5%B0%E5%B7%A5%E5%85%B7%E8%B0%83%E7%94%A8%EF%BC%8C%E4%B8%80%E4%B8%AA%E4%B8%8D%E8%B5%B0%EF%BC%9F" data-stellar-navigation=""><span class="toc-text">Q20. 那两个 Agent 是怎么分工的？一个走工具调用，一个不走？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#Q21-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%BF%85%E9%A1%BB%E5%8A%A0%E8%BF%99%E5%B1%82%E5%A4%96%E5%A3%B3%EF%BC%9F%EF%BC%88%E5%88%A4%E6%8D%AE%EF%BC%89" data-stellar-navigation=""><span class="toc-text">Q21. 什么时候必须加这层外壳？（判据）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link ui-interactive" href="#%E6%9C%AC%E8%8A%82%E8%A6%81%E7%82%B9%E6%B5%81%E6%B0%B4%EF%BC%88%E8%87%AA%E6%B5%8B%E7%94%A8%EF%BC%89" data-stellar-navigation=""><span class="toc-text">本节要点流水（自测用）</span></a></li></ol></li></ol></div>
+  <div class="widget-footer"><a class="top ui-interactive" onclick="util.scrollTop()"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M20.536 3.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12s0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464" opacity=".5"></path><path fill="currentColor" d="M9.53 12.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 9.56z"></path><path fill="currentColor" d="M9.53 16.03a.75.75 0 0 1-1.06-1.06l3-3a.75.75 0 0 1 1.06 0l3 3a.75.75 0 1 1-1.06 1.06L12 13.56z"></path></svg></span><span>回到顶部</span></a></div>
+</widget>
+
+
+</div></div></div></div></aside>
+</div><button type="button" class="site-scrim" data-shell-action="dismiss-drawer" aria-label="Close navigation" tabindex="-1"></button><div data-stellar-runtime-region="" class="site-dock" role="group" aria-label="Layout panels">
+  <button type="button" class="site-dock__button site-dock__button--rightbar ui-interactive" aria-label="Open rightbar" aria-controls="rightbar-region" aria-expanded="false" data-shell-action="toggle-rightbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>
+  </button>
+  <button type="button" class="site-dock__button site-dock__button--leftbar ui-interactive" aria-label="Open leftbar" aria-controls="leftbar-region" aria-expanded="false" data-shell-action="toggle-leftbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"></path><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"></path></g></svg>
+  </button>
 </div>
 
-<script src="/libs/aplayer/APlayer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
-
+<dialog data-stellar-runtime-region="" class="search-dialog" id="site-search-dialog" aria-labelledby="site-search-title">
+  <div class="search-dialog__panel search-wrapper" id="site-search-wrapper" searching="false">
+    <div class="search-dialog__header">
+      <div class="search-form" role="search">
+        <span class="search-button" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"></path><circle cx="14" cy="11" r="4"></circle></g></svg></span>
+        <input type="search" class="search-input" id="site-search-input" aria-labelledby="site-search-title" placeholder="搜索">
+      </div>
+      <button type="button" class="search-dialog__close" data-shell-action="close-search" aria-label="关闭搜索">×</button>
+    </div>
     
-    <div class="container row center-align" style="margin-bottom: 0px !important;">
-        <div class="col s12 m8 l8 copy-right">
-            Copyright&nbsp;&copy;
-            
-                <span id="year">2019-2026</span>
-            
-            <span id="year">2019</span>
-            <a href="/about" target="_blank">Qiu Yinlan</a>
-            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
-            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
-            <br>
-            
-            
-            
-            
-            
-            
-            <span id="busuanzi_container_site_pv">
-                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
-                    class="white-color"></span>&nbsp;次
-            </span>
-            
-            
-            <span id="busuanzi_container_site_uv">
-                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
-                    class="white-color"></span>&nbsp;人
-            </span>
-            
-            <br>
-            
-            <br>
-            
-        </div>
-        <div class="col s12 m4 l4 social-link social-statis">
-    <a href="https://github.com/qiuyinlan" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
-        <i class="fab fa-github"></i>
-    </a>
+      <div class="search-dialog__scope" role="radiogroup" aria-labelledby="site-search-title" hidden="">
+        <label class="search-dialog__scope-option" data-search-scope-option="all">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="all">
+          <span>全站</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="blog" hidden="">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="blog">
+          <span>博客</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="current" hidden="">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="current">
+          <span data-search-scope-current-label=""></span>
+        </label>
+      </div>
+    
+    <h2 class="search-dialog__title" id="site-search-title">站内搜索</h2>
+    <div class="search-result" id="site-search-result"></div>
+    <div class="search-no-result">没有找到内容！</div>
+  </div>
+</dialog>
+</div><div class="site-scripts">
+<script data-stellar-script="core" src="/js/stellar-icons.js?v=39c6ac17e854ffe2"></script>
 
-
-
-    <a href="mailto:1181062873@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
-        <i class="fas fa-envelope-open"></i>
-    </a>
-
-
-
-
-
-
-
-    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=1181062873" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 1181062873" data-position="top" data-delay="50">
-        <i class="fab fa-qq"></i>
-    </a>
-
-
-
-
-
-
-
-    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
-        <i class="fas fa-rss"></i>
-    </a>
-
-</div>
-    </div>
-</footer>
-
-<div class="progress-bar"></div>
-
-
-    <!-- 搜索遮罩框 -->
-<div id="searchModal" class="modal">
-    <div class="modal-content">
-        <div class="search-header">
-            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
-            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
-                   class="search-input">
-        </div>
-        <div id="searchResult"></div>
-    </div>
-</div>
-
-<script type="text/javascript">
-$(function () {
-    var searchFunc = function (path, search_id, content_id) {
-        'use strict';
-        $.ajax({
-            url: path,
-            dataType: "xml",
-            success: function (xmlResponse) {
-                // get the contents from search data
-                var datas = $("entry", xmlResponse).map(function () {
-                    return {
-                        title: $("title", this).text(),
-                        content: $("content", this).text(),
-                        url: $("url", this).text()
-                    };
-                }).get();
-                var $input = document.getElementById(search_id);
-                var $resultContent = document.getElementById(content_id);
-                $input.addEventListener('input', function () {
-                    var str = '<ul class=\"search-result-list\">';
-                    var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
-                    $resultContent.innerHTML = "";
-                    if (this.value.trim().length <= 0) {
-                        return;
-                    }
-                    // perform local searching
-                    datas.forEach(function (data) {
-                        var isMatch = true;
-                        var data_title = data.title.trim().toLowerCase();
-                        var data_content = data.content.trim().replace(/<[^>]+>/g, "").toLowerCase();
-                        var data_url = data.url;
-                        data_url = data_url.indexOf('/') === 0 ? data.url : '/' + data_url;
-                        var index_title = -1;
-                        var index_content = -1;
-                        var first_occur = -1;
-                        // only match artiles with not empty titles and contents
-                        if (data_title !== '' && data_content !== '') {
-                            keywords.forEach(function (keyword, i) {
-                                index_title = data_title.indexOf(keyword);
-                                index_content = data_content.indexOf(keyword);
-                                if (index_title < 0 && index_content < 0) {
-                                    isMatch = false;
-                                } else {
-                                    if (index_content < 0) {
-                                        index_content = 0;
-                                    }
-                                    if (i === 0) {
-                                        first_occur = index_content;
-                                    }
-                                }
-                            });
-                        }
-                        // show search results
-                        if (isMatch) {
-                            str += "<li><a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
-                            var content = data.content.trim().replace(/<[^>]+>/g, "");
-                            if (first_occur >= 0) {
-                                // cut out 100 characters
-                                var start = first_occur - 20;
-                                var end = first_occur + 80;
-                                if (start < 0) {
-                                    start = 0;
-                                }
-                                if (start === 0) {
-                                    end = 100;
-                                }
-                                if (end > content.length) {
-                                    end = content.length;
-                                }
-                                var match_content = content.substr(start, end);
-                                // highlight all keywords
-                                keywords.forEach(function (keyword) {
-                                    var regS = new RegExp(keyword, "gi");
-                                    match_content = match_content.replace(regS, "<em class=\"search-keyword\">" + keyword + "</em>");
-                                });
-
-                                str += "<p class=\"search-result\">" + match_content + "...</p>"
-                            }
-                            str += "</li>";
-                        }
-                    });
-                    str += "</ul>";
-                    $resultContent.innerHTML = str;
-                });
-            }
-        });
-    };
-
-    searchFunc('/search.xml', 'searchInput', 'searchResult');
-});
+<script data-stellar-script="defines">
+  window.canonical = window.stellarClientData.canonical;
+  const ctx = window.stellarClientData.ctx;
+  window.canonical.param = {permalink: "https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/", checklink: ctx.services.video.js};
+  ctx.date_suffix = {"just":"刚刚","min":"分钟前","hour":"小时前","day":"天前"};
+  if (ctx.search) Object.assign(ctx.search, {"more":"更多","no_more":"没有更多了"});
+  const def = window.stellarClientData.def;
+  window.ctx = ctx;
+  window.def = def;
 </script>
 
-    <!-- 回到顶部按钮 -->
-<div id="backTop" class="top-scroll">
-    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
-        <i class="fas fa-arrow-up"></i>
-    </a>
+
+<!-- core: 迁移期 DOM/资源兼容工具；Extension 注册与生命周期由 ESM runtime 所有 -->
+<script data-stellar-script="core" src="/js/utils.js?v=2.0.0"></script>
+<script data-stellar-script="core" src="/js/main.js?v=2.0.0" defer=""></script>
+<script data-stellar-script="core" defer="" src="/js/profile.js?v=2.0.0"></script>
+
+
+
+
+
+<script data-stellar-script="core" type="application/json" id="stellar-runtime-config">{"version":1,"root":"/","policy":{"cache":{"enabled":true,"defaultTtl":3600,"ttl":{"giscus":600,"waline":600,"artalk":600,"memos":600,"memos-user":86400,"sites":86400,"friends":86400,"friends_and_posts":86400,"siteinfo":86400},"maxEntries":200},"request":{"retries":2,"timeoutMs":5000,"idleTimeoutMs":3000,"maxCacheEntryBytes":204800},"features":{"codeCopyToastMs":2500},"providers":{"linkPrefetch":"flying_pages","lightbox":"fancybox","diagrams":"mermaid"}},"extensions":[{"id":"pin-slider","module":"/js/runtime/extensions/pin-slider.js","scope":"region","when":{"selector":".pin-slider"},"config":{}},{"id":"page-controls","module":"/js/runtime/extensions/page-controls.js","scope":"region","when":{"always":true},"config":{"highlight":"/js/search/highlight.js","tagtree":"/js/tagtree.js"}},{"id":"partial-navigation","module":"/js/runtime/extensions/partial-navigation.js","scope":"document","when":{"always":true},"config":{}},{"id":"search","module":"/js/runtime/extensions/search.js","scope":"document","when":{"selector":".search-input"},"config":{"provider":"local","options":{"scope":"all","includeContent":true,"cacheTtlSeconds":86400},"assets":{"client":null,"provider":"/js/search/local-search.js","shortcut":"/js/search/shortcut.js"}}},{"id":"hero-parallax","module":"/js/runtime/extensions/hero-parallax.js","scope":"region","when":{"selector":".wiki-hero"},"config":{}},{"id":"hero-effect","module":"/js/runtime/extensions/hero-effect.js","scope":"region","when":{"selector":"canvas[data-hero-effect]"},"config":{}},{"id":"lazy-loading","module":"/js/runtime/extensions/lazy-loading.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"}},{"id":"deferred-icons","module":"/js/runtime/extensions/deferred-icons.js","scope":"region","when":{"selector":"svg.icon[data-icon]"},"config":{}},{"id":"dropdown","module":"/js/runtime/extensions/dropdown.js","scope":"region","when":{"selector":"details.dropdown"},"config":{}},{"id":"services","module":"/js/runtime/extensions/services.js","scope":"region","when":{"selector":"#artalk_container, #twikoo_container, #waline_container, .data-service, [class*='ds-'], a[cardlink], a[data-md-link][data-siteinfo-api], .site-card [data-siteinfo-api], .voice\u003eaudio, .video\u003evideo, .chat-file"},"config":{"marked":"https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js"}},{"id":"settings","module":"/js/runtime/extensions/settings.js","scope":"region","when":{"selector":".settings-page"},"config":{}},{"id":"link-prefetch","module":"/js/runtime/extensions/link-prefetch.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"}},{"id":"lightbox","module":"/js/runtime/extensions/lightbox.js","scope":"region","when":{"selector":"[data-fancybox]:not(.error), .with-fancybox, .ds-memos, .timenode p\u003eimg"},"config":{"enabled":true,"selector":".timenode p\u003eimg","assets":{"localCss":"/css/plugins/fancybox.css","js":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js","css":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"}}},{"id":"reveal","module":"/js/runtime/extensions/reveal.js","scope":"region","when":{"selector":".slide-up"},"config":{"enabled":true,"duration":800,"interval":200,"distance":8,"blur":4}},{"id":"code-copy","module":"/js/runtime/extensions/code-copy.js","scope":"region","when":{"selector":".code"},"config":{"assets":{"js":"/js/plugins/copycode.js"},"messages":{"label":"复制","copied":"复制成功","denied":"未获得剪贴板权限","unsupported":"当前浏览器不支持剪贴板或页面不是 HTTPS"}}},{"id":"adaptive-text","module":"/js/runtime/extensions/adaptive-text.js","scope":"region","when":{"selector":"[data-text-adaptive]"},"config":{"assets":{"colorJs":"/js/color.js","js":"/js/plugins/adaptive-text.js"}}},{"id":"swiper","module":"/js/runtime/extensions/swiper.js","scope":"region","when":{"selector":"#swiper-api"},"config":{"assets":{"localCss":"/css/plugins/swiper.css","js":"https://unpkg.com/swiper@10.3/swiper-bundle.min.js","css":"https://unpkg.com/swiper@10.3/swiper-bundle.min.css"}}}]}</script>
+<script data-stellar-script="core" type="module" src="/js/runtime/index.js?v=2.0.0&amp;runtime=1"></script>
+
+
+<!-- inject -->
+
+
+<script data-stellar-script="core" defer="" src="/js/navigation-init.js?v=2.0.0"></script>
 </div>
 
-
-    <script src="/libs/materialize/materialize.min.js"></script>
-    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
-    <script src="/libs/aos/aos.js"></script>
-    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
-    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
-    <script src="/js/matery.js"></script>
-
-    <!-- Baidu Analytics -->
-
-    <!-- Baidu Push -->
-
-<script>
-    (function () {
-        var bp = document.createElement('script');
-        var curProtocol = window.location.protocol.split(':')[0];
-        if (curProtocol === 'https') {
-            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
-        } else {
-            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
-        }
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(bp, s);
-    })();
-</script>
-
-    
-    <script src="/libs/others/clicklove.js" async="async"></script>
-    
-    
-    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
-    
-
-    
-
-    
-
-	
-    
-
-    
-
-    
-
-    
-    <script src="/libs/instantpage/instantpage.js" type="module"></script>
-    
-
-</body>
-
-</html>
+<script type="application/json" id="stellar-navigation-config">{"collection":"[\"post\",\"post\"]","url":"https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/","signature":"7ddd6974f8f2ed57214b784dc3905fb501d34ef49df33573545e81109779fb10"}</script></body></html>
