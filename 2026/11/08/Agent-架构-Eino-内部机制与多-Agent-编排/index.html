@@ -409,7 +409,7 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">7684 字 · 预计阅读 26 分钟</span></div></div><div class="meta-row">
+</div><div class="right"><span class="cap reading">9064 字 · 预计阅读 31 分钟</span></div></div><div class="meta-row">
 <div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-08T13:00:00.000Z">2026-11-08</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-14T06:00:00.000Z">2026-11-14</time></span></div>
 </div></div>
     
@@ -1018,7 +1018,171 @@
 </ul>
 <p><strong>收益</strong>：可预测、可测试、可观测、有硬上限、责任清晰。<strong>代价</strong>：单点、不支持跨组织、节点能力受限。<strong>这四条代价对「单组织内部排障」全都不构成问题，所以中心化是正解不是妥协。</strong></p>
 <hr>
-<h2 id="五、Go-并发：channel-收结果"><a href="#五、Go-并发：channel-收结果" class="headerlink" title="五、Go 并发：channel 收结果"></a>五、Go 并发：channel 收结果</h2><h3 id="为什么要用-WaitGroup？channel-不能替代吗？"><a href="#为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="为什么要用 WaitGroup？channel 不能替代吗？"></a>为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
+<h2 id="五、工具调用到底怎么发生的（协议层）"><a href="#五、工具调用到底怎么发生的（协议层）" class="headerlink" title="五、工具调用到底怎么发生的（协议层）"></a>五、工具调用到底怎么发生的（协议层）</h2><h3 id="Q15-工具是怎么被调用的？"><a href="#Q15-工具是怎么被调用的？" class="headerlink" title="Q15. 工具是怎么被调用的？"></a>Q15. 工具是怎么被调用的？</h3><p><strong>先点破关键事实：模型只输出字符串，不执行任何东西。真执行是 Go 代码在 <code>tools/</code> 里查 ES / Prometheus。</strong></p>
+<p><strong>七步流程</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">① Go 进程发请求（messages + 11 个工具 schema）</span><br><span class="line">② 模型返回 tool_calls（只输出 JSON，不执行任何东西）</span><br><span class="line">③ Eino ReAct 解析成 schema.Message</span><br><span class="line">④ ToolsNode 按 name 查索引（tool_node.go），查不到就报错</span><br><span class="line">⑤ 执行注册进来的 Go 闭包 → 真去查 ES / Prometheus</span><br><span class="line">⑥ 结果包成 role:"tool" + tool_call_id 塞回 messages</span><br><span class="line">⑦ 回到 ①，循环到模型不再返回 tool_calls（或撞 MaxStep=25）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键</strong>：模型输出的是<strong>字符串</strong>（<code>tool_calls</code> 字段），Eino 解析后才变成可调用的 Go 函数。</p>
+<hr>
+<h3 id="Q16-tool-calls-是什么格式？"><a href="#Q16-tool-calls-是什么格式？" class="headerlink" title="Q16. tool_calls 是什么格式？"></a>Q16. tool_calls 是什么格式？</h3><p><strong>模型输出的原始 JSON</strong>：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"tool_calls"</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">{</span></span><br><span class="line">      <span class="attr">"id"</span><span class="punctuation">:</span> <span class="string">"call_abc123"</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"function"</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">"function"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">        <span class="attr">"name"</span><span class="punctuation">:</span> <span class="string">"query_alerts"</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">"arguments"</span><span class="punctuation">:</span> <span class="string">"{\"service\":\"payment\",\"window\":\"1h\"}"</span></span><br><span class="line">      <span class="punctuation">}</span></span><br><span class="line">    <span class="punctuation">}</span></span><br><span class="line">  <span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li><code>id</code>：工具调用 ID，后面要用它配对结果</li>
+<li><code>name</code>：工具名，必须和注册的名字一致</li>
+<li><code>arguments</code>：<strong>字符串</strong>（不是对象），里面是 JSON</li>
+</ul>
+<p><strong>为什么 arguments 是字符串</strong>：模型输出的是文本，JSON 只是文本的一种格式。Eino 要再解析一次才能变成 Go 的结构体。</p>
+<hr>
+<h3 id="Q17-ToolsNode-怎么知道调用哪个函数？"><a href="#Q17-ToolsNode-怎么知道调用哪个函数？" class="headerlink" title="Q17. ToolsNode 怎么知道调用哪个函数？"></a>Q17. ToolsNode 怎么知道调用哪个函数？</h3><p><strong>注册时的闭包</strong>（<code>full_agent.go</code>）：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">toolsNode, _ := compose.NewToolsNode(ctx, &amp;compose.ToolsNodeConfig{</span><br><span class="line">    Tools: []tool.BaseTool{</span><br><span class="line">        tool.NewInvokableRun(queryAlerts, <span class="string">"query_alerts"</span>, ...),</span><br><span class="line">        tool.NewInvokableRun(queryMetrics, <span class="string">"query_metrics"</span>, ...),</span><br><span class="line">        <span class="comment">// ... 其他工具</span></span><br><span class="line">    },</span><br><span class="line">})</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>查找逻辑</strong>（<code>tool_node.go</code>）：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ① 按 name 查索引</span></span><br><span class="line">invokable, ok := t.index[toolCall.Function.Name]</span><br><span class="line"><span class="keyword">if</span> !ok {</span><br><span class="line">    <span class="keyword">return</span> fmt.Errorf(<span class="string">"tool %q not found"</span>, toolCall.Function.Name)</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="comment">// ② 反序列化 arguments（字符串 → 结构体）</span></span><br><span class="line">args := invokable.NewArgs()</span><br><span class="line">json.Unmarshal([]<span class="type">byte</span>(toolCall.Function.Arguments), args)</span><br><span class="line"></span><br><span class="line"><span class="comment">// ③ 调用 Go 函数</span></span><br><span class="line">result, err := invokable.Run(ctx, args)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键</strong>：<code>tool.NewInvokableRun</code> 把 Go 函数包装成 Eino 能调用的格式，注册时就把名字和函数绑定了。</p>
+<hr>
+<h3 id="Q18-InvokableRun-是什么？"><a href="#Q18-InvokableRun-是什么？" class="headerlink" title="Q18. InvokableRun 是什么？"></a>Q18. InvokableRun 是什么？</h3><p><strong>本质</strong>：把 Go 函数包装成 Eino 能调用的格式。</p>
+<p><strong>三个要素</strong>：</p>
+<ol>
+<li><strong>函数本身</strong>（<code>fn</code>）：<code>func(ctx, args) (result, error)</code></li>
+<li><strong>名字</strong>（<code>name</code>）：模型输出里用的名字（如 <code>query_alerts</code>）</li>
+<li><strong>Schema</strong>（<code>jsonSchema</code>）：告诉模型这个工具需要什么参数</li>
+</ol>
+<p><strong>为什么需要包装</strong>：</p>
+<ul>
+<li>Go 函数是强类型的（<code>*QueryAlertsArgs</code> → <code>*QueryAlertsResult</code>）</li>
+<li>模型输出的是字符串（JSON）</li>
+<li>Eino 要在中间做反序列化、错误处理、可观测</li>
+</ul>
+<p><strong>代码位置</strong>：<code>flow/tools/invokable.go</code></p>
+<hr>
+<h3 id="Q19-一轮工具调用-几次模型请求？"><a href="#Q19-一轮工具调用-几次模型请求？" class="headerlink" title="Q19. 一轮工具调用=几次模型请求？"></a>Q19. 一轮工具调用=几次模型请求？</h3><p><strong>答案：两次。</strong></p>
+<p><strong>流程</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">① 第一次模型请求：决定要不要调工具</span><br><span class="line">   → 模型返回 tool_calls</span><br><span class="line">   </span><br><span class="line">② Eino 执行工具（Go 代码查 ES/Prometheus）</span><br><span class="line">   → 结果包成 role:"tool" + tool_call_id</span><br><span class="line">   </span><br><span class="line">③ 第二次模型请求：整合工具结果</span><br><span class="line">   → 模型返回最终答案</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>为什么是两次</strong>：</p>
+<ul>
+<li>第一次：模型决定<strong>做什么</strong>（查告警？查日志？）</li>
+<li>第二次：模型根据工具结果<strong>写答案</strong>（告警显示 P99 延迟高，所以…）</li>
+</ul>
+<p><strong>ReAct 循环</strong>：如果模型整合答案后发现还需要查更多数据，会再返回 tool_calls，继续循环（最多 25 轮）。</p>
+<p><strong>成本影响</strong>：</p>
+<ul>
+<li>一轮 ReAct = 2 次模型调用</li>
+<li>三轮 ReAct = 6 次模型调用</li>
+<li>这就是为什么 MaxStep 默认设 12/25（太贵了）</li>
+</ul>
+<hr>
+<h2 id="六、Agent-由哪几部分组成（六件组成）"><a href="#六、Agent-由哪几部分组成（六件组成）" class="headerlink" title="六、Agent 由哪几部分组成（六件组成）"></a>六、Agent 由哪几部分组成（六件组成）</h2><h3 id="一句话本质-2"><a href="#一句话本质-2" class="headerlink" title="一句话本质"></a>一句话本质</h3><p><strong>Agent = Invokable（工具）+ ToolsNode（执行器）+ ChatModel（模型）+ ReAct（编排）+ State（状态）+ Harness（包装器）</strong></p>
+<h3 id="六件清单"><a href="#六件清单" class="headerlink" title="六件清单"></a>六件清单</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>作用</th>
+<th>代码位置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Invokable</strong></td>
+<td>把 Go 函数包装成 Eino 能调用的格式</td>
+<td><code>flow/tools/invokable.go</code></td>
+</tr>
+<tr>
+<td><strong>ToolsNode</strong></td>
+<td>按工具名查索引、反序列化参数、执行函数</td>
+<td><code>flow/tools/tool_node.go</code></td>
+</tr>
+<tr>
+<td><strong>ChatModel</strong></td>
+<td>调模型（生成/流式）</td>
+<td><code>flow/model/chat_model.go</code></td>
+</tr>
+<tr>
+<td><strong>ReAct</strong></td>
+<td>编排循环（Thought → Action → Observation）</td>
+<td><code>flow/agent/react/react.go</code></td>
+</tr>
+<tr>
+<td><strong>State</strong></td>
+<td>共享状态（Messages + ReturnDirectly）</td>
+<td><code>flow/agent/react/state.go</code></td>
+</tr>
+<tr>
+<td><strong>Harness</strong></td>
+<td>包装器（输入/输出转换、错误处理）</td>
+<td><code>flow/agent/harness.go</code></td>
+</tr>
+</tbody></table></div>
+<h3 id="运行流程"><a href="#运行流程" class="headerlink" title="运行流程"></a>运行流程</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">用户输入</span><br><span class="line">  ↓</span><br><span class="line">Harness（输入转换：UserMessage → state.Messages）</span><br><span class="line">  ↓</span><br><span class="line">ReAct（编排循环）</span><br><span class="line">  ├─ ChatModel（调模型）</span><br><span class="line">  ├─ ToolsNode（执行工具）</span><br><span class="line">  └─ State（累积状态）</span><br><span class="line">  ↓</span><br><span class="line">Harness（输出转换：state.Messages → Response）</span><br><span class="line">  ↓</span><br><span class="line">返回答案</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="Orchestrator-和-Agent-的关系"><a href="#Orchestrator-和-Agent-的关系" class="headerlink" title="Orchestrator 和 Agent 的关系"></a>Orchestrator 和 Agent 的关系</h3><p><strong>Orchestrator</strong>（<code>orchestrator.go</code>）：</p>
+<ul>
+<li>调用 Planner.Plan() 分诊</li>
+<li>并行启动 Evidence / Knowledge Executor</li>
+<li>收集结果给 Synthesizer</li>
+<li>决定要不要 replan</li>
+</ul>
+<p><strong>Agent</strong>（<code>full_agent.go</code>）：</p>
+<ul>
+<li>单 Agent 模式，直接响应用户</li>
+<li>调模型 + 工具（9 个工具）</li>
+<li>不负责分诊、不负责并行</li>
+</ul>
+<p><strong>关系</strong>：Orchestrator 是外层编排器，Agent 是内层执行器。Orchestrator 可以调用 Agent（如 Evidence Executor 用 ReAct Agent），但 Agent 不调用 Orchestrator。</p>
+<h3 id="Agent-和-Agent-系统的区别"><a href="#Agent-和-Agent-系统的区别" class="headerlink" title="Agent 和 Agent 系统的区别"></a>Agent 和 Agent 系统的区别</h3><p><strong>Agent</strong>（单数）：一个完整的 ReAct 循环（如 <code>FullPilotAgent</code>）</p>
+<p><strong>Agent System</strong>（复数）：多个 Agent + 编排器（如多 Agent 排障系统）</p>
+<p><strong>区别</strong>：</p>
+<ul>
+<li>Agent：能独立响应用户</li>
+<li>Agent System：需要 Orchestrator 协调多个 Agent</li>
+</ul>
+<p><strong>Pilot 里</strong>：</p>
+<ul>
+<li>单 Agent = <code>FullPilotAgent</code>（ReAct + 9 工具）</li>
+<li>多 Agent System = Orchestrator + Planner + Evidence + Knowledge + Synthesizer</li>
+</ul>
+<h3 id="harness-对应关系"><a href="#harness-对应关系" class="headerlink" title="harness 对应关系"></a>harness 对应关系</h3><p><strong>harness 的作用</strong>：输入/输出转换、错误处理、超时控制。</p>
+<p><strong>对应关系</strong>：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>层级</th>
+<th>输入</th>
+<th>输出</th>
+<th>harness</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>单 Agent</strong></td>
+<td>UserMessage</td>
+<td>Response</td>
+<td><code>full_agent.go</code></td>
+</tr>
+<tr>
+<td><strong>多 Agent</strong></td>
+<td>query</td>
+<td>Result{Answer, Plan, Steps}</td>
+<td><code>orchestrator.go</code></td>
+</tr>
+</tbody></table></div>
+<p><strong>为什么需要 harness</strong>：</p>
+<ul>
+<li>输入转换：用户消息 → state.Messages</li>
+<li>输出转换：state.Messages → 结构化 Response</li>
+<li>错误处理：工具失败 → 降级策略</li>
+<li>超时控制：MaxStep=25，防止无限循环</li>
+</ul>
+<h3 id="学习顺序建议"><a href="#学习顺序建议" class="headerlink" title="学习顺序建议"></a>学习顺序建议</h3><ol>
+<li><strong>先学 Invokable</strong>：理解工具是怎么包装的</li>
+<li><strong>再学 ToolsNode</strong>：理解工具是怎么执行的</li>
+<li><strong>然后学 ReAct</strong>：理解循环是怎么编排的</li>
+<li><strong>最后学 Harness</strong>：理解输入输出是怎么转换的</li>
+</ol>
+<p><strong>不要一上来就学 State</strong>：State 是 ReAct 的内部细节，先理解流程再看状态。</p>
+<hr>
+<h2 id="七、Go-并发：channel-收结果"><a href="#七、Go-并发：channel-收结果" class="headerlink" title="七、Go 并发：channel 收结果"></a>七、Go 并发：channel 收结果</h2><h3 id="为什么要用-WaitGroup？channel-不能替代吗？"><a href="#为什么要用-WaitGroup？channel-不能替代吗？" class="headerlink" title="为什么要用 WaitGroup？channel 不能替代吗？"></a>为什么要用 WaitGroup？channel 不能替代吗？</h3><p><strong>因为 channel 只管「传数据」，不管「谁还没干完」——而 <code>close</code> 必须有人知道「全部发完了」才能调。</strong></p>
 <p><strong>close 两条铁律</strong>：只能发送方调；只能在所有发送完成后调。</p>
 <p>多个 goroutine 都在发时，<strong>谁是最后一个？没人知道</strong> → 必须有个外部全局计数器，那就是 WaitGroup。</p>
 <p><strong>三个看起来能替代、其实不行的方案：</strong></p>

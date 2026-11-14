@@ -410,7 +410,7 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">4932 字 · 预计阅读 17 分钟</span></div></div><div class="meta-row">
+</div><div class="right"><span class="cap reading">6204 字 · 预计阅读 21 分钟</span></div></div><div class="meta-row">
 <div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-06T13:00:00.000Z">2026-11-06</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-14T06:00:00.000Z">2026-11-14</time></span></div>
 </div></div>
     
@@ -426,10 +426,10 @@
   </div></div>
 <article class="md-text content slide-up"><h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一份文档入库（写）"><a href="#流程-A：一份文档入库（写）" class="headerlink" title="流程 A：一份文档入库（写）"></a>流程 A：一份文档入库（写）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Upload（带 title/content/category）</span><br><span class="line">  → 内容哈希生成 ID（不纳入 title）</span><br><span class="line">  → DocumentExists 查重：命中就 return，连 embedding 都不算</span><br><span class="line">  → Embedder 生成向量 → doc.Vector = vector</span><br><span class="line">  → json.Marshal 整个 struct（一次序列化，向量和文本粘在一起）</span><br><span class="line">  → 一次 HTTP PUT 进 ES</span><br><span class="line">  → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部原文进 _source</span><br></pre></td></tr></tbody></table></figure>
 
-<p>代码：<code>knowledge_controller.go</code> → <code>knowledge_retriever.go</code> → <code>elasticsearch.go</code>（详见 <a href="#4-%E6%95%B0%E6%8D%AE%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B">§4</a>）</p>
+<p>代码：<code>knowledge_controller.go</code> → <code>knowledge_retriever.go</code> → <code>elasticsearch.go</code>（详见 <a href="#210-%E5%90%91%E9%87%8F%E6%98%AF%E5%93%AA%E4%B8%80%E6%AD%A5%E5%AD%98%E7%9A%84">§2.10</a>）</p>
 <h3 id="流程-B：一次检索（读）"><a href="#流程-B：一次检索（读）" class="headerlink" title="流程 B：一次检索（读）"></a>流程 B：一次检索（读）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k          （只碰文本）</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k          （只碰浮点）</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排、去重 → 取 content 原文拼 prompt → 发给 LLM</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>LLM 从头到尾没看见过向量。</strong>（详见 <a href="#5-%E6%A3%80%E7%B4%A2%E6%B5%81%E7%A8%8B">§5</a>）</p>
+<p><strong>LLM 从头到尾没看见过向量。</strong>（详见 <a href="#35-%E5%AE%8C%E6%95%B4%E6%A3%80%E7%B4%A2%E6%97%B6%E5%BA%8F">§3.5</a>）</p>
 <h3 id="流程-C：一次评估（评测）"><a href="#流程-C：一次评估（评测）" class="headerlink" title="流程 C：一次评估（评测）"></a>流程 C：一次评估（评测）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">评测集（golden case：问题 + 期望工具 + 关键参数）</span><br><span class="line">  → 跑一次真实 chat</span><br><span class="line">  → 从轨迹里抽出 tool name + args</span><br><span class="line">  → 分档比对（工具名精确、枚举精确、时间窗口容忍、集合不看顺序）</span><br><span class="line">  → 算 pass 率 → 出报告、失败样本清单 → 历史对比</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>前置条件：工具调用必须落盘</strong>（详见 <a href="#7-agent-%E8%AF%84%E6%B5%8B">§7</a>）。</p>
@@ -465,22 +465,190 @@
 <li>近似重复（改两行）哈希失效，要 SimHash / MinHash</li>
 </ul>
 <hr>
-<h2 id="二、Elasticsearch：文本和向量怎么存"><a href="#二、Elasticsearch：文本和向量怎么存" class="headerlink" title="二、Elasticsearch：文本和向量怎么存"></a>二、Elasticsearch：文本和向量怎么存</h2><h3 id="2-1-ES-就是一个无限存-JSON-的文档库吗"><a href="#2-1-ES-就是一个无限存-JSON-的文档库吗" class="headerlink" title="2.1 ES 就是一个无限存 JSON 的文档库吗"></a>2.1 ES 就是一个无限存 JSON 的文档库吗</h3><p>大体对，但四个限定：</p>
-<ol>
-<li><strong>存储单位是 document</strong>（JSON），归在 index 里，index 再切成 shard。</li>
-<li><strong>落盘不是一个大文件</strong>：每个 shard 是一个 Lucene 目录，里面是若干 segment，每个 segment 又一堆文件（<code>.tim/.tip</code> 词典、<code>.doc</code> 倒排、<code>.pos</code> 位置、<code>.fdt</code> 原始 <code>_source</code>、<code>.dvd</code> 列存），另有 <code>translog</code> 保证未 refresh 时的持久化。</li>
-<li><strong>不是无限</strong>：单分片建议几十 GB 内，总量靠加分片和节点扩；<code>_source</code> 可关。</li>
-<li><strong>不是完全 schema-free</strong>：mapping 定型后写错类型要 reindex。</li>
-</ol>
-<p><strong>核心机制：segment 不可变。</strong></p>
+<h2 id="二、ES-存储：从-JSON-到磁盘文件"><a href="#二、ES-存储：从-JSON-到磁盘文件" class="headerlink" title="二、ES 存储：从 JSON 到磁盘文件"></a>二、ES 存储：从 JSON 到磁盘文件</h2><h3 id="2-1-你传的「文档」是什么格式"><a href="#2-1-你传的「文档」是什么格式" class="headerlink" title="2.1 你传的「文档」是什么格式"></a>2.1 你传的「文档」是什么格式</h3><p><strong>HTTP 请求里是 JSON 字符串：</strong></p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST /api/v1/knowledge/upload</span><br><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"title"</span><span class="punctuation">:</span> <span class="string">"Redis 连接超时排查"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"1. 检查 maxclients 配置..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"category"</span><span class="punctuation">:</span> <span class="string">"数据库"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"tags"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"redis"</span><span class="punctuation">,</span> <span class="string">"timeout"</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>但代码里是 Go struct：</strong></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// knowledge_controller.go</span></span><br><span class="line"><span class="keyword">type</span> UploadRequest <span class="keyword">struct</span> {</span><br><span class="line">    Title    <span class="type">string</span>   <span class="string">`json:"title"`</span></span><br><span class="line">    Content  <span class="type">string</span>   <span class="string">`json:"content"`</span></span><br><span class="line">    Category <span class="type">string</span>   <span class="string">`json:"category"`</span></span><br><span class="line">    Tags     []<span class="type">string</span> <span class="string">`json:"tags"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>转换流程：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">HTTP JSON 字符串</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">json.Unmarshal() 自动反序列化</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">Go struct (UploadRequest)</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">转成内部结构 (KnowledgeDocument)</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">json.Marshal() 序列化</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">HTTP PUT 发送给 ES（JSON 字符串）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键点：</strong></p>
 <ul>
-<li>新增 → 写新 segment</li>
-<li>删除 → 只在 <code>.del</code> 打标记</li>
-<li>更新 → 标删旧的 + 写新的</li>
-<li>定期 <strong>merge</strong> 合并，物理清理</li>
+<li>⚠️ 你传的是 JSON，但代码里处理的是 struct</li>
+<li>⚠️ 传给 ES 前又转回 JSON（<code>pkg/elasticsearch/elasticsearch.go</code> 的 <code>IndexDocument</code>）</li>
+<li>⚠️ JSONL 没进 ES，用于日志落盘（trace）</li>
 </ul>
-<p>后果：同 ID 覆盖写入，底层也是「标删 + 新增 segment」，物理先多了再靠 merge 收拾。<strong>所以去重要前置到 embedding 之前，不能指望 ES 帮你省。</strong></p>
-<h3 id="2-2-向量是哪一步存的"><a href="#2-2-向量是哪一步存的" class="headerlink" title="2.2 向量是哪一步存的"></a>2.2 向量是哪一步存的</h3><blockquote>
+<hr>
+<h3 id="2-2-ES-的层级结构"><a href="#2-2-ES-的层级结构" class="headerlink" title="2.2 ES 的层级结构"></a>2.2 ES 的层级结构</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Cluster（集群）</span><br><span class="line">   │</span><br><span class="line">   ├─ Node（节点）= 一台服务器</span><br><span class="line">   │     │</span><br><span class="line">   │     └─ Index（索引）= 逻辑数据库</span><br><span class="line">   │           │</span><br><span class="line">   │           └─ Shard（分片）= 物理存储单元</span><br><span class="line">   │                 │</span><br><span class="line">   │                 └─ Segment（段）= 不可变的文件集合</span><br><span class="line">   └─ Node（节点）</span><br><span class="line">         └─ Index（索引）</span><br><span class="line">               └─ Shard（分片）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>类比：</strong></p>
+<ul>
+<li>Cluster = 整个图书馆</li>
+<li>Index = 某一个书架（比如”计算机类”）</li>
+<li>Shard = 书架的一层</li>
+<li>Segment = 这一层上的某一摞书</li>
+</ul>
+<hr>
+<h3 id="2-3-Shard-到底是什么"><a href="#2-3-Shard-到底是什么" class="headerlink" title="2.3 Shard 到底是什么"></a>2.3 Shard 到底是什么</h3><p><strong>Shard = 一个 Lucene 目录。</strong></p>
+<p>里面长这样：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">shard_0/</span><br><span class="line">├── segments_123      # 元数据：记录有哪些 segment</span><br><span class="line">├── segments_124      # 每次 merge 后更新</span><br><span class="line">├── commit_123</span><br><span class="line">├── commit_124</span><br><span class="line">├── _0.cfs            # segment 0（合并文件）</span><br><span class="line">├── _1.cfs            # segment 1</span><br><span class="line">├── _2.cfs            # segment 2</span><br><span class="line">├── translog/         # 预写日志</span><br><span class="line">│   ├── translog-1.tlog</span><br><span class="line">│   └── translog-2.tlog</span><br><span class="line">└── _state/           # 索引状态</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键：每个 segment 是一组文件，不是单个文件。</strong></p>
+<hr>
+<h3 id="2-4-Segment-内部：7-个核心文件"><a href="#2-4-Segment-内部：7-个核心文件" class="headerlink" title="2.4 Segment 内部：7 个核心文件"></a>2.4 Segment 内部：7 个核心文件</h3><p>一个 segment 包含：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>文件后缀</th>
+<th>作用</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>.tim</code></td>
+<td>词项词典（FST 压缩）</td>
+<td>字典的”索引页”</td>
+</tr>
+<tr>
+<td><code>.tip</code></td>
+<td>词典索引（快速跳转）</td>
+<td>字典的”目录”</td>
+</tr>
+<tr>
+<td><code>.doc</code></td>
+<td>倒排表（词→文档 ID）</td>
+<td>“这个词出现在哪些文档”</td>
+</tr>
+<tr>
+<td><code>.pos</code></td>
+<td>位置信息（词在文档里的偏移）</td>
+<td>“这个词在文档第几个字”</td>
+</tr>
+<tr>
+<td><code>.fdt</code></td>
+<td>原始字段值（_source）</td>
+<td><strong>文档原文（JSON）</strong></td>
+</tr>
+<tr>
+<td><code>.fdx</code></td>
+<td>.fdt 的索引</td>
+<td>快速定位原文</td>
+</tr>
+<tr>
+<td><code>.dvd</code></td>
+<td>列式存储（doc values）</td>
+<td>排序/聚合用</td>
+</tr>
+</tbody></table></div>
+<p><strong>例子：</strong></p>
+<p>文档 1：<code>"Redis 连接超时"</code><br>文档 2：<code>"MySQL 连接池"</code></p>
+<p><strong>倒排表（.doc 文件）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">"Redis"   → [文档 1]</span><br><span class="line">"MySQL"   → [文档 2]</span><br><span class="line">"连接"    → [文档 1, 2]</span><br><span class="line">"超时"    → [文档 1]</span><br><span class="line">"池"      → [文档 2]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>位置信息（.pos 文件）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">"Redis"   → 文档 1: 位置 0</span><br><span class="line">"连接"    → 文档 1: 位置 1</span><br><span class="line">           文档 2: 位置 1</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="2-5-JSON-存在哪"><a href="#2-5-JSON-存在哪" class="headerlink" title="2.5 JSON 存在哪"></a>2.5 JSON 存在哪</h3><p><strong>答案：<code>_source</code> 字段，对应磁盘上的 <code>.fdt</code> 文件。</strong></p>
+<p>你传入的整个 JSON 文档，ES 会<strong>原封不动</strong>存在 <code>_source</code>：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"title"</span><span class="punctuation">:</span> <span class="string">"Redis 连接超时排查"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"1. 检查 maxclients..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"tags"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"redis"</span><span class="punctuation">,</span> <span class="string">"timeout"</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"vector"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="number">0.021</span><span class="punctuation">,</span> <span class="number">-0.113</span><span class="punctuation">,</span> <span class="number">0.884</span><span class="punctuation">,</span> ...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"created_at"</span><span class="punctuation">:</span> <span class="string">"2026-11-06T09:00:00Z"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>但 ES 不止存 JSON，还会额外建倒排索引：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│  你传入的 JSON                                       │</span><br><span class="line">│  { "title": "Redis...", "content": "...", ... }     │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ├──────────────────────────────────────────┐</span><br><span class="line">   │                                          │</span><br><span class="line">   ▼                                          ▼</span><br><span class="line">┌─────────────────────┐            ┌─────────────────────┐</span><br><span class="line">│  _source（原文）     │            │  倒排索引（分析后）  │</span><br><span class="line">│  存在 .fdt 文件      │            │  存在 .doc/.pos 文件 │</span><br><span class="line">│  原封不动存 JSON     │            │  分词后建索引        │</span><br><span class="line">│  查询时"还给你"      │            │  检索时"找到它"      │</span><br><span class="line">└─────────────────────┘            └─────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>为什么存两份？</strong></p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>存储</th>
+<th>格式</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>_source</code></td>
+<td>原始 JSON</td>
+<td>返回结果时”还给你”</td>
+</tr>
+<tr>
+<td>倒排索引</td>
+<td>分词后的词项</td>
+<td>检索时”找到它”</td>
+</tr>
+</tbody></table></div>
+<p><strong>如果只存 JSON：</strong> 搜”Redis”要扫描所有文档，逐行解析 JSON，慢到无法接受。</p>
+<p><strong>如果只存倒排索引：</strong> 能找到文档，但拿不到原文。</p>
+<p><strong>ES 聪明在：两边都存，各司其职。</strong></p>
+<hr>
+<h3 id="2-6-Segment-不可变：核心机制"><a href="#2-6-Segment-不可变：核心机制" class="headerlink" title="2.6 Segment 不可变：核心机制"></a>2.6 Segment 不可变：核心机制</h3><p><strong>核心设计：Segment 一旦写入，就不能改。</strong></p>
+<p><strong>为什么？</strong></p>
+<ol>
+<li><strong>并发安全</strong>：不用锁，读的时候不会被打断</li>
+<li><strong>缓存友好</strong>：OS 可以缓存 segment 文件，永远有效</li>
+<li><strong>压缩高效</strong>：不用留空间给后续修改</li>
+</ol>
+<p><strong>代价：</strong> 删除/更新必须用”标记 + 新增”的方式。</p>
+<p><strong>新增/删除/更新的实际操作：</strong></p>
+<p><strong>新增文档：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 写 translog（预写日志，保证不丢）</span><br><span class="line">2. 写入内存 buffer</span><br><span class="line">3. 每秒 refresh → buffer 变成新 segment（可见）</span><br><span class="line">4. 定期 flush → segment 落盘</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>删除文档：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">不是真的删，是在 .del 文件里打个标记：</span><br><span class="line"></span><br><span class="line">.del 文件：</span><br><span class="line">文档 3 → deleted</span><br><span class="line">文档 5 → deleted</span><br><span class="line"></span><br><span class="line">查询时跳过这些文档。</span><br><span class="line">物理删除要等 merge。</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>更新文档：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">更新 = 删除旧版本 + 写入新版本</span><br><span class="line"></span><br><span class="line">例：文档 1 从 "Redis 超时" 改成 "Redis 连接超时"</span><br><span class="line"></span><br><span class="line">1. 标记文档 1 为 deleted（.del 文件）</span><br><span class="line">2. 写入新文档 1（新 segment）</span><br><span class="line">3. 两个版本共存，直到 merge</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>后果：</strong> 同 ID 覆盖写入，物理上先多了，靠 merge 收拾。<strong>所以去重要前置到 embedding 之前，不能指望 ES 帮你省。</strong></p>
+<hr>
+<h3 id="2-7-Translog：不丢数据的保证"><a href="#2-7-Translog：不丢数据的保证" class="headerlink" title="2.7 Translog：不丢数据的保证"></a>2.7 Translog：不丢数据的保证</h3><p><strong>问题：</strong> 写入 buffer 后还没 refresh，机器挂了怎么办？</p>
+<p><strong>解决：先写 translog（预写日志）。</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">写入流程：</span><br><span class="line">1. 写 translog（顺序写，快）</span><br><span class="line">2. 写 buffer（内存）</span><br><span class="line">3. refresh 后 → translog 可清空</span><br><span class="line"></span><br><span class="line">崩溃恢复：</span><br><span class="line">1. 读取 translog</span><br><span class="line">2. 重放未持久化的操作</span><br><span class="line">3. 恢复数据</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>类比：</strong> 会计做账前先写草稿，正式入账后草稿可撕。</p>
+<hr>
+<h3 id="2-8-Merge：后台整理"><a href="#2-8-Merge：后台整理" class="headerlink" title="2.8 Merge：后台整理"></a>2.8 Merge：后台整理</h3><p><strong>问题：</strong> segment 越来越多，查询要扫太多文件。</p>
+<p><strong>解决：Merge 线程定期合并。</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">合并前：</span><br><span class="line">segment_0 (1000 文档)</span><br><span class="line">segment_1 (500 文档)</span><br><span class="line">segment_2 (200 文档，含 50 个已删除)</span><br><span class="line"></span><br><span class="line">       ↓ merge</span><br><span class="line"></span><br><span class="line">合并后：</span><br><span class="line">segment_3 (1650 文档，已清理删除)</span><br><span class="line">segment_0, _1, _2 被删除</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>代价：</strong> 合并时要读写大量数据，吃 I/O。</p>
+<hr>
+<h3 id="2-9-总结：ES-存储的核心特点"><a href="#2-9-总结：ES-存储的核心特点" class="headerlink" title="2.9 总结：ES 存储的核心特点"></a>2.9 总结：ES 存储的核心特点</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>特点</th>
+<th>好处</th>
+<th>代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Segment 不可变</td>
+<td>并发读无锁、缓存友好</td>
+<td>删除/更新要标记 + 新增</td>
+</tr>
+<tr>
+<td>倒排索引</td>
+<td>关键词检索极快</td>
+<td>写放大（merge 开销）</td>
+</tr>
+<tr>
+<td>Translog</td>
+<td>崩溃不丢数据</td>
+<td>额外写一次日志</td>
+</tr>
+<tr>
+<td>分片机制</td>
+<td>水平扩展</td>
+<td>跨分片查询复杂</td>
+</tr>
+<tr>
+<td>_source 存 JSON</td>
+<td>返回原文方便</td>
+<td>多存一份（可关）</td>
+</tr>
+</tbody></table></div>
+<h3 id="2-10-向量是哪一步存的"><a href="#2-10-向量是哪一步存的" class="headerlink" title="2.10 向量是哪一步存的"></a>2.10 向量是哪一步存的</h3><blockquote>
 <p><strong>最容易误解的事实：全程只有一次写请求，向量和文本是一起进去的。</strong></p>
 </blockquote>
 <p><strong>第 1 步</strong> <code>knowledge_controller.go</code> — 构造文档，此时没有向量</p>
@@ -511,7 +679,7 @@
 <li>所有字段原始值 → 全部进 <code>_source</code></li>
 </ul>
 <p>所以同一份 <code>content</code> 在磁盘上存在两处：倒排表里（切碎成词）负责「找到它」，<code>_source</code> 里（完整原文）负责「还给你」。</p>
-<h3 id="2-3-只发向量，模型怎么倒排？文档内容在哪"><a href="#2-3-只发向量，模型怎么倒排？文档内容在哪" class="headerlink" title="2.3 只发向量，模型怎么倒排？文档内容在哪"></a>2.3 只发向量，模型怎么倒排？文档内容在哪</h3><p><strong>方向搞反了：不是把向量发给模型，是模型吐出向量。</strong> 向量是结果，不是输入。</p>
+<h3 id="2-11-只发向量，模型怎么倒排？文档内容在哪"><a href="#2-11-只发向量，模型怎么倒排？文档内容在哪" class="headerlink" title="2.11 只发向量，模型怎么倒排？文档内容在哪"></a>2.11 只发向量，模型怎么倒排？文档内容在哪</h3><p><strong>方向搞反了：不是把向量发给模型，是模型吐出向量。</strong> 向量是结果，不是输入。</p>
 <p><strong>文档内容就在同一个 document 里</strong>，和向量是不同字段：</p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"title"</span><span class="punctuation">:</span> <span class="string">"Redis 连接超时排查"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"1. 检查 maxclients ..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"tags"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"redis"</span><span class="punctuation">,</span> <span class="string">"timeout"</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"vector"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="number">0.021</span><span class="punctuation">,</span> <span class="number">-0.113</span><span class="punctuation">,</span> <span class="number">0.884</span><span class="punctuation">,</span> ...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"created_at"</span><span class="punctuation">:</span> <span class="string">"2026-11-06T09:00:00Z"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -521,7 +689,10 @@
 
 <p>O(N) 全量算余弦再排序。没有倒排、没有图结构。ES 8 也支持 <code>knn</code> 字段（HNSW 近似最近邻），百万级以上才需要。</p>
 <hr>
-<h2 id="三、检索的核心：两路召回-RRF-融合"><a href="#三、检索的核心：两路召回-RRF-融合" class="headerlink" title="三、检索的核心：两路召回 + RRF 融合"></a>三、检索的核心：两路召回 + RRF 融合</h2><h3 id="3-1-为什么需要两路"><a href="#3-1-为什么需要两路" class="headerlink" title="3.1 为什么需要两路"></a>3.1 为什么需要两路</h3><p>单一检索方式有盲区：</p>
+<h2 id="三、检索的核心：两路召回-RRF-融合"><a href="#三、检索的核心：两路召回-RRF-融合" class="headerlink" title="三、检索的核心：两路召回 + RRF 融合"></a>三、检索的核心：两路召回 + RRF 融合</h2><blockquote>
+<p>前置：ES 已存好倒排索引（BM25 用）和向量字段（向量检索用）</p>
+</blockquote>
+<h3 id="3-1-为什么需要两路"><a href="#3-1-为什么需要两路" class="headerlink" title="3.1 为什么需要两路"></a>3.1 为什么需要两路</h3><p>单一检索方式有盲区：</p>
 <div class="md-table-scroll"><table>
 <thead>
 <tr>
@@ -656,7 +827,7 @@
 <h3 id="3-5-完整检索时序"><a href="#3-5-完整检索时序" class="headerlink" title="3.5 完整检索时序"></a>3.5 完整检索时序</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">用户 POST /api/v1/chat</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  1. 提取查询文本                     │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  2. 两路并行检索                     │</span><br><span class="line">│     BM25 查询 ──→ ES                │</span><br><span class="line">│     向量查询 ──→ ES                 │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  3. RRF 融合                         │</span><br><span class="line">│     把两路结果合并、去重、重新排序    │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  4. 返回 topK 文档                   │</span><br><span class="line">│     带着原始分数 + 融合分数 + 来源标记 │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  5. 组装 Prompt                      │</span><br><span class="line">│  系统指令 + 检索知识 + 用户问题       │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  6. 调用大模型生成回答               │</span><br><span class="line">└─────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
 
 <hr>
-<h2 id="四、数据写入流程"><a href="#四、数据写入流程" class="headerlink" title="四、数据写入流程"></a>四、数据写入流程</h2><h3 id="4-1-原来的实现有什么问题"><a href="#4-1-原来的实现有什么问题" class="headerlink" title="4.1 原来的实现有什么问题"></a>4.1 原来的实现有什么问题</h3><p><code>internal/ai/retriever/knowledge_retriever.go</code>（改前）</p>
+<h2 id="四、数据写入流程（去重改造）"><a href="#四、数据写入流程（去重改造）" class="headerlink" title="四、数据写入流程（去重改造）"></a>四、数据写入流程（去重改造）</h2><h3 id="4-1-原来的实现有什么问题"><a href="#4-1-原来的实现有什么问题" class="headerlink" title="4.1 原来的实现有什么问题"></a>4.1 原来的实现有什么问题</h3><p><code>internal/ai/retriever/knowledge_retriever.go</code>（改前）</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *KnowledgeRetriever)</span></span> generateDocID(title, content <span class="type">string</span>) <span class="type">string</span> {</span><br><span class="line">	hash := md5.Sum([]<span class="type">byte</span>(title + content))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(hash[:])</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
 
 <p><strong>问题一：ID 把 title 算进去了。</strong> 内容一样、标题不同 → 不同 ID → 两条记录、两段相同向量。</p>
