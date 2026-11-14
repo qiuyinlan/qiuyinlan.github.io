@@ -42,12 +42,16 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-06T13:00:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-14T03:24:40.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-14T06:00:00.000Z" data-stellar-page-meta="">
+<meta property="article:tag" content="BM25" data-stellar-page-meta="">
+<meta property="article:tag" content="RAG" data-stellar-page-meta="">
+<meta property="article:tag" content="RRF" data-stellar-page-meta="">
+<meta property="article:tag" content="向量检索" data-stellar-page-meta="">
 <meta property="article:tag" content="检索" data-stellar-page-meta="">
 <meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="从浮点数到向量检索：ES、BM25 与 Agent 评测" data-stellar-page-meta="">
   
   
-  <meta name="keywords" content="检索" data-stellar-page-meta="">
+  <meta name="keywords" content="检索,RAG,BM25,向量检索,RRF" data-stellar-page-meta="">
 
   <!-- feed -->
   
@@ -61,7 +65,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-06T21:00:00+08:00","dateModified":"2026-11-14T11:24:40+08:00","datePublished":"2026-11-06T21:00:00+08:00","description":"零、主干流程速查（先看这个）流程 A：一份文档入库（写）1234567Upload（带 title/content/category）  → 内容哈希生成 ID（不纳入 title）  → DocumentExists 查重：命中就 return，连 embedding 都不算  → Embedder 生成向量 → doc.Vector = vector  → json.Marshal 整个...","headline":"从浮点数到向量检索：ES、BM25 与 Agent 评测","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"检索","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-06T21:00:00+08:00","dateModified":"2026-11-14T14:00:00+08:00","datePublished":"2026-11-06T21:00:00+08:00","description":"零、主干流程速查（先看这个）流程 A：一份文档入库（写）1234567Upload（带 title/content/category）  → 内容哈希生成 ID（不纳入 title）  → DocumentExists 查重：命中就 return，连 embedding 都不算  → Embedder 生成向量 → doc.Vector = vector  → json.Marshal 整个...","headline":"从浮点数到向量检索：ES、BM25 与 Agent 评测","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/06/%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"检索, RAG, BM25, 向量检索, RRF","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css">
 
 
@@ -198,42 +202,6 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;14&#x2F;%E5%8D%95-Agent-%E6%9E%B6%E6%9E%84%E6%BC%94%E8%BF%9B-V1-%E5%88%B0-V2-%E5%AF%B9%E6%AF%94&#x2F;" title="单 Agent 架构演进：V1 到 V2 对比">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">单</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">单 Agent 架构演进：V1 到 V2 对比</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;08&#x2F;Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92&#x2F;" title="Agent 架构、Eino 内部机制与多 Agent 编排（含 V2 架构升级）">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">A</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排（含 V2 架构升级）</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
 <a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;06&#x2F;%E4%BB%8E%E6%B5%AE%E7%82%B9%E6%95%B0%E5%88%B0%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2-ES-BM25-%E4%B8%8E-Agent-%E8%AF%84%E6%B5%8B&#x2F;" title="从浮点数到向量检索：ES、BM25 与 Agent 评测">
   
   
@@ -242,6 +210,24 @@
     <span class="ui-collection__content">
       
       <span class="ui-collection__title">从浮点数到向量检索：ES、BM25 与 Agent 评测</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;08&#x2F;Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92&#x2F;" title="Agent 架构、Eino 内部机制与多 Agent 编排">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">A</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
       
       
     </span>
@@ -377,6 +363,24 @@
 </a>
 
   
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2025&#x2F;06&#x2F;07&#x2F;ftp%E5%8D%8F%E8%AE%AE%E4%BB%8B%E7%BB%8D%E5%8F%8A%E4%BB%A3%E7%A0%81&#x2F;" title="ftp协议介绍及代码">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">F</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">ftp协议介绍及代码</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
 </div></div>
   
 </widget>
@@ -406,8 +410,8 @@
     
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
-</div><div class="right"><span class="cap reading">5125 字 · 预计阅读 18 分钟</span></div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-06T13:00:00.000Z">2026-11-06</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-14T03:24:40.000Z">2026-11-14</time></span></div>
+</div><div class="right"><span class="cap reading">4932 字 · 预计阅读 17 分钟</span></div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-06T13:00:00.000Z">2026-11-06</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-14T06:00:00.000Z">2026-11-14</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -422,14 +426,15 @@
   </div></div>
 <article class="md-text content slide-up"><h2 id="零、主干流程速查（先看这个）"><a href="#零、主干流程速查（先看这个）" class="headerlink" title="零、主干流程速查（先看这个）"></a>零、主干流程速查（先看这个）</h2><h3 id="流程-A：一份文档入库（写）"><a href="#流程-A：一份文档入库（写）" class="headerlink" title="流程 A：一份文档入库（写）"></a>流程 A：一份文档入库（写）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Upload（带 title/content/category）</span><br><span class="line">  → 内容哈希生成 ID（不纳入 title）</span><br><span class="line">  → DocumentExists 查重：命中就 return，连 embedding 都不算</span><br><span class="line">  → Embedder 生成向量 → doc.Vector = vector</span><br><span class="line">  → json.Marshal 整个 struct（一次序列化，向量和文本粘在一起）</span><br><span class="line">  → 一次 HTTP PUT 进 ES</span><br><span class="line">  → ES 按 mapping 拆：text 建倒排 / dense_vector 存向量 / 全部原文进 _source</span><br></pre></td></tr></tbody></table></figure>
 
-<p>代码：<code>knowledge_controller.go</code> → <code>knowledge_retriever.go</code> → <code>elasticsearch.go</code>（详见 <a href="#q5">Q5</a>、<a href="#q11">Q11</a>）</p>
+<p>代码：<code>knowledge_controller.go</code> → <code>knowledge_retriever.go</code> → <code>elasticsearch.go</code>（详见 <a href="#4-%E6%95%B0%E6%8D%AE%E5%86%99%E5%85%A5%E6%B5%81%E7%A8%8B">§4</a>）</p>
 <h3 id="流程-B：一次检索（读）"><a href="#流程-B：一次检索（读）" class="headerlink" title="流程 B：一次检索（读）"></a>流程 B：一次检索（读）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query 分词 → 倒排表求交 → BM25 打分 → top-k          （只碰文本）</span><br><span class="line">query → embedding → 和全库向量算余弦 → top-k          （只碰浮点）</span><br><span class="line">        ↓</span><br><span class="line">      RRF 融合重排、去重 → 取 content 原文拼 prompt → 发给 LLM</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>LLM 从头到尾没看见过向量。</strong>（详见 <a href="#q13">Q13</a>）</p>
+<p><strong>LLM 从头到尾没看见过向量。</strong>（详见 <a href="#5-%E6%A3%80%E7%B4%A2%E6%B5%81%E7%A8%8B">§5</a>）</p>
 <h3 id="流程-C：一次评估（评测）"><a href="#流程-C：一次评估（评测）" class="headerlink" title="流程 C：一次评估（评测）"></a>流程 C：一次评估（评测）</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">评测集（golden case：问题 + 期望工具 + 关键参数）</span><br><span class="line">  → 跑一次真实 chat</span><br><span class="line">  → 从轨迹里抽出 tool name + args</span><br><span class="line">  → 分档比对（工具名精确、枚举精确、时间窗口容忍、集合不看顺序）</span><br><span class="line">  → 算 pass 率 → 出报告、失败样本清单 → 历史对比</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>前置条件：工具调用必须落盘（见<a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/#q10" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>JSON、JSONL 与 Function Calling 的 Q10</a>）。</strong>（详见 <a href="#q14">Q14</a>–<a href="#q17">Q17</a>）</p>
-<h2 id="一、浮点数"><a href="#一、浮点数" class="headerlink" title="一、浮点数"></a>一、浮点数</h2><h3 id="Q1-浮点数是什么？"><a href="#Q1-浮点数是什么？" class="headerlink" title="Q1. 浮点数是什么？"></a><span id="q1"></span>Q1. 浮点数是什么？</h3><p>用「科学计数法的二进制版」表示小数：<code>±1.xxxx × 2^e</code>，由符号位、尾数、指数三部分组成。</p>
+<p><strong>前置条件：工具调用必须落盘</strong>（详见 <a href="#7-agent-%E8%AF%84%E6%B5%8B">§7</a>）。</p>
+<hr>
+<h2 id="一、从浮点数到向量"><a href="#一、从浮点数到向量" class="headerlink" title="一、从浮点数到向量"></a>一、从浮点数到向量</h2><h3 id="1-1-浮点数是什么"><a href="#1-1-浮点数是什么" class="headerlink" title="1.1 浮点数是什么"></a>1.1 浮点数是什么</h3><p>用「科学计数法的二进制版」表示小数：<code>±1.xxxx × 2^e</code>，由符号位、尾数、指数三部分组成。</p>
 <p><code>float64</code> 是 1 位符号 + 11 位指数 + 52 位尾数。小数点位置「浮动」，所以范围大。</p>
 <p><strong>两个必答的坑：</strong></p>
 <ul>
@@ -437,7 +442,7 @@
 <li><strong>精度丢失</strong>：大数吃小数（<code>1e16+1 == 1e16</code>），比较要设误差，不能 <code>==</code>。</li>
 </ul>
 <p>一句话：<strong>浮点是「近似表示连续小数」的方案，快、范围大、但不精确，所以不能算钱。</strong></p>
-<h3 id="Q2-向量模型也返回浮点数，那不就不精确了？"><a href="#Q2-向量模型也返回浮点数，那不就不精确了？" class="headerlink" title="Q2. 向量模型也返回浮点数，那不就不精确了？"></a><span id="q2"></span>Q2. 向量模型也返回浮点数，那不就不精确了？</h3><p>两层「精确」被混在一起了。</p>
+<h3 id="1-2-向量也是浮点数，那不就不精确了？"><a href="#1-2-向量也是浮点数，那不就不精确了？" class="headerlink" title="1.2 向量也是浮点数，那不就不精确了？"></a>1.2 向量也是浮点数，那不就不精确了？</h3><p>两层「精确」被混在一起了。</p>
 <ul>
 <li>浮点的不精确是<strong>绝对误差</strong>（0.1 存成 0.1000000015）。但 embedding 从来不关心单个分量的绝对值，只关心<strong>向量之间的相对关系</strong>（余弦、排序）。</li>
 <li>误差随机分布，算相似度时大量分量互相抵消；float32 有 7 位有效数字，对「判断语义像不像」是过剩的。</li>
@@ -445,7 +450,7 @@
 </ul>
 <p>更进一步：把向量量化成 int8，检索召回率通常只掉 1~2 个点。因为 top-k 要的是<strong>排序大体正确</strong>，不是分数分毫不差。</p>
 <p><strong>对比记忆：算钱用整数，算向量用浮点。前者怕绝对误差，后者只要相对顺序。</strong></p>
-<h3 id="Q3-内容一样、名字不一样，会算两遍吗？"><a href="#Q3-内容一样、名字不一样，会算两遍吗？" class="headerlink" title="Q3. 内容一样、名字不一样，会算两遍吗？"></a><span id="q3"></span>Q3. 内容一样、名字不一样，会算两遍吗？</h3><p>会。embedding 只取决于 token 序列，<strong>跟文件名、标题、路径毫无关系</strong>。同内容不同名 → 两个逐位相同的向量 → 索引里两条记录。</p>
+<h3 id="1-3-内容一样、名字不一样，会算两遍吗"><a href="#1-3-内容一样、名字不一样，会算两遍吗" class="headerlink" title="1.3 内容一样、名字不一样，会算两遍吗"></a>1.3 内容一样、名字不一样，会算两遍吗</h3><p>会。embedding 只取决于 token 序列，<strong>跟文件名、标题、路径毫无关系</strong>。同内容不同名 → 两个逐位相同的向量 → 索引里两条记录。</p>
 <p>两个后果：</p>
 <ul>
 <li>检索 top-k 返回重复内容，白占 context，还挤掉其他相关内容</li>
@@ -459,24 +464,8 @@
 <li>哈希要在<strong>文本清洗之后</strong>算，否则脏版/净版会被当成两份</li>
 <li>近似重复（改两行）哈希失效，要 SimHash / MinHash</li>
 </ul>
-<h2 id="二、Pilot-知识库去重改造（代码）"><a href="#二、Pilot-知识库去重改造（代码）" class="headerlink" title="二、Pilot 知识库去重改造（代码）"></a>二、Pilot 知识库去重改造（代码）</h2><h3 id="Q4-原来的实现有什么问题？"><a href="#Q4-原来的实现有什么问题？" class="headerlink" title="Q4. 原来的实现有什么问题？"></a><span id="q4"></span>Q4. 原来的实现有什么问题？</h3><p><code>internal/ai/retriever/knowledge_retriever.go</code>（改前）</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *KnowledgeRetriever)</span></span> generateDocID(title, content <span class="type">string</span>) <span class="type">string</span> {</span><br><span class="line">	hash := md5.Sum([]<span class="type">byte</span>(title + content))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(hash[:])</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>问题一：ID 把 title 算进去了。</strong> 内容一样、标题不同 → 不同 ID → 两条记录、两段相同向量。</p>
-<p><strong>问题二更亏：<code>IndexDocument</code> 先算向量、后生成 ID。</strong> 顺序是：</p>
-<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vector, err := r.embedder.Embed(r.ctx, doc.Content)   <span class="comment">// 先花钱</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> doc.ID == <span class="string">""</span> { doc.ID = r.generateDocID(doc.Title, doc.Content) }  <span class="comment">// 后算 ID</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>即使标题内容完全相同，向量也已经调用完 API 了，最后只是被 ES 用同 ID 覆盖。<strong>只防住了索引重复，没防住成本重复。</strong></p>
-<h3 id="Q5-改成了什么样？"><a href="#Q5-改成了什么样？" class="headerlink" title="Q5. 改成了什么样？"></a><span id="q5"></span>Q5. 改成了什么样？</h3><p>三件事：</p>
-<ol>
-<li><code>generateDocID(title, content)</code> → <code>generateContentID(content)</code>，<strong>只哈希内容</strong>；新增 <code>normalizeContent()</code> 把连续空白（含换行、CRLF、行尾空格）折叠成一个空格，避免排版差异造成伪重复。</li>
-<li><code>IndexDocument</code> 里<strong>去重前置到 embedding 之前</strong>：先算 ID → <code>elasticsearch.DocumentExists()</code> → 命中直接 <code>return</code>，embedding 调用次数为 0。</li>
-<li><code>BatchIndexDocuments</code> 用 <code>seen</code> map 去批内重复 + 逐个 exists 过滤 → 剩下的一次性交给 <code>EmbedBatch()</code>，避免一条一个请求。</li>
-</ol>
-<p>配套新增 <code>pkg/elasticsearch/elasticsearch.go</code> 的 <code>DocumentExists(ctx, index, docID)</code>，404 视为「不存在」而非错误。</p>
-<p><strong>边界：</strong> 显式传 ID 时保留覆盖更新语义（只对内容生成式 ID 做「存在即跳过」）；近似重复识别不了。</p>
-<p><strong>面试口径：不是强业务主键设计，而是「按内容幂等 + 成本前置拦截」。</strong></p>
-<h2 id="三、ES-到底怎么存的"><a href="#三、ES-到底怎么存的" class="headerlink" title="三、ES 到底怎么存的"></a>三、ES 到底怎么存的</h2><h3 id="Q6-ES-就是一个无限存-JSON-的文档库吗？"><a href="#Q6-ES-就是一个无限存-JSON-的文档库吗？" class="headerlink" title="Q6. ES 就是一个无限存 JSON 的文档库吗？"></a><span id="q6"></span>Q6. ES 就是一个无限存 JSON 的文档库吗？</h3><p>大体对，但四个限定：</p>
+<hr>
+<h2 id="二、Elasticsearch：文本和向量怎么存"><a href="#二、Elasticsearch：文本和向量怎么存" class="headerlink" title="二、Elasticsearch：文本和向量怎么存"></a>二、Elasticsearch：文本和向量怎么存</h2><h3 id="2-1-ES-就是一个无限存-JSON-的文档库吗"><a href="#2-1-ES-就是一个无限存-JSON-的文档库吗" class="headerlink" title="2.1 ES 就是一个无限存 JSON 的文档库吗"></a>2.1 ES 就是一个无限存 JSON 的文档库吗</h3><p>大体对，但四个限定：</p>
 <ol>
 <li><strong>存储单位是 document</strong>（JSON），归在 index 里，index 再切成 shard。</li>
 <li><strong>落盘不是一个大文件</strong>：每个 shard 是一个 Lucene 目录，里面是若干 segment，每个 segment 又一堆文件（<code>.tim/.tip</code> 词典、<code>.doc</code> 倒排、<code>.pos</code> 位置、<code>.fdt</code> 原始 <code>_source</code>、<code>.dvd</code> 列存），另有 <code>translog</code> 保证未 refresh 时的持久化。</li>
@@ -491,64 +480,8 @@
 <li>定期 <strong>merge</strong> 合并，物理清理</li>
 </ul>
 <p>后果：同 ID 覆盖写入，底层也是「标删 + 新增 segment」，物理先多了再靠 merge 收拾。<strong>所以去重要前置到 embedding 之前，不能指望 ES 帮你省。</strong></p>
-<h3 id="Q7-MySQL-背后是一个文件吗？"><a href="#Q7-MySQL-背后是一个文件吗？" class="headerlink" title="Q7. MySQL 背后是一个文件吗？"></a><span id="q7"></span>Q7. MySQL 背后是一个文件吗？</h3><p>也不是。InnoDB 是 <code>ibdata1</code> / <code>xxx.ibd</code> 表空间文件，内部切成 <strong>16KB page</strong>，按 B+Tree 组织；另有 redo log、undo、binlog。</p>
-<p><strong>关键对比：</strong></p>
-<ul>
-<li><strong>MySQL</strong>：一棵可<strong>原地修改</strong>的 B+Tree，靠 redo/undo 保证正确性，适合事务型随机读写</li>
-<li><strong>ES</strong>：一堆<strong>不可变</strong>倒排 segment 不断追加和合并，适合写一次、查多次；代价是写放大</li>
-</ul>
-<h3 id="Q8-为什么-40G-云盘一编译就挂？盘不是挺大吗？"><a href="#Q8-为什么-40G-云盘一编译就挂？盘不是挺大吗？" class="headerlink" title="Q8. 为什么 40G 云盘一编译就挂？盘不是挺大吗？"></a><span id="q8"></span>Q8. 为什么 40G 云盘一编译就挂？盘不是挺大吗？</h3><p><strong>瓶颈是性能配额，不是空间。</strong></p>
-<ul>
-<li>云盘的 IOPS/BPS 配额<strong>按容量线性给</strong>，40G 在最低档（<code>rotational=1</code>，内核按机械盘对待，本质是网络存储块设备）</li>
-<li><code>go build</code> 是<strong>几十万个小文件随机写</strong>（每个依赖包一个 <code>.a</code>、一堆 <code>.o</code>、索引文件），吃 IOPS 不吃顺序带宽</li>
-<li>1.7G 内存小，page cache 攒不住脏页，频繁回写，写放大更明显</li>
-<li>打满配额 → <code>StoragePerformanceReachLimit</code> → 云盘限速惩罚 → 越写越慢，雪崩</li>
-</ul>
-<p><strong>结论：不是「永远不能编」，是「不能裸编」。</strong> 现实做法是本地编译 / CI 编译；真要在这台机器上编，必须 cgroup <code>io.max</code> 限速 + 后台跑 + 只编单包，代价十几到几十分钟。</p>
-<blockquote>
-<p>项目规则已固化：<strong>AI 不在服务器上跑 <code>go build</code> / <code>go vet</code> / <code>go test</code></strong>，见 <code>AGENTS.md</code>「编译验证流程」。</p>
-</blockquote>
-<h2 id="四、倒排索引与-BM25"><a href="#四、倒排索引与-BM25" class="headerlink" title="四、倒排索引与 BM25"></a>四、倒排索引与 BM25</h2><h3 id="Q9-什么是倒排索引？"><a href="#Q9-什么是倒排索引？" class="headerlink" title="Q9. 什么是倒排索引？"></a><span id="q9"></span>Q9. 什么是倒排索引？</h3><p><strong>正排 = 文档 → 词；倒排 = 词 → 文档。</strong></p>
-<p>例子：</p>
-<ul>
-<li>文档1：<code>redis 连接超时</code></li>
-<li>文档2：<code>mysql 连接池</code></li>
-<li>文档3：<code>redis 内存溢出</code></li>
-</ul>
-<p>倒排表：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">redis  → [1, 3]</span><br><span class="line">mysql  → [2]</span><br><span class="line">连接   → [1, 2]</span><br><span class="line">超时   → [1]</span><br><span class="line">内存   → [3]</span><br></pre></td></tr></tbody></table></figure>
-
-<p>搜 <code>redis</code> 直接查表拿 <code>[1,3]</code>，<strong>顺序扫描变成一次查表</strong>。多词查询就是求交集。</p>
-<p><strong>Lucene 里的对应文件：</strong></p>
-<ul>
-<li><code>.tim</code> / <code>.tip</code>：词典（FST 压缩，快速判断词是否存在）</li>
-<li><code>.doc</code>：倒排表（文档 ID 列表 + 跳表，方便求交）</li>
-<li><code>.pos</code>：位置信息（支持短语搜索）</li>
-</ul>
-<p><strong>前置步骤是分词</strong>：中文要先切词，再小写、去停用词。切错了就永远搜不出来。</p>
-<h3 id="Q10-BM25-一定要配倒排索引吗？"><a href="#Q10-BM25-一定要配倒排索引吗？" class="headerlink" title="Q10. BM25 一定要配倒排索引吗？"></a><span id="q10"></span>Q10. BM25 一定要配倒排索引吗？</h3><p><strong>不是必须捆绑，但工程上总是绑在一起——因为刚好互补。</strong></p>
-<p>BM25 是<strong>打分函数</strong>，倒排索引是<strong>存储结构</strong>，不在一个层面。</p>
-<p>BM25 需要四样统计量，而倒排索引全都有：</p>
-<ul>
-<li><code>tf</code>：词在本文档出现次数 → posting 里带</li>
-<li><code>df</code>：多少文档含此词 → 词典里的 <code>docFreq</code></li>
-<li>文档长度 → <code>norms</code>（<code>.nvd/.nvm</code>）</li>
-<li>全局统计 → segment 的 <code>.stats</code></li>
-</ul>
-<p><strong>但两边都能拆开：</strong></p>
-<ul>
-<li>倒排索引可以不配 BM25：早年 Lucene 默认 TF-IDF，ES 5.0 后才换 BM25；也能只做布尔检索；也能把 BM25 当特征喂 LTR</li>
-<li>BM25 也能不配倒排：稀疏向量方案（SPLADE）走向量检索；小规模内存直算</li>
-</ul>
-<p><strong>为什么实际总绑一起</strong>：BM25 和倒排的强项是同一件事——精确词项匹配。搜报错码、专有名词、版本号，BM25 又快又准；换个说法问就废，那部分交给向量。这就是 Pilot 做<strong>两路独立召回 + RRF 融合</strong>的原因。</p>
-<p><strong>两个面试坑：</strong></p>
-<ol>
-<li><strong>分片统计问题</strong>：BM25 的 <code>df</code> 是分片内统计，多分片时同一文档分数不可比，跨分片排序失真。解法 <code>search_type=dfs_query_then_fetch</code>（多一轮往返）。</li>
-<li><strong>参数可调</strong>：<code>k1=1.2</code> 控制词频饱和，<code>b=0.75</code> 控制文档长度惩罚，可按字段配 <code>similarity</code>。</li>
-</ol>
-<p>一句话：<strong>BM25 是公式，倒排索引是数据源，ES 焊死的原因是最优搭配，不是技术依赖。</strong></p>
-<h2 id="五、向量怎么存、怎么检索（走代码）"><a href="#五、向量怎么存、怎么检索（走代码）" class="headerlink" title="五、向量怎么存、怎么检索（走代码）"></a>五、向量怎么存、怎么检索（走代码）</h2><h3 id="Q11-向量是哪一步存的？其他信息哪一步传进去的？"><a href="#Q11-向量是哪一步存的？其他信息哪一步传进去的？" class="headerlink" title="Q11. 向量是哪一步存的？其他信息哪一步传进去的？"></a><span id="q11"></span>Q11. 向量是哪一步存的？其他信息哪一步传进去的？</h3><blockquote>
-<p>最容易误解的事实：<strong>全程只有一次写请求</strong>，向量和文本是一起进去的。</p>
+<h3 id="2-2-向量是哪一步存的"><a href="#2-2-向量是哪一步存的" class="headerlink" title="2.2 向量是哪一步存的"></a>2.2 向量是哪一步存的</h3><blockquote>
+<p><strong>最容易误解的事实：全程只有一次写请求，向量和文本是一起进去的。</strong></p>
 </blockquote>
 <p><strong>第 1 步</strong> <code>knowledge_controller.go</code> — 构造文档，此时没有向量</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doc := &amp;types.KnowledgeDocument{Title: req.Title, Content: req.Content, Category: req.Category}</span><br></pre></td></tr></tbody></table></figure>
@@ -570,7 +503,7 @@
 <p><strong>第 7 步</strong> <code>pkg/elasticsearch/elasticsearch.go</code> — 一次 HTTP PUT 落盘</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">req := esapi.IndexRequest{Index: index, DocumentID: docID, Body: strings.NewReader(<span class="type">string</span>(data)), Refresh: refresh}</span><br></pre></td></tr></tbody></table></figure>
 
-<p><strong>ES 拿到后按 mapping 拆</strong>（<code>knowledge_retriever.go</code>）：</p>
+<p><strong>ES 拿到后按 mapping 拆</strong>：</p>
 <ul>
 <li><code>title</code> / <code>content</code> → <code>text</code> + standard 分词器 → 分词、建倒排</li>
 <li><code>category</code> / <code>tags</code> → <code>keyword</code> → 不分词，精确匹配索引</li>
@@ -578,7 +511,7 @@
 <li>所有字段原始值 → 全部进 <code>_source</code></li>
 </ul>
 <p>所以同一份 <code>content</code> 在磁盘上存在两处：倒排表里（切碎成词）负责「找到它」，<code>_source</code> 里（完整原文）负责「还给你」。</p>
-<h3 id="Q12-只发向量，模型怎么倒排？文档内容在哪？"><a href="#Q12-只发向量，模型怎么倒排？文档内容在哪？" class="headerlink" title="Q12. 只发向量，模型怎么倒排？文档内容在哪？"></a><span id="q12"></span>Q12. 只发向量，模型怎么倒排？文档内容在哪？</h3><p><strong>方向搞反了：不是把向量发给模型，是模型吐出向量。</strong> 向量是结果，不是输入。</p>
+<h3 id="2-3-只发向量，模型怎么倒排？文档内容在哪"><a href="#2-3-只发向量，模型怎么倒排？文档内容在哪" class="headerlink" title="2.3 只发向量，模型怎么倒排？文档内容在哪"></a>2.3 只发向量，模型怎么倒排？文档内容在哪</h3><p><strong>方向搞反了：不是把向量发给模型，是模型吐出向量。</strong> 向量是结果，不是输入。</p>
 <p><strong>文档内容就在同一个 document 里</strong>，和向量是不同字段：</p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"title"</span><span class="punctuation">:</span> <span class="string">"Redis 连接超时排查"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"1. 检查 maxclients ..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"tags"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"redis"</span><span class="punctuation">,</span> <span class="string">"timeout"</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"vector"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="number">0.021</span><span class="punctuation">,</span> <span class="number">-0.113</span><span class="punctuation">,</span> <span class="number">0.884</span><span class="punctuation">,</span> ...<span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"created_at"</span><span class="punctuation">:</span> <span class="string">"2026-11-06T09:00:00Z"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -587,16 +520,201 @@
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">"script_score"</span><span class="punctuation">:</span> <span class="punctuation">{</span><span class="attr">"script"</span><span class="punctuation">:</span> <span class="punctuation">{</span><span class="attr">"source"</span><span class="punctuation">:</span> <span class="string">"cosineSimilarity(params.query_vector, 'vector') + 1.0"</span><span class="punctuation">}</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>O(N) 全量算余弦再排序。没有倒排、没有图结构。ES 8 也支持 <code>knn</code> 字段（HNSW 近似最近邻），百万级以上才需要。</p>
-<h3 id="Q13-完整检索链路"><a href="#Q13-完整检索链路" class="headerlink" title="Q13. 完整检索链路"></a><span id="q13"></span>Q13. 完整检索链路</h3><p>用户问 <code>Redis 连不上怎么办</code>：</p>
+<hr>
+<h2 id="三、检索的核心：两路召回-RRF-融合"><a href="#三、检索的核心：两路召回-RRF-融合" class="headerlink" title="三、检索的核心：两路召回 + RRF 融合"></a>三、检索的核心：两路召回 + RRF 融合</h2><h3 id="3-1-为什么需要两路"><a href="#3-1-为什么需要两路" class="headerlink" title="3.1 为什么需要两路"></a>3.1 为什么需要两路</h3><p>单一检索方式有盲区：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>检索方式</th>
+<th>原理</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>BM25</strong></td>
+<td>倒排索引 + 词频统计</td>
+<td>专有名词准、快</td>
+<td>不懂语义</td>
+</tr>
+<tr>
+<td><strong>向量检索</strong></td>
+<td>Embedding + 余弦相似度</td>
+<td>懂语义、同义词</td>
+<td>慢、依赖模型</td>
+</tr>
+</tbody></table></div>
+<p><strong>例子：</strong></p>
+<ul>
+<li>搜 <code>"Kubernetes 部署"</code> → BM25 准（专有名词命中），向量也准</li>
+<li>搜 <code>"容器怎么发布"</code> → BM25 可能找不到”Kubernetes”，向量能理解”发布”≈”部署”</li>
+<li>搜 <code>"K8s yaml 配置"</code> → BM25 可能 miss（”K8s”没出现在文档里），向量能匹配”Kubernetes”</li>
+</ul>
+<p><strong>工程实践：两路同时跑，然后用融合算法合并结果。</strong></p>
+<h3 id="3-2-BM25：倒排索引与打分"><a href="#3-2-BM25：倒排索引与打分" class="headerlink" title="3.2 BM25：倒排索引与打分"></a>3.2 BM25：倒排索引与打分</h3><p><strong>倒排索引（Inverted Index）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">正排（文档 → 词）：</span><br><span class="line">文档 1 → "Kubernetes 部署 教程"</span><br><span class="line">文档 2 → "Docker 容器 入门"</span><br><span class="line">文档 3 → "Kubernetes 容器 编排"</span><br><span class="line"></span><br><span class="line">倒排（词 → 文档）：</span><br><span class="line">"Kubernetes" → [文档 1, 文档 3]</span><br><span class="line">"部署" → [文档 1]</span><br><span class="line">"容器" → [文档 2, 文档 3]</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>分词时机：</strong></p>
+<ul>
+<li><strong>写入时</strong>：ES 接收文档 → 分词 → 建倒排索引</li>
+<li><strong>查询时</strong>：同样的分析器再分一次 → 查倒排索引 → 算 BM25 分数</li>
+</ul>
+<p><strong>BM25 评分公式（简化理解）：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">分数 = Σ (IDF × TF 归一化值)</span><br><span class="line"></span><br><span class="line">- TF（词频）：这个词在文档里出现几次</span><br><span class="line">- IDF（逆文档频率）：这个词有多稀有（越稀有权重越高）</span><br><span class="line">- 文档长度惩罚：长文档会吃亏（避免凑字数）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>两个面试坑：</strong></p>
 <ol>
-<li><strong>BM25 路</strong>：分词 → 查倒排表求交 → BM25 打分 → top-k（只碰文本）</li>
-<li><strong>向量路</strong>：query → embedding → 和库里所有向量算余弦 → top-k（只碰浮点）</li>
-<li><strong>融合</strong>：RRF 合并重排、去重（<code>recall.go</code> 的 <code>fuseRRF</code>，得分 <code>Σ 1/(k+rank+1)</code>，<code>k=60</code>）</li>
-<li><strong>喂 LLM</strong>：把命中文档的 <strong><code>content</code> 原文</strong>拼进 prompt</li>
+<li><strong>分片统计问题</strong>：BM25 的 <code>df</code> 是分片内统计，多分片时同一文档分数不可比。解法 <code>search_type=dfs_query_then_fetch</code>（多一轮往返）。</li>
+<li><strong>参数可调</strong>：<code>k1=1.2</code> 控制词频饱和，<code>b=0.75</code> 控制文档长度惩罚。</li>
 </ol>
-<p><strong>LLM 从头到尾没看见过向量。</strong> 向量只在检索阶段当中间变量用了一次就被扔了。</p>
-<p>向量是「找文档的钥匙」，内容是「最终给模型看的资料」。</p>
-<h2 id="六、Agent-评测"><a href="#六、Agent-评测" class="headerlink" title="六、Agent 评测"></a>六、Agent 评测</h2><h3 id="Q14-怎么评价一个-Agent-的表现？"><a href="#Q14-怎么评价一个-Agent-的表现？" class="headerlink" title="Q14. 怎么评价一个 Agent 的表现？"></a><span id="q14"></span>Q14. 怎么评价一个 Agent 的表现？</h3><p>不能用一个分数，分三层：</p>
+<h3 id="3-3-向量检索：语义相似度"><a href="#3-3-向量检索：语义相似度" class="headerlink" title="3.3 向量检索：语义相似度"></a>3.3 向量检索：语义相似度</h3><p><strong>流程：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">用户问题 → Embedding 模型 → 1024 维向量</span><br><span class="line">                    │</span><br><span class="line">                    ▼</span><br><span class="line">         知识库里的文档向量（已预先存好）</span><br><span class="line">                    │</span><br><span class="line">                    ▼</span><br><span class="line">         算余弦相似度 → 取最相似的 topK</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>余弦相似度公式：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cosine = (A·B) / (|A| × |B|)</span><br><span class="line">结果范围：-1 到 1，越接近 1 越相似</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>ES 查询语句：</strong></p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">"script_score"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"script"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">        <span class="attr">"source"</span><span class="punctuation">:</span> <span class="string">"cosineSimilarity(params.query_vector, 'vector') + 1.0"</span></span><br><span class="line">    <span class="punctuation">}</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="3-4-RRF-融合：把两路结果合为一份"><a href="#3-4-RRF-融合：把两路结果合为一份" class="headerlink" title="3.4 RRF 融合：把两路结果合为一份"></a>3.4 RRF 融合：把两路结果合为一份</h3><p><strong>问题：</strong> BM25 分数和向量相似度<strong>值域不同</strong>，不能直接相加。</p>
+<ul>
+<li>BM25 分数：可能是 2.3、5.1、0.8…</li>
+<li>向量相似度：0 到 1 之间（如 0.85、0.72）</li>
+</ul>
+<p><strong>解决方案：RRF（Reciprocal Rank Fusion，倒数排名融合）</strong></p>
+<p><strong>核心公式：</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RRF 分数 = Σ (1 / (k + rank))</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>rank</code> = 文档在某路检索中的排名（第 1 名 rank=1，第 2 名 rank=2）</li>
+<li><code>k</code> = 常数，工程常用 60</li>
+<li><code>Σ</code> = 把所有检索路的结果累加</li>
+</ul>
+<p><strong>核心思想：只依赖排名，不依赖原始分数。</strong></p>
+<p><strong>计算例子（k=60）：</strong></p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>文档</th>
+<th>BM25 排名</th>
+<th>向量排名</th>
+<th>RRF 分数计算</th>
+<th>最终分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>文档 A</td>
+<td>第 1 名</td>
+<td>第 3 名</td>
+<td>1/(60+1) + 1/(60+3)</td>
+<td>0.0323</td>
+</tr>
+<tr>
+<td>文档 B</td>
+<td>第 2 名</td>
+<td>第 1 名</td>
+<td>1/(60+2) + 1/(60+1)</td>
+<td>0.0327</td>
+</tr>
+<tr>
+<td>文档 C</td>
+<td>第 5 名</td>
+<td>-</td>
+<td>1/(60+5)</td>
+<td>0.0154</td>
+</tr>
+<tr>
+<td>文档 D</td>
+<td>-</td>
+<td>第 2 名</td>
+<td>1/(60+2)</td>
+<td>0.0161</td>
+</tr>
+</tbody></table></div>
+<p><strong>说明：</strong></p>
+<ul>
+<li>文档 A 在两路都出现，累加两项</li>
+<li>文档 C 只在 BM25 出现，只加一项</li>
+<li><strong>不需要两路齐全才能计算</strong></li>
+</ul>
+<p><strong>为什么 k=60？</strong></p>
+<p>来源：2009 年 SIGIR 论文《Combining results of multiple information retrieval systems using Reciprocal Rank Fusion》。</p>
+<p>实验结论：</p>
+<ul>
+<li>k 太小（如 5）：第 1 名碾压后面，排名差异被放大太多</li>
+<li>k 太大（如 100）：第 1 名和第 50 名差不多，排名差异被平滑太多</li>
+<li><strong>k=60 在多个数据集上效果最好</strong></li>
+</ul>
+<p><strong>代码实现（Pilot <code>recall.go</code>）：</strong></p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">fuseRRF</span><span class="params">(bm25, vector []candidate, rrfK, limit <span class="type">int</span>)</span></span> []RetrievedDocument {</span><br><span class="line">    byDocument := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="type">string</span>]*fused)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 1. 遍历 BM25 结果，累加 RRF 分项分</span></span><br><span class="line">    <span class="keyword">for</span> rank, candidate := <span class="keyword">range</span> bm25 {</span><br><span class="line">        entry.fusedScore += <span class="number">1</span> / <span class="type">float64</span>(rrfK + rank + <span class="number">1</span>)  <span class="comment">// rank 从 0 开始，所以 +1</span></span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 2. 遍历向量结果，同文档继续累加</span></span><br><span class="line">    <span class="keyword">for</span> rank, candidate := <span class="keyword">range</span> vector {</span><br><span class="line">        entry.fusedScore += <span class="number">1</span> / <span class="type">float64</span>(rrfK + rank + <span class="number">1</span>)</span><br><span class="line">    }</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 3. 按融合分数降序排序</span></span><br><span class="line">    sort.SliceStable(results, <span class="function"><span class="keyword">func</span><span class="params">(i, j <span class="type">int</span>)</span></span> <span class="type">bool</span> {</span><br><span class="line">        <span class="keyword">return</span> results[i].Score &gt; results[j].Score</span><br><span class="line">    })</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4. 截取 topK 返回</span></span><br><span class="line">    <span class="keyword">return</span> results[:limit]</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键点：</strong></p>
+<ul>
+<li>⚠️ 代码里 <code>rank</code> 是数组下标（从 0 开始），公式里 <code>rank</code> 从 1 开始，所以要写 <code>rank + 1</code></li>
+<li>⚠️ 必须等两路都遍历完，分数才是最终值，之后才能排序</li>
+</ul>
+<h3 id="3-5-完整检索时序"><a href="#3-5-完整检索时序" class="headerlink" title="3.5 完整检索时序"></a>3.5 完整检索时序</h3><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">用户 POST /api/v1/chat</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  1. 提取查询文本                     │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  2. 两路并行检索                     │</span><br><span class="line">│     BM25 查询 ──→ ES                │</span><br><span class="line">│     向量查询 ──→ ES                 │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  3. RRF 融合                         │</span><br><span class="line">│     把两路结果合并、去重、重新排序    │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  4. 返回 topK 文档                   │</span><br><span class="line">│     带着原始分数 + 融合分数 + 来源标记 │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  5. 组装 Prompt                      │</span><br><span class="line">│  系统指令 + 检索知识 + 用户问题       │</span><br><span class="line">└─────────────────────────────────────┘</span><br><span class="line">   │</span><br><span class="line">   ▼</span><br><span class="line">┌─────────────────────────────────────┐</span><br><span class="line">│  6. 调用大模型生成回答               │</span><br><span class="line">└─────────────────────────────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="四、数据写入流程"><a href="#四、数据写入流程" class="headerlink" title="四、数据写入流程"></a>四、数据写入流程</h2><h3 id="4-1-原来的实现有什么问题"><a href="#4-1-原来的实现有什么问题" class="headerlink" title="4.1 原来的实现有什么问题"></a>4.1 原来的实现有什么问题</h3><p><code>internal/ai/retriever/knowledge_retriever.go</code>（改前）</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *KnowledgeRetriever)</span></span> generateDocID(title, content <span class="type">string</span>) <span class="type">string</span> {</span><br><span class="line">	hash := md5.Sum([]<span class="type">byte</span>(title + content))</span><br><span class="line">	<span class="keyword">return</span> hex.EncodeToString(hash[:])</span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>问题一：ID 把 title 算进去了。</strong> 内容一样、标题不同 → 不同 ID → 两条记录、两段相同向量。</p>
+<p><strong>问题二更亏：<code>IndexDocument</code> 先算向量、后生成 ID。</strong> 顺序是：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vector, err := r.embedder.Embed(r.ctx, doc.Content)   <span class="comment">// 先花钱</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">if</span> doc.ID == <span class="string">""</span> { doc.ID = r.generateDocID(doc.Title, doc.Content) }  <span class="comment">// 后算 ID</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>即使标题内容完全相同，向量也已经调用完 API 了，最后只是被 ES 用同 ID 覆盖。<strong>只防住了索引重复，没防住成本重复。</strong></p>
+<h3 id="4-2-改成了什么样"><a href="#4-2-改成了什么样" class="headerlink" title="4.2 改成了什么样"></a>4.2 改成了什么样</h3><p>三件事：</p>
+<ol>
+<li><code>generateDocID(title, content)</code> → <code>generateContentID(content)</code>，<strong>只哈希内容</strong>；新增 <code>normalizeContent()</code> 把连续空白（含换行、CRLF、行尾空格）折叠成一个空格，避免排版差异造成伪重复。</li>
+<li><code>IndexDocument</code> 里<strong>去重前置到 embedding 之前</strong>：先算 ID → <code>elasticsearch.DocumentExists()</code> → 命中直接 <code>return</code>，embedding 调用次数为 0。</li>
+<li><code>BatchIndexDocuments</code> 用 <code>seen</code> map 去批内重复 + 逐个 exists 过滤 → 剩下的一次性交给 <code>EmbedBatch()</code>，避免一条一个请求。</li>
+</ol>
+<p>配套新增 <code>pkg/elasticsearch/elasticsearch.go</code> 的 <code>DocumentExists(ctx, index, docID)</code>，404 视为「不存在」而非错误。</p>
+<p><strong>边界：</strong> 显式传 ID 时保留覆盖更新语义（只对内容生成式 ID 做「存在即跳过」）；近似重复识别不了。</p>
+<p><strong>面试口径：不是强业务主键设计，而是「按内容幂等 + 成本前置拦截」。</strong></p>
+<hr>
+<h2 id="五、工程实践建议"><a href="#五、工程实践建议" class="headerlink" title="五、工程实践建议"></a>五、工程实践建议</h2><h3 id="5-1-每路召回数量"><a href="#5-1-每路召回数量" class="headerlink" title="5.1 每路召回数量"></a>5.1 每路召回数量</h3><p><strong>不要直接召回 final_top_k，要多召回一些。</strong></p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">bm25_top_k:</span> <span class="number">20</span>        <span class="comment"># BM25 召回 20 条</span></span><br><span class="line"><span class="attr">vector_top_k:</span> <span class="number">20</span>      <span class="comment"># 向量召回 20 条</span></span><br><span class="line"><span class="attr">final_top_k:</span> <span class="number">5</span>        <span class="comment"># RRF 融合后取 5 条</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>原因：</strong></p>
+<ul>
+<li>某路检索可能把相关文档排在第 10 名</li>
+<li>如果只召回 5 条，相关文档就被漏掉了</li>
+<li>RRF 融合后再排序，取最靠前的 5 条</li>
+</ul>
+<h3 id="5-2-中文分词器"><a href="#5-2-中文分词器" class="headerlink" title="5.2 中文分词器"></a>5.2 中文分词器</h3><p><strong>Pilot 默认用 <code>standard</code>，生产环境建议换 <code>ik_max_word</code>。</strong></p>
+<figure class="highlight yaml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ES 索引设置</span></span><br><span class="line"><span class="attr">"analyzer":</span> <span class="string">"ik_max_word"</span><span class="string">,</span></span><br><span class="line"><span class="attr">"search_analyzer":</span> <span class="string">"ik_smart"</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>区别：</strong></p>
+<ul>
+<li><code>ik_max_word</code>：尽可能多分词（”中华人民共和国” → “中华/华人/人民/共和/共和国…”)</li>
+<li><code>ik_smart</code>：最少切分（”中华人民共和国” → “中华人民共和国”）</li>
+</ul>
+<h3 id="5-3-调试技巧"><a href="#5-3-调试技巧" class="headerlink" title="5.3 调试技巧"></a>5.3 调试技巧</h3><p>Pilot 提供 <code>/api/v1/knowledge/search/detailed</code> 接口，返回每路分数：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"document"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"id"</span><span class="punctuation">:</span> <span class="string">"abc123"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"title"</span><span class="punctuation">:</span> <span class="string">"Kubernetes 部署指南"</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"..."</span></span><br><span class="line">  <span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"score"</span><span class="punctuation">:</span> <span class="number">0.0327</span><span class="punctuation">,</span>           <span class="comment">// RRF 融合分数</span></span><br><span class="line">  <span class="attr">"bm25_score"</span><span class="punctuation">:</span> <span class="number">5.23</span><span class="punctuation">,</span>        <span class="comment">// BM25 原始分数</span></span><br><span class="line">  <span class="attr">"vector_score"</span><span class="punctuation">:</span> <span class="number">0.89</span><span class="punctuation">,</span>      <span class="comment">// 向量相似度</span></span><br><span class="line">  <span class="attr">"fused_score"</span><span class="punctuation">:</span> <span class="number">0.0327</span><span class="punctuation">,</span>     <span class="comment">// 同 score</span></span><br><span class="line">  <span class="attr">"recall_methods"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"bm25"</span><span class="punctuation">,</span> <span class="string">"vector"</span><span class="punctuation">]</span>  <span class="comment">// 两路都命中</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>用途：</strong></p>
+<ul>
+<li>看 <code>recall_methods</code> 知道文档是哪种检索命中的</li>
+<li>对比 <code>bm25_score</code> 和 <code>vector_score</code> 分析哪路更有效</li>
+<li>调参时观察分数变化</li>
+</ul>
+<hr>
+<h2 id="六、RRF-的优缺点"><a href="#六、RRF-的优缺点" class="headerlink" title="六、RRF 的优缺点"></a>六、RRF 的优缺点</h2><h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ol>
+<li><strong>实现简单</strong>：几行代码就能搞定</li>
+<li><strong>调参少</strong>：只需要调一个 k 值（固定 60 就行）</li>
+<li><strong>不用归一化</strong>：BM25 和向量分数单位不同，RRF 只看排名</li>
+<li><strong>鲁棒性强</strong>：多路检索都认可的文档会排前面</li>
+<li><strong>支持多路叠加</strong>：两路、三路、更多路都可以</li>
+</ol>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ol>
+<li><strong>丢掉原始分数信息</strong>：BM25 第 1 名和第 2 名的分差、向量相似度的差距，全部被平滑成排名</li>
+<li><strong>差的路也有权重</strong>：如果某路检索质量很差，它依然会给结果分配权重</li>
+<li><strong>需要每路先召回 topN</strong>：一般每路先召回 100 条，再送入 RRF，不会拿全量文档计算</li>
+</ol>
+<hr>
+<h2 id="七、Agent-评测"><a href="#七、Agent-评测" class="headerlink" title="七、Agent 评测"></a>七、Agent 评测</h2><h3 id="7-1-怎么评价一个-Agent-的表现"><a href="#7-1-怎么评价一个-Agent-的表现" class="headerlink" title="7.1 怎么评价一个 Agent 的表现"></a>7.1 怎么评价一个 Agent 的表现</h3><p>不能用一个分数，分三层：</p>
 <p><strong>第一层 单步质量（工具选择对不对）</strong> — 最好评，因为输入输出都结构化：工具选择准确率、参数正确率、无效调用率。</p>
 <p><strong>第二层 链路质量（多步走完没有）</strong> — 任务完成率、平均步数/冗余步数、失败可恢复率、循环检测。要评得有 golden trajectory 对照。</p>
 <p><strong>第三层 端到端质量</strong> — 任务成功率、<strong>结论有没有证据支撑</strong>（Agent 特有，最怕编）、幻觉率、token 成本和 P95 延迟。</p>
@@ -607,11 +725,10 @@
 <li><strong>线上埋点</strong>：步数、工具命中、耗时、token 全打点，覆盖离线集碰不到的长尾</li>
 </ul>
 <p><strong>落到 Pilot 要诚实划边界：</strong></p>
-<p>现有三层验证是 <code>cmd/checkdeps</code>（依赖连通性：Redis/ES/MySQL/Prometheus/Jaeger/DashScope Key/日志索引）、<code>cmd/e2echeck</code>（真跑全链路：上传→检索→真实聊天→查历史→校验各存储有数据）、单测（输入规范化/SSE 格式化/时间戳解析/ES 结果解析/中间件连通）。</p>
+<p>现有三层验证是 <code>cmd/checkdeps</code>（依赖连通性）、<code>cmd/e2echeck</code>（真跑全链路）、单测（输入规范化/SSE 格式化/时间戳解析）。</p>
 <p><strong>但这三层解决的是「链路通不通、功能有没有坏」，属于可观测性和集成正确性，不等于「回答质量好不好」。</strong></p>
 <p>缺的是：golden 评测集 + 工具调用准确率统计 + 结论证据溯源。</p>
-<p><strong>加分点：</strong> 面试官想听的不是「我调了很多 Prompt 所以效果好」，而是（1）知道要拆过程指标和结果指标（2）意识到「链路跑通」≠「答得对」（3）<strong>主动说出自己项目的边界</strong>，不把 e2e 包装成效果评测。</p>
-<h3 id="Q15-「自动比对」具体怎么做？举个例子"><a href="#Q15-「自动比对」具体怎么做？举个例子" class="headerlink" title="Q15. 「自动比对」具体怎么做？举个例子"></a><span id="q15"></span>Q15. 「自动比对」具体怎么做？举个例子</h3><p>前提：工具调用本身就是结构化的（<code>tool</code> 是枚举，<code>args</code> 是 JSON），所以能机械比对。</p>
+<h3 id="7-2-自动比对具体怎么做"><a href="#7-2-自动比对具体怎么做" class="headerlink" title="7.2 自动比对具体怎么做"></a>7.2 自动比对具体怎么做</h3><p>前提：工具调用本身就是结构化的（<code>tool</code> 是枚举，<code>args</code> 是 JSON），所以能机械比对。</p>
 <p><strong>① 写评测样本（golden case）</strong></p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"id"</span><span class="punctuation">:</span> <span class="string">"case-001"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"question"</span><span class="punctuation">:</span> <span class="string">"payment 服务最近 15 分钟为什么报错？"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"expected_tools"</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">"query_logs"</span><span class="punctuation">,</span> <span class="string">"query_metrics"</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"expected_args"</span><span class="punctuation">:</span> <span class="punctuation">{</span></span><br><span class="line">    <span class="attr">"query_logs"</span><span class="punctuation">:</span> <span class="punctuation">{</span><span class="attr">"service"</span><span class="punctuation">:</span> <span class="string">"payment"</span><span class="punctuation">,</span> <span class="attr">"level"</span><span class="punctuation">:</span> <span class="string">"error"</span><span class="punctuation">,</span> <span class="attr">"window"</span><span class="punctuation">:</span> <span class="string">"15m"</span><span class="punctuation">}</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">"query_metrics"</span><span class="punctuation">:</span> <span class="punctuation">{</span><span class="attr">"service"</span><span class="punctuation">:</span> <span class="string">"payment"</span><span class="punctuation">}</span></span><br><span class="line">  <span class="punctuation">}</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
@@ -632,39 +749,12 @@
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 工具集合命中：集合运算，不看顺序</span></span><br><span class="line">toolScore := <span class="type">float64</span>(hit) / <span class="type">float64</span>(<span class="built_in">len</span>(expected.Tools))</span><br><span class="line"><span class="comment">// 参数得分：按类型走容忍度</span></span><br><span class="line">paramScore := compareArgs(expected.Args, actual.Args)</span><br><span class="line"><span class="comment">// 单步分 = 工具名 0.4 + 参数 0.6</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>整体 pass：<code>toolScore == 1 &amp;&amp; paramScore &gt;= 0.8</code>。</p>
-<p><strong>⑤ 三个例子看差别</strong></p>
-<ul>
-<li>期望 <code>query_logs(service=payment, window=15m)</code>，实际 <code>window=10m</code> → 时间走容忍 → <strong>pass</strong></li>
-<li>实际 <code>service=order</code> → 服务名错，硬伤 → <strong>fail</strong></li>
-<li>实际只调了 <code>search_knowledge</code> → 工具召回 0/2 → <strong>0 分</strong>（典型的路由错了）</li>
-</ul>
-<p><strong>⑥ 批量跑 + 回归</strong>：输出工具选择准确率、参数完全正确率、端到端 pass 率、失败样本清单。每次改 prompt / 换模型重跑，分数掉了就说明改坏了——<strong>和单测一个道理，只是被测对象从函数变成 Agent</strong>。</p>
-<p><strong>两个工程细节：</strong></p>
-<ol>
-<li><strong>别用字符串比 JSON</strong>：<code>{"a":1,"b":2}</code> 和 <code>{"b":2,"a":1}</code> 语义相同，必须解析成 map 逐 key 比</li>
-<li><strong>期望值要留「或」</strong>：查告警调 <code>query_alerts</code> 对，调 <code>query_metrics</code> + 自己判阈值也算合理。写死会天天误报，最后没人看</li>
-</ol>
-<p>一句话：<strong>自动比对 = 把工具调用当 API 断言来测，工具名精确、参数分类型给容差、集合比较不看顺序。</strong></p>
-<h3 id="Q16-这是专门的评测脚本做的吗？"><a href="#Q16-这是专门的评测脚本做的吗？" class="headerlink" title="Q16. 这是专门的评测脚本做的吗？"></a><span id="q16"></span>Q16. 这是专门的评测脚本做的吗？</h3><p>通常是，但不一定。三种形态：</p>
-<p><strong>形态一：独立 <code>cmd/eval</code>（最推荐）</strong></p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cmd/eval/main.go          入口：读数据集、跑批、出报告</span><br><span class="line">testdata/eval_cases.json  评测数据集（进 git）</span><br><span class="line">internal/eval/scorer.go   比对逻辑</span><br><span class="line">reports/eval_20261106.md  每次结果存档</span><br></pre></td></tr></tbody></table></figure>
-
-<p>Pilot 已有 <code>cmd/checkdeps</code>、<code>cmd/e2echeck</code> 的先例，同一个路子，不引入新依赖。</p>
-<p><strong>形态二：塞进 <code>go test</code></strong> — 好处是顺手跑，坏处致命：Agent 评测要调真模型，<strong>慢、要钱、非确定性</strong>。放进 CI 结果就是天天红然后被 <code>-short</code> 跳过。最多打 <code>//go:build eval</code> 单独跑。</p>
-<p><strong>形态三：现成平台</strong> — Promptfoo（最轻，yaml 声明用例）、Langfuse/LangSmith（带 trace 回放）、Ragas/DeepEval（偏 RAG 质量）、OpenAI Evals。<strong>Go 生态基本没有好用的</strong>，Eino 也不带，所以 Go 项目现实做法是自己写 scorer + 接 LLM judge。</p>
-<p><strong>真正重要的不是「有没有脚本」，而是三件事：</strong></p>
-<ul>
-<li><strong>数据集版本化</strong>：进 git，改了就 diff 得出来。不冻住数据集，历史分数没法比</li>
-<li><strong>跑批可复现</strong>：记录模型快照名、prompt 版本、temperature、随机种子。否则今天 70 明天 65，分不清是代码坏了还是模型抖了</li>
-<li><strong>结果留档可对比</strong>：每次出报告存下来看曲线，而不是「我印象中变好了」</li>
-</ul>
-<p><strong>Pilot 的诚实答法：</strong> 目前没有独立 Agent 评测脚本，验证体系是「连通性 + e2e + 单测」，解决「跑不跑得通」，不解决「答得对不对」。追问怎么加，就答形态一那套。<strong>知道缺什么、也知道第一步落在哪，比硬说「我们有评测体系」强。</strong></p>
-<h3 id="Q17-工具调用的-JSON-是执行时本来就有吗？方便后续评测吗？"><a href="#Q17-工具调用的-JSON-是执行时本来就有吗？方便后续评测吗？" class="headerlink" title="Q17. 工具调用的 JSON 是执行时本来就有吗？方便后续评测吗？"></a><span id="q17"></span>Q17. 工具调用的 JSON 是执行时本来就有吗？方便后续评测吗？</h3><p><strong>协议里天然有，但 Pilot 没存下来。这两件事要分开说。</strong></p>
+<h3 id="7-3-工具调用的-JSON-是执行时本来就有吗"><a href="#7-3-工具调用的-JSON-是执行时本来就有吗" class="headerlink" title="7.3 工具调用的 JSON 是执行时本来就有吗"></a>7.3 工具调用的 JSON 是执行时本来就有吗</h3><p><strong>协议里天然有，但 Pilot 没存下来。这两件事要分开说。</strong></p>
 <p><strong>第一层 模型协议</strong>（OpenAI function calling）：</p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"role"</span><span class="punctuation">:</span><span class="string">"assistant"</span><span class="punctuation">,</span><span class="attr">"tool_calls"</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">{</span><span class="attr">"id"</span><span class="punctuation">:</span><span class="string">"call_abc"</span><span class="punctuation">,</span><span class="attr">"type"</span><span class="punctuation">:</span><span class="string">"function"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"function"</span><span class="punctuation">:</span><span class="punctuation">{</span><span class="attr">"name"</span><span class="punctuation">:</span><span class="string">"query_logs"</span><span class="punctuation">,</span><span class="attr">"arguments"</span><span class="punctuation">:</span><span class="string">"{\"service\":\"payment\",\"window\":\"15m\"}"</span><span class="punctuation">}</span><span class="punctuation">}</span><span class="punctuation">]</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
 <p>坑：<strong><code>arguments</code> 是 JSON 字符串，不是对象</strong>，评测要再 <code>json.Unmarshal</code> 一次。</p>
-<p><strong>第二层 ReAct 循环</strong>：Eino 把 <code>tool_calls</code> 和执行结果（<code>role:"tool"</code> + <code>tool_call_id</code>）拼回消息列表喂下一轮（<code>full_agent.go</code> 挂 <code>ToolCallingModel</code>）。这些 tool 消息<strong>只活在这次的内存里</strong>，循环结束就没了。</p>
+<p><strong>第二层 ReAct 循环</strong>：Eino 把 <code>tool_calls</code> 和执行结果拼回消息列表喂下一轮。这些 tool 消息<strong>只活在这次的内存里</strong>，循环结束就没了。</p>
 <p><strong>第三层 持久化：Pilot 根本没落盘</strong>（关键）</p>
 <p><code>pkg/types/types.go</code></p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ChatMessage <span class="keyword">struct</span> {</span><br><span class="line">	Role      <span class="type">string</span>    <span class="string">`json:"role"`</span></span><br><span class="line">	Content   <span class="type">string</span>    <span class="string">`json:"content"`</span></span><br><span class="line">	Timestamp time.Time <span class="string">`json:"timestamp"`</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
@@ -673,29 +763,31 @@
 <p><code>chat_controller.go</code> 落库：</p>
 <figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_ = c.shortTermMemory.SaveMessage(..., types.ChatMessage{Role: <span class="string">"user"</span>, Content: req.Query})</span><br><span class="line">_ = c.shortTermMemory.SaveMessage(..., types.ChatMessage{Role: <span class="string">"assistant"</span>, Content: result.Answer})</span><br></pre></td></tr></tbody></table></figure>
 
-<p>只存「问了什么」「最终答了什么」，<strong>中间调了哪些工具、参数是什么、返回了什么全丢了</strong>。ES 里的运行日志是服务端 INFO/ERROR，不是结构化 trace。</p>
+<p>只存「问了什么」「最终答了什么」，<strong>中间调了哪些工具、参数是什么、返回了什么全丢了</strong>。</p>
 <p><strong>所以要支持评测，得加一层 trace 落盘</strong>，最小形态是 JSONL（一行一条）：</p>
 <figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span><span class="attr">"trace_id"</span><span class="punctuation">:</span><span class="string">"t-001"</span><span class="punctuation">,</span><span class="attr">"step"</span><span class="punctuation">:</span><span class="number">1</span><span class="punctuation">,</span><span class="attr">"tool"</span><span class="punctuation">:</span><span class="string">"query_logs"</span><span class="punctuation">,</span><span class="attr">"args"</span><span class="punctuation">:</span><span class="punctuation">{</span><span class="attr">"service"</span><span class="punctuation">:</span><span class="string">"payment"</span><span class="punctuation">,</span><span class="attr">"window"</span><span class="punctuation">:</span><span class="string">"15m"</span><span class="punctuation">}</span><span class="punctuation">,</span><span class="attr">"ok"</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">"elapsed_ms"</span><span class="punctuation">:</span><span class="number">312</span><span class="punctuation">,</span><span class="attr">"ts"</span><span class="punctuation">:</span><span class="string">"..."</span><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
 
-<p>实现：Eino ReAct 的 <code>OnToolStart</code> / <code>OnToolEnd</code> 钩子里抓 name + args + 延迟，写文件或独立 ES 索引。<strong>顺带好处不止评测</strong>——线上排查「用户说答错了」时能直接看这一步调了什么，比看最终回答有用得多。</p>
+<p>实现：Eino ReAct 的 <code>OnToolStart</code> / <code>OnToolEnd</code> 钩子里抓 name + args + 延迟，写文件或独立 ES 索引。</p>
 <p><strong>面试答法：</strong> 分清「协议层」和「可观测层」。内存里有 ≠ 能事后审计。主动说出缺口（只能做到端到端，做不到工具级归因），比假装「天然能评测」强。</p>
 <p>一句话：<strong>协议给了你 JSON，但没给你历史记录——要评测，得自己把 trace 写下来。</strong></p>
-<h2 id="七、方法论沉淀（讲技术的正确姿势）"><a href="#七、方法论沉淀（讲技术的正确姿势）" class="headerlink" title="七、方法论沉淀（讲技术的正确姿势）"></a>七、方法论沉淀（讲技术的正确姿势）</h2><p>这次最大的教训不是知识点，是讲法。</p>
-<p><strong>讲「XX 是怎么工作的」，按真实执行顺序走代码：</strong></p>
+<hr>
+<h2 id="八、方法论沉淀"><a href="#八、方法论沉淀" class="headerlink" title="八、方法论沉淀"></a>八、方法论沉淀</h2><p><strong>讲「XX 是怎么工作的」，按真实执行顺序走代码：</strong></p>
 <ol>
 <li>分步编号，不按理论章节</li>
-<li>每步给 <code>文件名:行号</code> + 真实代码片段</li>
+<li>每步给 <code>文件名：行号</code> + 真实代码片段</li>
 <li>每步说清「数据变成了什么 / 存在哪 / 谁调用了谁」</li>
 <li><strong>开头点破最容易误解的事实</strong>（如「只有一次请求」「向量是结果不是输入」）</li>
 <li>结尾一句话收口</li>
 </ol>
 <p>反面教材：第一次讲 ES 存向量时从倒排索引原理讲起，没落到代码，对方连问三轮（向量发给模型？文档存哪？哪一步存的？）才讲清——等于把对方的时间翻了三倍。</p>
+<hr>
 <h2 id="相关文章"><a href="#相关文章" class="headerlink" title="相关文章"></a>相关文章</h2><ul>
 <li><a href="https://qiuyinlan.github.io/2026/11/08/Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>Agent 架构、Eino 内部机制与多 Agent 编排</a></li>
 <li><a href="https://qiuyinlan.github.io/2026/11/07/JSON-JSONL-%E4%B8%8E-Function-Calling-Agent-%E7%9A%84%E8%B0%83%E7%94%A8%E4%B8%8E%E8%BD%A8%E8%BF%B9/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>JSON、JSONL 与 Function Calling：Agent 的调用与轨迹</a></li>
+<li><a href="https://qiuyinlan.github.io/2026/11/09/pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus/" data-md-link=""><span class="md-link-icon ui-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><g opacity=".5"><path d="M19.7388 4.26118C17.0572 1.57961 12.7095 1.57961 10.0279 4.26118L9.30707 4.98203C9.01418 5.27492 9.01418 5.7498 9.30707 6.04269C9.59997 6.33558 10.0748 6.33558 10.3677 6.04269L11.0886 5.32184C13.1844 3.22605 16.5823 3.22605 18.6781 5.32184C20.7739 7.41763 20.7739 10.8156 18.6781 12.9114L17.9573 13.6322C17.6644 13.9251 17.6644 14.4 17.9573 14.6929C18.2502 14.9858 18.725 14.9858 19.0179 14.6929L19.7388 13.972C22.4203 11.2905 22.4203 6.94276 19.7388 4.26118Z"></path><path d="M6.04269 9.30707C6.33558 9.59997 6.33558 10.0748 6.04269 10.3677L5.32184 11.0886C3.22605 13.1844 3.22605 16.5823 5.32184 18.6781C7.41763 20.7739 10.8156 20.7739 12.9114 18.6781L13.6322 17.9573C13.9251 17.6644 14.4 17.6644 14.6929 17.9573C14.9858 18.2501 14.9858 18.725 14.6929 19.0179L13.972 19.7388C11.2905 22.4203 6.94276 22.4203 4.26118 19.7388C1.57961 17.0572 1.57961 12.7095 4.26118 10.0279L4.98203 9.30707C5.27492 9.01418 5.7498 9.01418 6.04269 9.30707Z"></path></g><path d="M14.6933 9.30707C14.9862 9.59997 14.9862 10.0748 14.6933 10.3677L10.3682 14.6928C10.0753 14.9857 9.60045 14.9857 9.30756 14.6928C9.01467 14.3999 9.01467 13.9251 9.30756 13.6322L13.6327 9.30707C13.9255 9.01418 14.4004 9.01418 14.6933 9.30707Z"></path></g></svg></span>pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</a></li>
 </ul>
 </article>
-<div class="article-tags slide-up"><a class="tag" href="/tags/%E6%A3%80%E7%B4%A2/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>检索</a></div>
+<div class="article-tags slide-up"><a class="tag" href="/tags/%E6%A3%80%E7%B4%A2/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>检索</a><a class="tag" href="/tags/RAG/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>RAG</a><a class="tag" href="/tags/BM25/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>BM25</a><a class="tag" href="/tags/%E5%90%91%E9%87%8F%E6%A3%80%E7%B4%A2/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>向量检索</a><a class="tag" href="/tags/RRF/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>RRF</a></div>
 
 
   <div class="article-share slide-up" id="share">
