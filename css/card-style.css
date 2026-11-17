@@ -1,0 +1,412 @@
+/* 分类页/首页 卡片式布局 - 毛玻璃渐变效果 */
+
+/* ========== 分类切换器 ========== */
+.category-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.category-filter a {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  background: rgba(245, 245, 245, 0.8);
+  backdrop-filter: blur(10px);
+  color: #555;
+  border: 1px solid rgba(200, 200, 200, 0.3);
+}
+
+.category-filter a:hover {
+  background: rgba(224, 224, 224, 0.8);
+  color: #222;
+}
+
+.category-filter a.active {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ========== 文章列表容器 ========== */
+.post-list.post {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ========== 文章卡片 ========== */
+.post-card.post {
+  /* 默认渐变：从左到右，天蓝 → 白色 */
+  background: linear-gradient(90deg, 
+    rgba(135, 206, 250, 0.8) 0%, 
+    rgba(173, 216, 230, 0.6) 30%, 
+    rgba(224, 238, 255, 0.4) 60%, 
+    rgba(255, 255, 255, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(200, 200, 200, 0.4);
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none !important;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 手机端适配 */
+@media (max-width: 768px) {
+  .post-list.post {
+    padding: 0 12px;
+  }
+  
+  .post-card.post {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+  
+  .post-card.post .post-title {
+    font-size: 0.95rem;
+  }
+  
+  .post-card.post .excerpt {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+  }
+  
+  .post-card.post .meta.cap {
+    font-size: 0.7rem;
+  }
+  
+  .category-filter {
+    gap: 6px;
+  }
+  
+  .category-filter a {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* 不同项目不同渐变颜色：从左到右，天蓝色系 → 白色 */
+.post-card.post.cat-身体 {
+  background: linear-gradient(90deg, 
+    rgba(255, 182, 193, 0.8) 0%, 
+    rgba(255, 205, 210, 0.6) 30%, 
+    rgba(255, 228, 230, 0.4) 60%, 
+    rgba(255, 250, 252, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post.cat-pilot {
+  background: linear-gradient(90deg, 
+    rgba(186, 200, 255, 0.8) 0%, 
+    rgba(205, 215, 255, 0.6) 30%, 
+    rgba(224, 230, 255, 0.4) 60%, 
+    rgba(250, 245, 255, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post.cat-算法 {
+  background: linear-gradient(90deg, 
+    rgba(173, 230, 200, 0.8) 0%, 
+    rgba(195, 240, 220, 0.6) 30%, 
+    rgba(217, 250, 240, 0.4) 60%, 
+    rgba(245, 255, 250, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post.cat-八股 {
+  background: linear-gradient(90deg, 
+    rgba(255, 220, 170, 0.8) 0%, 
+    rgba(255, 235, 200, 0.6) 30%, 
+    rgba(255, 245, 220, 0.4) 60%, 
+    rgba(255, 252, 245, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post.cat-随笔 {
+  background: linear-gradient(90deg, 
+    rgba(135, 206, 250, 0.8) 0%, 
+    rgba(173, 216, 230, 0.6) 30%, 
+    rgba(224, 238, 255, 0.4) 60%, 
+    rgba(245, 250, 255, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post.cat-IM {
+  background: linear-gradient(90deg, 
+    rgba(200, 200, 255, 0.8) 0%, 
+    rgba(215, 215, 255, 0.6) 30%, 
+    rgba(230, 230, 255, 0.4) 60%, 
+    rgba(252, 245, 255, 0.95) 100%);
+  border-color: rgba(200, 200, 200, 0.4);
+}
+
+.post-card.post:hover {
+  border-color: rgba(180, 180, 180, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* ========== 卡片标题 ========== */
+.post-card.post .post-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+/* ========== 摘要文字 ========== */
+.post-card.post .excerpt {
+  display: block;
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ========== 元信息行：日期 · 项目 · 字数 ========== */
+.post-card.post .meta.cap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #888;
+  font-size: 0.75rem;
+  margin-top: 0;
+  flex-wrap: wrap;
+}
+
+.post-card.post .meta.cap .cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #888;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  font-size: 0.75rem;
+}
+
+/* 日期加日历图标 */
+.post-card.post .meta.cap .cap#post-meta,
+.post-card.post .meta.cap cap.time-wrap {
+  position: relative;
+  padding-left: 18px;
+}
+
+.post-card.post .meta.cap .cap#post-meta::before,
+.post-card.post .meta.cap .cap time::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cg fill='none' stroke='%23888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 分类/标签加图标 */
+.post-card.post .meta.cap .cap.breadcrumb {
+  position: relative;
+  padding-left: 18px;
+}
+
+.post-card.post .meta.cap .cap.breadcrumb::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cg fill='none' stroke='%23888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M7 7h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z'/%3E%3Cpath d='M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 字数统计加图标 */
+.post-card.post .meta.cap .cap.wordcount {
+  position: relative;
+  padding-left: 18px;
+}
+
+.post-card.post .meta.cap .cap.wordcount::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14'%3E%3Cg fill='none' stroke='%23888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M12 6v12m-4-8h8'/%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.post-card.post .meta.cap .cap svg {
+  display: none;
+}
+
+/* 用 · 分隔 */
+.post-card.post .meta.cap .cap:not(:last-child)::after {
+  content: '·';
+  margin-left: 6px;
+  color: #ccc;
+}
+
+/* 字数显示 */
+.post-card.post .meta.cap .wordcount {
+  display: inline;
+}
+
+.post-card.post .meta.cap .min2read {
+  display: none;
+}
+
+/* 隐藏标签 */
+.card-tags {
+  display: none !important;
+}
+
+/* ========== 深色模式 ========== */
+[data-theme="dark"] .post-card.post {
+  background: linear-gradient(90deg, 
+    rgba(26, 26, 26, 0.95) 0%, 
+    rgba(37, 37, 37, 0.9) 50%, 
+    rgba(42, 42, 42, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(120, 120, 120, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .post-card.post .post-title {
+  color: #eee;
+}
+
+[data-theme="dark"] .post-card.post .excerpt {
+  color: #aaa;
+}
+
+[data-theme="dark"] .post-card.post .meta.cap {
+  color: #777;
+}
+
+[data-theme="dark"] .category-filter a {
+  background: rgba(50, 50, 50, 0.8);
+  backdrop-filter: blur(10px);
+  border-color: rgba(80, 80, 80, 0.3);
+  color: #aaa;
+}
+
+[data-theme="dark"] .category-filter a:hover {
+  background: rgba(60, 60, 60, 0.8);
+  color: #ddd;
+}
+
+[data-theme="dark"] .category-filter a.active {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  border-color: rgba(102, 126, 234, 0.5);
+  color: #fff;
+}
+
+/* 深色模式下不同项目的渐变：从左到右，天蓝色系 → 深色 */
+[data-theme="dark"] .post-card.post {
+  background: linear-gradient(90deg, 
+    rgba(135, 206, 250, 0.7) 0%, 
+    rgba(173, 216, 230, 0.5) 30%, 
+    rgba(224, 238, 255, 0.3) 60%, 
+    rgba(35, 40, 50, 0.98) 100%);
+  border-color: rgba(135, 206, 250, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-身体 {
+  background: linear-gradient(90deg, 
+    rgba(255, 182, 193, 0.7) 0%, 
+    rgba(255, 205, 210, 0.5) 30%, 
+    rgba(255, 228, 230, 0.3) 60%, 
+    rgba(45, 35, 40, 0.98) 100%);
+  border-color: rgba(255, 182, 193, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-pilot {
+  background: linear-gradient(90deg, 
+    rgba(186, 200, 255, 0.7) 0%, 
+    rgba(205, 215, 255, 0.5) 30%, 
+    rgba(224, 230, 255, 0.3) 60%, 
+    rgba(40, 35, 50, 0.98) 100%);
+  border-color: rgba(186, 200, 255, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-算法 {
+  background: linear-gradient(90deg, 
+    rgba(173, 230, 200, 0.7) 0%, 
+    rgba(195, 240, 220, 0.5) 30%, 
+    rgba(217, 250, 240, 0.3) 60%, 
+    rgba(35, 45, 40, 0.98) 100%);
+  border-color: rgba(173, 230, 200, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-八股 {
+  background: linear-gradient(90deg, 
+    rgba(255, 220, 170, 0.7) 0%, 
+    rgba(255, 235, 200, 0.5) 30%, 
+    rgba(255, 245, 220, 0.3) 60%, 
+    rgba(50, 40, 45, 0.98) 100%);
+  border-color: rgba(255, 220, 170, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-随笔 {
+  background: linear-gradient(90deg, 
+    rgba(135, 206, 250, 0.7) 0%, 
+    rgba(173, 216, 230, 0.5) 30%, 
+    rgba(224, 238, 255, 0.3) 60%, 
+    rgba(35, 40, 50, 0.98) 100%);
+  border-color: rgba(135, 206, 250, 0.7);
+}
+
+[data-theme="dark"] .post-card.post.cat-IM {
+  background: linear-gradient(90deg, 
+    rgba(200, 200, 255, 0.7) 0%, 
+    rgba(215, 215, 255, 0.5) 30%, 
+    rgba(230, 230, 255, 0.3) 60%, 
+    rgba(45, 40, 55, 0.98) 100%);
+  border-color: rgba(200, 200, 255, 0.7);
+}
+
+/* ========== 隐藏页脚 ========== */
+.page-footer,
+.footnote,
+footer {
+  display: none !important;
+}
