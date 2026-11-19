@@ -1,0 +1,1451 @@
+
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0" theme-name="Stellar" theme-version="2.0.0">
+  
+  
+  <meta name="generator" content="Hexo 8.1.2">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title data-stellar-page-meta>Redis 学习笔记 - hi,it's Qiu Yinlan!</title>
+  <script data-stellar-script="core">
+    (function () {
+      var key = 'stellar:v2:leftbar-state';
+      var fallback = "expanded";
+      try {
+        var value = localStorage.getItem(key);
+        document.documentElement.dataset.leftbarState = value === 'collapsed' || value === 'expanded' ? value : fallback;
+      } catch (error) {
+        document.documentElement.dataset.leftbarState = fallback;
+      }
+    })();
+  </script>
+
+  <meta name="description" content="一、数据结构1. String（字符串）一句话本质：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。 为什么不用 C 字符串？C 字符串的缺陷：  长度获取慢：必须遍历到 \0，O(n) 缓冲区溢出：修改时不检查空间，容易越界 无法二进制安全：依赖 \0 判断结尾，不能存包含 \0 的数据  SDS" data-stellar-page-meta="">
+<meta property="og:type" content="article" data-stellar-page-meta="">
+<meta property="og:title" content="Redis 学习笔记" data-stellar-page-meta="">
+<meta property="og:url" content="https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" data-stellar-page-meta="">
+<meta property="og:site_name" content="hi,it's Qiu Yinlan!" data-stellar-page-meta="">
+<meta property="og:description" content="一、数据结构1. String（字符串）一句话本质：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。 为什么不用 C 字符串？C 字符串的缺陷：  长度获取慢：必须遍历到 \0，O(n) 缓冲区溢出：修改时不检查空间，容易越界 无法二进制安全：依赖 \0 判断结尾，不能存包含 \0 的数据  SDS" data-stellar-page-meta="">
+<meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
+<meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
+<meta property="article:published_time" content="2026-11-19T04:40:00.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-19T04:43:19.000Z" data-stellar-page-meta="">
+<meta property="article:tag" content="redis" data-stellar-page-meta="">
+<meta property="article:tag" content="数据库" data-stellar-page-meta="">
+<meta property="article:tag" content="缓存" data-stellar-page-meta="">
+<meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="Redis 学习笔记" data-stellar-page-meta="">
+  
+  
+  <meta name="keywords" content="redis,缓存,数据库" data-stellar-page-meta="">
+
+  <!-- feed -->
+  
+
+  <link rel="preload" href="/css/main.css?v=2.0.0" as="style">
+  <link rel="stylesheet" href="/css/main.css?v=2.0.0">
+  <style>:root{--text-loading:"正在加载";--text-loading-error:"加载失败，请稍后重试。"}</style>
+
+
+  
+
+  
+
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T12:40:00+08:00","dateModified":"2026-11-19T12:43:19+08:00","datePublished":"2026-11-19T12:40:00+08:00","description":"一、数据结构1. String（字符串）一句话本质：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。\n为什么不用 C 字符串？C 字符串的缺陷：\n\n长度获取慢：必须遍历到 \\0，O(n)\n缓冲区溢出：修改时不检查空间，容易越界\n无法二进制安全：依赖 \\0 判断结尾，不能存包含 \\0 的数据\n\n...","headline":"Redis 学习笔记","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"redis, 缓存, 数据库","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <link rel="stylesheet" href="/css/toc-float.css?v=20261117">
+<link rel="stylesheet" href="/css/card-style.css?v=20261117">
+
+
+  <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
+  <link rel="preload" as="script" href="/js/stellar-icons.js?v=39c6ac17e854ffe2">
+  
+  
+</head>
+<body data-page-type="content" data-page-layout="post" data-article-style="tech"><div data-stellar-runtime-region id="site-cover" class="site-cover"></div><div class="site-shell" id="start" data-regions="leftbar"><div class="site-workspace">
+<aside data-stellar-runtime-region id="leftbar-region" class="site-region site-region--leftbar" data-region="leftbar" aria-label="Leftbar"><div class="site-region__surface ui-surface"><div class="site-region__decoration" aria-hidden="true"></div><div class="site-region__viewport"><header class="site-region__header site-region__zone site-region__zone--top">
+    <div class="widget-instance widget-instance--brand" data-widget-id="leftbar:fixed:brand" data-presentation="leftbar" data-leftbar-rail>
+<header class="brand-header brand-header--regular brand-header--site"><div class="brand-wrap"><a class="brand-image brand-image--avatar" href="&#x2F;"><img no-lazy src="&#x2F;favicon.png" alt="" onerror="this.onerror&#x3D;null;this.src&#x3D;&quot;&#x2F;images&#x2F;stellar-error.491ee870f4940739.svg&quot;"></a><a class="brand-title" href="&#x2F;"><div class="brand-name">Qiu Yinlan</div><div class="brand-tagline cap">分享技术、生活和学习笔记</div></a></div><div class="brand-search">
+
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<button class="ui-collection__item ui-interactive card-hover card-hover--spotlight search-trigger has-hover-surface" type="button" title="搜索" aria-label="搜索" data-shell-action="open-search" data-search-instance="leftbar-brand-search" data-search-domain="blog" data-search-domain-label="博客" data-search-domain-blog="true">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"/><circle cx="14" cy="11" r="4"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">搜索</span>
+      
+      
+    </span>
+  
+  <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
+
+  
+</button>
+
+  
+</div>
+
+
+</div></header>
+</div>
+  </header>
+  <div class="site-region__body site-region__zone site-region__zone--body">
+    <div class="widget-instance widget-instance--menu" data-widget-id="leftbar:fixed:menu" data-presentation="leftbar" data-leftbar-rail>
+
+
+<nav class="menu dis-select">
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-active is-themed" href="&#x2F;" title="近期发布" aria-current="page" style="--item-theme:#1BCDFC;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.879 2.879C5 3.757 5 5.172 5 8v8c0 2.828 0 4.243.879 5.121C6.757 22 8.172 22 11 22h2c2.828 0 4.243 0 5.121-.879C19 20.243 19 18.828 19 16V8c0-2.828 0-4.243-.879-5.121C17.243 2 15.828 2 13 2h-2c-2.828 0-4.243 0-5.121.879M8.25 17a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75M9 12.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zM8.25 9A.75.75 0 0 1 9 8.25h6a.75.75 0 0 1 0 1.5H9A.75.75 0 0 1 8.25 9" clip-rule="evenodd"/><path fill="currentColor" d="M5.235 4.058C5 4.941 5 6.177 5 8v8c0 1.823 0 3.058.235 3.942L5 19.924c-.975-.096-1.631-.313-2.121-.803C2 18.243 2 16.828 2 14v-4c0-2.829 0-4.243.879-5.121c.49-.49 1.146-.707 2.121-.803zm13.53 15.884C19 19.058 19 17.822 19 16V8c0-1.823 0-3.059-.235-3.942l.235.018c.975.096 1.631.313 2.121.803C22 5.757 22 7.17 22 9.999v4c0 2.83 0 4.243-.879 5.122c-.49.49-1.146.707-2.121.803z" opacity=".5"/></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">近期发布</span>
+      
+      
+    </span>
+  
+  
+  <span class="ui-collection__indicator"></span>
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="&#x2F;categories&#x2F;" title="分类" style="--item-theme:#FF6B6B;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M2 6.94975C2 6.06722 2 5.62595 2.06935 5.25839C2.37464 3.64031 3.64031 2.37464 5.25839 2.06935C5.62595 2 6.06722 2 6.94975 2C7.33642 2 7.52976 2 7.71557 2.01738C8.51665 2.09229 9.27652 2.40704 9.89594 2.92051C10.0396 3.03961 10.1763 3.17633 10.4497 3.44975L11 4C11.8158 4.81578 12.2237 5.22367 12.7121 5.49543C12.9804 5.64471 13.2651 5.7626 13.5604 5.84678C14.0979 6 14.6747 6 15.8284 6H16.2021C18.8345 6 20.1506 6 21.0062 6.76946C21.0849 6.84024 21.1598 6.91514 21.2305 6.99383C22 7.84935 22 9.16554 22 11.7979V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V6.94975Z" opacity=".5"/><path d="M20 6.23751C19.9992 5.94016 19.9949 5.76263 19.9746 5.60842C19.7974 4.26222 18.7381 3.2029 17.3919 3.02567C17.1969 3 16.9647 3 16.5003 3H9.98828C10.1042 3.10392 10.2347 3.23445 10.45 3.44975L11.0003 4C11.8161 4.81578 12.2239 5.22367 12.7124 5.49543C12.9807 5.64471 13.2653 5.7626 13.5606 5.84678C14.0982 6 14.675 6 15.8287 6H16.2024C17.9814 6 19.1593 6 20 6.23751Z"/><path fill-rule="evenodd" d="M12.25 10C12.25 9.58579 12.5858 9.25 13 9.25H18C18.4142 9.25 18.75 9.58579 18.75 10C18.75 10.4142 18.4142 10.75 18 10.75H13C12.5858 10.75 12.25 10.4142 12.25 10Z" clip-rule="evenodd"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">分类</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="&#x2F;archives&#x2F;" title="归档" style="--item-theme:#7C4DFF;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M6.94028 2C7.35614 2 7.69326 2.32421 7.69326 2.72414V4.18487C8.36117 4.17241 9.10983 4.17241 9.95219 4.17241H13.9681C14.8104 4.17241 15.5591 4.17241 16.227 4.18487V2.72414C16.227 2.32421 16.5641 2 16.98 2C17.3958 2 17.733 2.32421 17.733 2.72414V4.24894C19.178 4.36022 20.1267 4.63333 20.8236 5.30359C21.5206 5.97385 21.8046 6.88616 21.9203 8.27586L22 9H2.92456H2V8.27586C2.11571 6.88616 2.3997 5.97385 3.09665 5.30359C3.79361 4.63333 4.74226 4.36022 6.1873 4.24894V2.72414C6.1873 2.32421 6.52442 2 6.94028 2Z"/><path d="M21.9995 14.0001V12.0001C21.9995 11.161 21.9963 9.66527 21.9834 9H2.00917C1.99626 9.66527 1.99953 11.161 1.99953 12.0001V14.0001C1.99953 17.7713 1.99953 19.6569 3.1711 20.8285C4.34267 22.0001 6.22829 22.0001 9.99953 22.0001H13.9995C17.7708 22.0001 19.6564 22.0001 20.828 20.8285C21.9995 19.6569 21.9995 17.7713 21.9995 14.0001Z" opacity=".5"/><path d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"/><path d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"/><path d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"/><path d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"/><path d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"/><path d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">归档</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;about&#x2F;" title="关于">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20" opacity=".5"/><path d="M12 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6m0 7.5c-3.04 0-5.5 1.57-5.5 3.5c0 .65.28 1.26.77 1.77A7.96 7.96 0 0 0 12 20.5a7.96 7.96 0 0 0 4.73-1.73c.49-.51.77-1.12.77-1.77c0-1.93-2.46-3.5-5.5-3.5"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">关于</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+</div>
+
+</nav>
+
+</div>
+    <div class="widgets widget-stack widget-stack--leftbar widget-stack--body"><div class="widget-instance widget-instance--recent" data-widget-id="leftbar:1:recent" data-presentation="leftbar">
+
+<widget class="widget-wrapper slide-up recent-widget">
+  
+    <div class="widget-header dis-select">
+      <span class="name">最近更新</span>
+      
+    </div>
+  
+  <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;08&#x2F;Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92&#x2F;" title="Agent 架构、Eino 内部机制与多 Agent 编排">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">A</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;16&#x2F;Pilot-%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1-Redis%20%E4%B8%8E%20MySQL%20%E5%86%B7%E7%83%AD%E5%88%86%E5%B1%82&#x2F;" title="Pilot 记忆系统设计：Redis 工作记忆与 MySQL 历史档案的冷热分层">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Pilot 记忆系统设计：Redis 工作记忆与 MySQL 历史档案的冷热分层</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86%20-%20%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%20%E5%8F%AF%E9%9D%A0%20-%20%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8E%20HTTPS%20%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">计</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;" title="Redis 学习笔记">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">R</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Redis 学习笔记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;IM%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3-5%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C&#x2F;" title="IM 项目架构详解：5 个服务怎么协作">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">I</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">IM 项目架构详解：5 个服务怎么协作</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;17&#x2F;MySQL-%E9%9B%B6%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8-%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%B0GROUP-BY&#x2F;" title="MySQL 零基础入门：从数据库到 GROUP BY">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">M</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">MySQL 零基础入门：从数据库到 GROUP BY</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;17&#x2F;%E9%AA%A8%E7%9B%86%E6%97%8B%E8%BD%AC%20-%20%E8%85%B9%E6%96%9C%E8%82%8C%E5%A4%B1%E8%A1%A1&#x2F;" title="骨盆右旋时，腹斜肌到底是怎么失衡的">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">骨</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">骨盆右旋时，腹斜肌到底是怎么失衡的</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;16&#x2F;Kafka%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20%E5%88%86%E5%8C%BA%E6%9C%89%E5%BA%8F%E4%B8%8E%E8%A7%A3%E8%80%A6%E5%89%8A%E5%B3%B0&#x2F;" title="Kafka 学习笔记 - 分区有序与解耦削峰">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">K</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Kafka 学习笔记 - 分区有序与解耦削峰</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86-%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+</div></div>
+  
+</widget>
+
+
+</div></div>
+  </div>
+  <footer class="site-region__footer">
+    
+    <div class="site-region__system ui-collection" data-layout="inline" data-variant="nav" data-density="compact">
+      <div class="site-region__settings"><div class="widget-instance widget-instance--settings" data-widget-id="leftbar:fixed:settings" data-presentation="leftbar" data-leftbar-rail>
+<a class="settings-widget ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;settings&#x2F;" data-profile-provider="" data-profile-identity-enabled="false" data-profile-fallback-avatar="https:&#x2F;&#x2F;gcore.jsdelivr.net&#x2F;gh&#x2F;cdn-x&#x2F;placeholder@1.0.12&#x2F;avatar&#x2F;round&#x2F;3442075.svg" data-settings-placement="leftbar" data-settings-label="设置" aria-label="设置" title="设置">
+  <span class="settings-widget__avatar" aria-hidden="true">
+    <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2Z" clip-rule="evenodd" opacity=".5"/><path d="M12.4277 8.25C10.3567 8.25 8.67773 9.92893 8.67773 12C8.67773 14.0711 10.3567 15.75 12.4277 15.75C14.4988 15.75 16.1777 14.0711 16.1777 12C16.1777 9.92893 14.4988 8.25 12.4277 8.25Z"/></g></svg></span>
+  </span>
+  <span class="settings-widget__name ui-collection__title">设置</span>
+</a>
+</div></div>
+      <button type="button" class="leftbar-state-toggle ui-collection__item ui-interactive card-hover card-hover--spotlight is-icon-only" aria-label="Collapse leftbar" aria-expanded="true" data-shell-action="toggle-leftbar"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.172 4.172C2 5.343 2 7.229 2 11v2c0 3.771 0 5.657 1.172 6.828S6.229 21 10 21h5V3h-5C6.229 3 4.343 3 3.172 4.172" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M5.5 9.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm1 4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zM22 13v-2c0-3.771 0-5.657-1.172-6.828c-.974-.975-3.192-1.139-5.828-1.166v17.988c2.636-.027 4.854-.191 5.828-1.166C22 18.657 22 16.771 22 13"/></svg></span></button>
+    </div>
+  </footer></div></div></aside>
+<main data-stellar-runtime-region class="site-main" id="main">
+
+
+<div class="article-banner-wrap slide-up"><div class="article banner top">
+  <div class="content">
+    
+    <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+</div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T04:40:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-19T04:43:19.000Z">2026-11-19</time></span></div>
+</div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>Redis 学习笔记</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div></div>
+<article class="md-text content slide-up"><h2 id="一、数据结构"><a href="#一、数据结构" class="headerlink" title="一、数据结构"></a>一、数据结构</h2><h3 id="1-String（字符串）"><a href="#1-String（字符串）" class="headerlink" title="1. String（字符串）"></a>1. String（字符串）</h3><p><strong>一句话本质</strong>：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。</p>
+<h4 id="为什么不用-C-字符串？"><a href="#为什么不用-C-字符串？" class="headerlink" title="为什么不用 C 字符串？"></a>为什么不用 C 字符串？</h4><p>C 字符串的缺陷：</p>
+<ul>
+<li><strong>长度获取慢</strong>：必须遍历到 <code>\0</code>，O(n)</li>
+<li><strong>缓冲区溢出</strong>：修改时不检查空间，容易越界</li>
+<li><strong>无法二进制安全</strong>：依赖 <code>\0</code> 判断结尾，不能存包含 <code>\0</code> 的数据</li>
+</ul>
+<p>SDS 的解决方案：</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sdshdr</span> {</span></span><br><span class="line">    <span class="type">int</span> len;      <span class="comment">// 已用长度 → O(1) 获取长度</span></span><br><span class="line">    <span class="type">int</span> alloc;    <span class="comment">// 总容量 → 判断是否需要扩容</span></span><br><span class="line">    <span class="type">char</span> flags;   <span class="comment">// 头部类型标记</span></span><br><span class="line">    <span class="type">char</span> buf[];   <span class="comment">// 实际数据</span></span><br><span class="line">};</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>SDS 的五种头部类型</strong>（省内存）：</p>
+<ul>
+<li>sdshdr5/8/16/32/64：用不同大小的头部适配不同长度的字符串</li>
+<li>小字符串用更小的头部，减少元数据开销</li>
+</ul>
+<p><strong>SDS 的三大优势</strong>：</p>
+<ol>
+<li><strong>O(1) 获取长度</strong>：直接读 len 字段</li>
+<li><strong>杜绝缓冲区溢出</strong>：修改前检查 alloc，自动扩容</li>
+<li><strong>空间预分配</strong>：修改后多留空间，减少后续内存重分配</li>
+</ol>
+<h4 id="String-的三种编码"><a href="#String-的三种编码" class="headerlink" title="String 的三种编码"></a>String 的三种编码</h4><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>编码</th>
+<th>适用场景</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int</td>
+<td>长整型数字</td>
+<td>直接用 8 字节长整型存，最省空间</td>
+</tr>
+<tr>
+<td>embstr</td>
+<td>短字符串</td>
+<td>SDS 和对象头在连续内存，少一次分配，读写快</td>
+</tr>
+<tr>
+<td>raw</td>
+<td>长字符串</td>
+<td>SDS 和对象头分开分配，灵活但可能产生内存碎片</td>
+</tr>
+</tbody></table></div>
+<h4 id="String-的应用场景"><a href="#String-的应用场景" class="headerlink" title="String 的应用场景"></a>String 的应用场景</h4><ul>
+<li><strong>整体缓存</strong>：经常整体读写的对象（如整个用户配置的 JSON 串）</li>
+<li><strong>原子计数器</strong>：INCR/DECR 命令，适合点赞数、播放量、限流计数</li>
+<li><strong>分布式锁</strong>：SETNX 命令（仅当 Key 不存在时设置）</li>
+<li><strong>二进制安全</strong>：可存图片、序列化对象等任意二进制数据</li>
+<li><strong>BitMap</strong>：SETBIT/GETBIT 操作，用于签到等二值状态统计</li>
+<li><strong>HyperLogLog</strong>：PFADD/PFCOUNT，用于 UV 计数等基数统计</li>
+</ul>
+<p><strong>BitMap vs HyperLogLog</strong>：</p>
+<ul>
+<li>BitMap：能精确查具体用户状态（如某天是否签到）</li>
+<li>HyperLogLog：只估算总数，不记录具体是谁，有概率误判</li>
+</ul>
+<hr>
+<h3 id="2-Hash（哈希）"><a href="#2-Hash（哈希）" class="headerlink" title="2. Hash（哈希）"></a>2. Hash（哈希）</h3><p><strong>一句话本质</strong>：Hash 是”一个 key 管一堆 field-value”，专门用来存对象，比 String 存 JSON 更省内存、更精准。</p>
+<h4 id="Hash-vs-String-存对象"><a href="#Hash-vs-String-存对象" class="headerlink" title="Hash vs String 存对象"></a>Hash vs String 存对象</h4><p><strong>String 存对象</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Key: user:1001</span><br><span class="line">Value: {"name":"张三", "age":25}  // 整个 JSON 串</span><br></pre></td></tr></tbody></table></figure>
+<p>缺点：改年龄要读整个 JSON、改完再全量写回去</p>
+<p><strong>Hash 存对象</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Key: user:1001</span><br><span class="line">Field: name → 张三，age → 25</span><br></pre></td></tr></tbody></table></figure>
+<p>优点：</p>
+<ul>
+<li><strong>精准修改</strong>：HSET user:1001 age 26，只改年龄，不用全量读写</li>
+<li><strong>节省内存</strong>：Hash 底层对少量字段做了空间优化</li>
+<li><strong>独立查询</strong>：HGET user:1001 name，直接取字段，不用解析 JSON</li>
+</ul>
+<h4 id="Hash-底层实现"><a href="#Hash-底层实现" class="headerlink" title="Hash 底层实现"></a>Hash 底层实现</h4><ul>
+<li><strong>数据少、值短</strong> → listpack（压缩列表），连续存储，省内存</li>
+<li><strong>数据多或值大</strong> → hashtable（哈希表），查找效率 O(1)</li>
+</ul>
+<h4 id="Hash-的应用场景"><a href="#Hash-的应用场景" class="headerlink" title="Hash 的应用场景"></a>Hash 的应用场景</h4><ul>
+<li><strong>用户资料</strong>：user:1001，存 name、avatar、status 等字段</li>
+<li><strong>房间状态</strong>：room:2001，存 title、online_count、owner 等字段</li>
+<li><strong>购物车</strong>：商品 ID 为 field，数量为 value</li>
+</ul>
+<p><strong>注意</strong>：Hash 是”一个 key 下面挂多个 field-value”，不是”很多个独立 key”。多个 field 共享一个 key 的开销，比用多个独立 key 更省空间。</p>
+<hr>
+<h3 id="3-List（列表）"><a href="#3-List（列表）" class="headerlink" title="3. List（列表）"></a>3. List（列表）</h3><p><strong>一句话本质</strong>：List 是双向链表套数组的混合结构，兼顾增删速度和内存利用率。</p>
+<h4 id="Quicklist-Listpack-组合"><a href="#Quicklist-Listpack-组合" class="headerlink" title="Quicklist + Listpack 组合"></a>Quicklist + Listpack 组合</h4><p><strong>Listpack（节点内部）</strong>：</p>
+<ul>
+<li>一块连续内存，按顺序存多个元素</li>
+<li>没有额外指针开销，比普通数组/链表更省内存</li>
+</ul>
+<p><strong>Quicklist（整体结构）</strong>：</p>
+<ul>
+<li>外面包一层双向链表，把多个 Listpack 串起来</li>
+<li>每个链表节点里装着一个 Listpack</li>
+</ul>
+<p><strong>为什么这样组合</strong>：</p>
+<ul>
+<li>只用链表：每个元素都存指针，太费内存</li>
+<li>只用大数组：中间插入/删除要搬数据，太慢</li>
+<li>Quicklist：既保留链表增删快的优点，又利用 Listpack 的连续内存省空间</li>
+</ul>
+<p><strong>注意</strong>：这些不是 Redis 独有的，是通用的数据结构设计。Redis 的独特之处是把它们结合在特定数据类型上，并针对内存数据库场景做了极致优化。</p>
+<hr>
+<h3 id="4-Set（集合）"><a href="#4-Set（集合）" class="headerlink" title="4. Set（集合）"></a>4. Set（集合）</h3><p><strong>一句话本质</strong>：Set 是无序、唯一元素的集合，适合去重且无需排序的场景。</p>
+<h4 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h4><ul>
+<li>SADD：添加元素（重复会自动去重）</li>
+<li>SMEMBERS：查看所有元素（无序）</li>
+<li>SISMEMBER：判断元素是否存在</li>
+<li>SINTER/SUNION：求交集/并集</li>
+</ul>
+<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><ul>
+<li>聚合计算（并集、交集、差集）</li>
+<li>点赞、共同关注、抽奖活动等</li>
+</ul>
+<hr>
+<h3 id="5-ZSet（有序集合）"><a href="#5-ZSet（有序集合）" class="headerlink" title="5. ZSet（有序集合）"></a>5. ZSet（有序集合）</h3><p><strong>一句话本质</strong>：Zset 是带分数的有序集合，底层用跳表保排序、哈希表保精准查，完美契合排行榜需求。</p>
+<h4 id="ZSet-vs-Set-核心区别"><a href="#ZSet-vs-Set-核心区别" class="headerlink" title="ZSet vs Set 核心区别"></a>ZSet vs Set 核心区别</h4><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Set</th>
+<th>ZSet</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>有序性</td>
+<td>完全无序</td>
+<td>按分数从小到大排序</td>
+</tr>
+<tr>
+<td>元素</td>
+<td>唯一</td>
+<td>唯一（分数可重复）</td>
+</tr>
+<tr>
+<td>操作</td>
+<td>集合交并差</td>
+<td>基于分数的排序、范围查询、排名计算</td>
+</tr>
+</tbody></table></div>
+<h4 id="常用命令-1"><a href="#常用命令-1" class="headerlink" title="常用命令"></a>常用命令</h4><ul>
+<li>ZADD key score member：存数据并打分</li>
+<li>ZRANGE key 0 -1 WITHSCORES：按排名从小到大取</li>
+<li>ZREVRANGE key 0 -1 WITHSCORES：按排名从大到小取（适合排行榜）</li>
+<li>ZRANGEBYSCORE key 100 200：按分数范围取</li>
+<li>ZINCRBY key 5 member：增减元素分数</li>
+<li>ZRANK key member：获取元素排名</li>
+</ul>
+<h4 id="ZSet-底层实现"><a href="#ZSet-底层实现" class="headerlink" title="ZSet 底层实现"></a>ZSet 底层实现</h4><p><strong>两种编码</strong>：</p>
+<ul>
+<li><strong>listpack</strong>：小型有序集合（默认元素数量≤128，单个成员≤64 字节）</li>
+<li><strong>跳表 + 哈希表</strong>：超过紧凑编码限制后转换</li>
+</ul>
+<p><strong>为什么用跳表 + 哈希表组合</strong>：</p>
+<ul>
+<li>跳表：负责排序和范围查询（如取排行榜前 10 名），查找效率 O(log n)</li>
+<li>哈希表：负责精确查找某个成员的分数（如查某用户的具体积分），O(1)</li>
+</ul>
+<p><strong>为什么不只用有序数组</strong>：数组中间插入元素要移动大量数据，效率低。跳表通过多层指针，插入删除只需改指针，不用搬数据。</p>
+<h4 id="跳表详解"><a href="#跳表详解" class="headerlink" title="跳表详解"></a>跳表详解</h4><p><strong>跳表是什么</strong>：有序链表 + 多层索引，用来替代平衡树，查找/插入/删除期望 O(log n)，实现比红黑树简单。</p>
+<p><strong>跳表节点结构</strong>：</p>
+<figure class="highlight c"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> {</span></span><br><span class="line">    sds ele;                    <span class="comment">// 元素值</span></span><br><span class="line">    <span class="type">double</span> score;               <span class="comment">// 元素权重值</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">backward</span>;</span>  <span class="comment">// 后向指针（倒序遍历）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistLevel</span> {</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">zskiplistNode</span> *<span class="title">forward</span>;</span>  <span class="comment">// 前向指针</span></span><br><span class="line">        <span class="type">unsigned</span> <span class="type">long</span> span;             <span class="comment">// 跨度（用于计算排名）</span></span><br><span class="line">    } level[];                    <span class="comment">// 层级数组</span></span><br><span class="line">} zskiplistNode;</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>层高怎么随机</strong>：</p>
+<ul>
+<li>节点从 1 层开始，每轮以 25% 的概率增加 1 层</li>
+<li>最多 32 层（ZSKIPLIST_MAXLEVEL）</li>
+<li>越往上节点越少，不需要维护严格的层级比例</li>
+</ul>
+<p><strong>跨度的作用</strong>：主要用于计算排名。查找成员时，把沿途经过的跨度累加起来，就能知道这个成员排在第几位，所以 ZRANK 不需要从头数到尾。</p>
+<h4 id="为什么-Redis-用跳表不用-B-树？"><a href="#为什么-Redis-用跳表不用-B-树？" class="headerlink" title="为什么 Redis 用跳表不用 B+ 树？"></a>为什么 Redis 用跳表不用 B+ 树？</h4><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>B+ 树</th>
+<th>跳表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>设计目标</td>
+<td>为磁盘优化，减少 I/O</td>
+<td>为内存优化，实现简单</td>
+</tr>
+<tr>
+<td>节点结构</td>
+<td>多叉平衡树，复杂</td>
+<td>多层链表，简单</td>
+</tr>
+<tr>
+<td>范围查询</td>
+<td>需要中序遍历</td>
+<td>顺着链表扫，天然友好</td>
+</tr>
+<tr>
+<td>实现难度</td>
+<td>节点分裂/合并复杂</td>
+<td>随机层高，改指针即可</td>
+</tr>
+</tbody></table></div>
+<p><strong>核心原因</strong>：</p>
+<ul>
+<li>B+ 树为减少磁盘 I/O 设计，节点大且分裂合并逻辑复杂，在内存里反而浪费空间和时间</li>
+<li>Redis 数据全在内存，不存在磁盘”翻页”慢的问题</li>
+<li>跳表在内存中读写快、实现简单、范围查询友好</li>
+</ul>
+<h4 id="跳表的应用场景（不仅-Redis）"><a href="#跳表的应用场景（不仅-Redis）" class="headerlink" title="跳表的应用场景（不仅 Redis）"></a>跳表的应用场景（不仅 Redis）</h4><ul>
+<li><strong>Redis</strong>：zset（有序集合）</li>
+<li><strong>LevelDB/RocksDB</strong>：MemTable（内存表）默认是跳表</li>
+<li><strong>Java</strong>：ConcurrentSkipListMap/ConcurrentSkipListSet（JDK 自带）</li>
+<li><strong>自研组件</strong>：时序数据库、网关、本地缓存、时间轮等</li>
+</ul>
+<hr>
+<h3 id="6-GEO（地理位置）"><a href="#6-GEO（地理位置）" class="headerlink" title="6. GEO（地理位置）"></a>6. GEO（地理位置）</h3><p><strong>一句话本质</strong>：GEO 底层直接复用 Zset 实现，把经纬度换算成 Geohash 作为分数，地点名作为成员。</p>
+<h4 id="怎么工作的"><a href="#怎么工作的" class="headerlink" title="怎么工作的"></a>怎么工作的</h4><ul>
+<li><strong>存</strong>：GEO 把经纬度换算成 Geohash（一个唯一的数字），作为 Zset 的分数；地点名字作为成员，调用 ZADD 存入</li>
+<li><strong>查</strong>：利用 Zset 天然有序的特性，通过分数范围快速找出附近的点</li>
+</ul>
+<p><strong>为什么选 Zset</strong>：Zset 底层是跳表，天然支持排序和范围查找，完美契合”找附近”这种需求。</p>
+<hr>
+<h2 id="二、过期机制与内存淘汰"><a href="#二、过期机制与内存淘汰" class="headerlink" title="二、过期机制与内存淘汰"></a>二、过期机制与内存淘汰</h2><h3 id="1-EXPIRE-vs-TTL"><a href="#1-EXPIRE-vs-TTL" class="headerlink" title="1. EXPIRE vs TTL"></a>1. EXPIRE vs TTL</h3><p><strong>一句话本质</strong>：EXPIRE 是设定闹钟（设置过期时间），TTL 是看一眼现在几点（查看剩余时间）。</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th>返回值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EXPIRE key 60</td>
+<td>设置 60 秒后过期</td>
+<td>1 成功，0 失败</td>
+</tr>
+<tr>
+<td>TTL key</td>
+<td>查看剩余秒数</td>
+<td>正数=剩余秒数，-1=永不过期，-2=已不存在</td>
+</tr>
+</tbody></table></div>
+<p><strong>注意</strong>：修改 key 的值会不会影响过期时间？</p>
+<ul>
+<li>普通 SET 覆盖值：会清除原来的过期时间（可用 KEEPTTL 保留）</li>
+<li>INCR、HSET、LPUSH 等原地修改：通常保留已有的过期时间</li>
+</ul>
+<hr>
+<h3 id="2-过期删除策略"><a href="#2-过期删除策略" class="headerlink" title="2. 过期删除策略"></a>2. 过期删除策略</h3><p><strong>一句话本质</strong>：Redis 用”惰性删除 + 定期删除”两道防线清理过期 key，在 CPU 开销和内存回收之间做平衡。</p>
+<h4 id="惰性删除"><a href="#惰性删除" class="headerlink" title="惰性删除"></a>惰性删除</h4><ul>
+<li><strong>什么时候删</strong>：访问 key 时检查有效期，发现过期就删除</li>
+<li><strong>优点</strong>：只在需要时检查，不浪费 CPU</li>
+<li><strong>缺点</strong>：如果 key 一直不被访问，会一直占内存</li>
+</ul>
+<h4 id="定期删除"><a href="#定期删除" class="headerlink" title="定期删除"></a>定期删除</h4><ul>
+<li><strong>什么时候删</strong>：每隔一段时间（默认每秒 10 次）随机抽查一批 key</li>
+<li><strong>怎么检查</strong>：从过期字典中抽样，如果过期比例高就继续检查，否则退出</li>
+<li><strong>时间预算</strong>：默认每轮约 25ms，不会把所有 key 都遍历一遍</li>
+</ul>
+<h4 id="为什么不在过期时立即删除？"><a href="#为什么不在过期时立即删除？" class="headerlink" title="为什么不在过期时立即删除？"></a>为什么不在过期时立即删除？</h4><ul>
+<li>过期 key 较多时，删除操作可能占用大量 CPU 时间</li>
+<li>在内存不紧张但 CPU 紧张的情况下，把 CPU 用于删除与当前任务无关的 key，会影响服务器响应时间和吞吐量</li>
+</ul>
+<h4 id="已经过期但还没删除的-key，能读到吗？"><a href="#已经过期但还没删除的-key，能读到吗？" class="headerlink" title="已经过期但还没删除的 key，能读到吗？"></a>已经过期但还没删除的 key，能读到吗？</h4><ul>
+<li><strong>不能</strong>。逻辑过期和物理删除是两回事</li>
+<li>主节点读取时会检查过期时间，发现已过期就当作不存在处理</li>
+<li>从节点依赖主节点传播删除命令，但对普通客户端读取也会根据过期时间判断</li>
+</ul>
+<hr>
+<h3 id="3-内存淘汰策略"><a href="#3-内存淘汰策略" class="headerlink" title="3. 内存淘汰策略"></a>3. 内存淘汰策略</h3><p><strong>一句话本质</strong>：内存淘汰是在内存超过 maxmemory 时，根据策略选择 key 淘汰腾出空间；过期删除是清理已过期的 key，两者目标不同。</p>
+<h4 id="Redis-7-0-的八种策略"><a href="#Redis-7-0-的八种策略" class="headerlink" title="Redis 7.0 的八种策略"></a>Redis 7.0 的八种策略</h4><p><strong>不进行数据淘汰</strong>：</p>
+<ul>
+<li><strong>noeviction</strong>（默认）：超过内存上限时拒绝写入，返回 OOM 错误（但过期 key 仍会删除）</li>
+</ul>
+<p><strong>在设置了过期时间的数据中淘汰</strong>：</p>
+<ul>
+<li><strong>volatile-random</strong>：随机淘汰设置了过期时间的 key</li>
+<li><strong>volatile-ttl</strong>：优先淘汰更早过期的 key</li>
+<li><strong>volatile-lru</strong>：淘汰最久未使用的（有过期时间的）</li>
+<li><strong>volatile-lfu</strong>：淘汰最少使用的（有过期时间的）</li>
+</ul>
+<p><strong>在所有数据范围内淘汰</strong>：</p>
+<ul>
+<li><strong>allkeys-random</strong>：随机淘汰任意 key</li>
+<li><strong>allkeys-lru</strong>：淘汰整个键值中最久未使用的</li>
+<li><strong>allkeys-lfu</strong>：淘汰整个键值中最少使用的</li>
+</ul>
+<p><strong>注意</strong>：如果选择 volatile 系列策略但没有可淘汰的过期键，写入仍然可能报 OOM。</p>
+<h4 id="LRU-vs-LFU"><a href="#LRU-vs-LFU" class="headerlink" title="LRU vs LFU"></a>LRU vs LFU</h4><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>LRU</th>
+<th>LFU</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>关注指标</td>
+<td>最近有没有用过</td>
+<td>一段时间内用得多不多</td>
+</tr>
+<tr>
+<td>实现方式</td>
+<td>近似 LRU（抽样 + 候选池）</td>
+<td>近似 LFU（概率递增 + 时间衰减）</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>热点变化较快</td>
+<td>热点比较稳定</td>
+</tr>
+</tbody></table></div>
+<p><strong>Redis 的实现</strong>：</p>
+<ul>
+<li>没有维护严格的 LRU 链表，而是用近似 LRU</li>
+<li>maxmemory-samples 控制采样数量，采样越多越接近真实 LRU，但 CPU 开销也越大</li>
+</ul>
+<hr>
+<h2 id="三、持久化"><a href="#三、持久化" class="headerlink" title="三、持久化"></a>三、持久化</h2><h3 id="1-RDB-vs-AOF"><a href="#1-RDB-vs-AOF" class="headerlink" title="1. RDB vs AOF"></a>1. RDB vs AOF</h3><p><strong>一句话本质</strong>：RDB 是拍快照（某一时刻的内存数据），AOF 是记命令（所有写操作日志），两者各有优劣。</p>
+<h4 id="RDB-快照"><a href="#RDB-快照" class="headerlink" title="RDB 快照"></a>RDB 快照</h4><p><strong>怎么实现</strong>：</p>
+<ul>
+<li><strong>SAVE</strong>：主线程生成 RDB 文件，会阻塞（生产环境不用）</li>
+<li><strong>BGSAVE</strong>：fork 子进程生成快照，主进程不阻塞</li>
+</ul>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>文件紧凑，适合备份和传输</li>
+<li>恢复时直接加载数据，通常比重放 AOF 命令快</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>故障时可能丢失最近一次成功快照之后的修改</li>
+<li>fork 会短暂阻塞主线程</li>
+<li>生成快照期间如果写入频繁，写时复制会增加内存占用</li>
+</ul>
+<h4 id="AOF-日志"><a href="#AOF-日志" class="headerlink" title="AOF 日志"></a>AOF 日志</h4><p><strong>怎么实现</strong>：</p>
+<ul>
+<li>执行完写命令后，以追加方式写入文件</li>
+<li>重启时读取文件并逐一执行命令来恢复数据</li>
+</ul>
+<p><strong>三种写回策略</strong>（appendfsync）：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>策略</th>
+<th>说明</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>always</td>
+<td>每次写命令后都 fsync 刷盘</td>
+<td>数据最安全</td>
+<td>磁盘同步开销大</td>
+</tr>
+<tr>
+<td>everysec（推荐）</td>
+<td>每秒由后台线程 fsync 一次</td>
+<td>通常丢失≤1 秒数据</td>
+<td>磁盘卡顿时可能延迟</td>
+</tr>
+<tr>
+<td>no</td>
+<td>不主动 fsync，由操作系统决定</td>
+<td>性能最好</td>
+<td>数据丢失窗口难控制</td>
+</tr>
+</tbody></table></div>
+<p><strong>AOF 缺点</strong>：</p>
+<ul>
+<li>纯命令格式的 AOF 通常比 RDB 大</li>
+<li>恢复时需要重放命令，耗时可能更长</li>
+<li>AOF 损坏时可用 redis-check-aof 修复，但可能截掉部分数据</li>
+</ul>
+<hr>
+<h3 id="2-AOF-重写"><a href="#2-AOF-重写" class="headerlink" title="2. AOF 重写"></a>2. AOF 重写</h3><p><strong>一句话本质</strong>：AOF 重写是根据当前内存数据生成新的持久化内容，不是读取旧 AOF 再逐条合并命令。</p>
+<p><strong>为什么要重写</strong>：</p>
+<ul>
+<li>例子：先 SET counter 0，再 INCR 100 次，最后 counter 是 100</li>
+<li>重写时只需要生成”counter 等于 100”的命令，不需要保留所有历史操作</li>
+</ul>
+<p><strong>怎么实现</strong>：</p>
+<ul>
+<li>用 BGREWRITEAOF 手动触发，或根据文件大小和增长比例自动触发</li>
+<li>由子进程完成，主进程继续处理请求</li>
+</ul>
+<p><strong>版本区别</strong>：</p>
+<ul>
+<li><strong>Redis 7.0 之前</strong>：主进程把重写期间的增量写入 AOF 重写缓冲区，最后补到新文件</li>
+<li><strong>Redis 7.0 起</strong>：使用多部分 AOF，子进程生成新的 base 文件，主进程把变化写到新的 incr 文件，通过 manifest 切换</li>
+</ul>
+<hr>
+<h3 id="3-写时复制（Copy-On-Write）"><a href="#3-写时复制（Copy-On-Write）" class="headerlink" title="3. 写时复制（Copy On Write）"></a>3. 写时复制（Copy On Write）</h3><p><strong>一句话本质</strong>：BGSAVE fork 子进程后，父子进程共享内存页；主进程修改某页时，操作系统才复制该页，让快照和修改互不干扰。</p>
+<p><strong>怎么工作的</strong>：</p>
+<ol>
+<li>fork 时，父子进程共享同一份物理内存页</li>
+<li>主进程要修改某页时，操作系统复制该页，父子进程各自使用不同的物理页</li>
+<li>子进程看到的仍然是 fork 时的数据视图</li>
+</ol>
+<p><strong>好处</strong>：</p>
+<ul>
+<li><strong>省内存</strong>：fork 瞬间不复制所有数据，只有真正修改的才会触发复制</li>
+<li><strong>省时间</strong>：fork 几乎瞬间完成，不阻塞主进程</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>fork 本身有成本（创建进程、复制页表），数据量大时会短暂阻塞主线程</li>
+<li>写入会增加内存占用（修改的共享页越多，COW 产生的额外内存越多）</li>
+</ul>
+<hr>
+<h3 id="4-同时开启-RDB-和-AOF，重启时加载哪个？"><a href="#4-同时开启-RDB-和-AOF，重启时加载哪个？" class="headerlink" title="4. 同时开启 RDB 和 AOF，重启时加载哪个？"></a>4. 同时开启 RDB 和 AOF，重启时加载哪个？</h3><p><strong>正常情况下</strong>：开启 AOF 后，Redis 重启会优先使用 AOF 恢复数据（因为它通常保留更多近期变化）。</p>
+<p><strong>混合持久化</strong>（aof-use-rdb-preamble yes）：</p>
+<ul>
+<li>AOF 的基础部分采用 RDB 格式，后续变化采用 AOF 命令格式</li>
+<li>Redis 7.0 起，基础数据和增量命令分开保存，由 manifest 文件管理</li>
+<li>恢复时先加载基础数据，再回放增量命令，兼顾恢复速度和数据安全性</li>
+</ul>
+<hr>
+<h2 id="四、事务与原子性"><a href="#四、事务与原子性" class="headerlink" title="四、事务与原子性"></a>四、事务与原子性</h2><h3 id="1-如何实现原子性？"><a href="#1-如何实现原子性？" class="headerlink" title="1. 如何实现原子性？"></a>1. 如何实现原子性？</h3><p><strong>一句话本质</strong>：Redis 单条命令天然原子（主线程串行执行）；多条命令需要原子性时，用 Lua 脚本或事务。</p>
+<h4 id="单条命令"><a href="#单条命令" class="headerlink" title="单条命令"></a>单条命令</h4><ul>
+<li>INCR、DECR、SET 等单条命令执行时不会被其他客户端的命令插进来</li>
+<li>但应用层的”先 GET 再加一再 SET”是两个命令，中间可能被其他客户端修改</li>
+</ul>
+<h4 id="Lua-脚本"><a href="#Lua-脚本" class="headerlink" title="Lua 脚本"></a>Lua 脚本</h4><p><strong>优点</strong>：</p>
+<ul>
+<li>把判断和修改放在 Redis 服务端一起执行</li>
+<li>执行期间其他命令不能插入，天然原子性</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>Lua 的原子执行不等于出错后自动回滚（前面修改成功，后面报错不会撤销）</li>
+<li>脚本应尽量先检查参数、数据类型和业务条件，再执行写操作</li>
+<li>Lua 执行期间会占用主线程，不适合长时间循环或扫描大量数据</li>
+</ul>
+<h4 id="事务（MULTI-EXEC）"><a href="#事务（MULTI-EXEC）" class="headerlink" title="事务（MULTI/EXEC）"></a>事务（MULTI/EXEC）</h4><p><strong>怎么工作</strong>：</p>
+<ol>
+<li>MULTI 开启事务，后面命令先进入队列</li>
+<li>收到 EXEC 才按顺序执行</li>
+<li>事务执行期间，其他客户端的命令不会插到事务中间</li>
+</ol>
+<p><strong>重要区别</strong>：Redis 事务不提供数据库事务那样的回滚机制</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>错误类型</th>
+<th>处理方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>入队时出错（命令不存在、参数错误）</td>
+<td>EXEC 时拒绝执行整个事务</td>
+</tr>
+<tr>
+<td>执行时出错（如 WRONGTYPE）</td>
+<td>只有这条命令失败，其他命令仍会执行</td>
+</tr>
+</tbody></table></div>
+<p><strong>例子</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MULTI</span><br><span class="line">LPOP a:stock  // 类型错误</span><br><span class="line">DECR b:stock  // 这条仍会执行成功</span><br><span class="line">EXEC</span><br><span class="line">// 返回：1) 错误  2) 8</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="2-WATCH-乐观锁"><a href="#2-WATCH-乐观锁" class="headerlink" title="2. WATCH 乐观锁"></a>2. WATCH 乐观锁</h3><p><strong>一句话本质</strong>：WATCH 是”盯着某个 key”，EXEC 时发现 key 被改过就放弃执行，由客户端决定是否重试。</p>
+<p><strong>怎么工作</strong>：</p>
+<ol>
+<li>WATCH key：先盯着这个 key（记住它现在的状态）</li>
+<li>读取当前值，做业务判断</li>
+<li>MULTI：开启事务，把命令打包排队</li>
+<li>EXEC：提交事务时检查 key 是否被改过<ul>
+<li>没变：事务正常执行</li>
+<li>变了：事务作废，返回 nil</li>
+</ul>
+</li>
+</ol>
+<p><strong>通俗比喻</strong>：就像去餐厅点菜，先看好菜单（读取数据），然后告诉服务员你要做菜（WATCH+MULTI）。但在你最终下单（EXEC）前，如果厨房已经把菜做完了（key 被改了），服务员就会说”菜没了，重新点吧”。</p>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>WATCH 和事务命令要使用同一条连接</li>
+<li>EXEC 结束后会取消监视，重试时要重新 WATCH</li>
+<li>竞争激烈时可能频繁失败，因此要有重试上限和退避</li>
+</ul>
+<hr>
+<h3 id="3-Pipeline（流水线）"><a href="#3-Pipeline（流水线）" class="headerlink" title="3. Pipeline（流水线）"></a>3. Pipeline（流水线）</h3><p><strong>一句话本质</strong>：Pipeline 主要用来减少网络往返和网络读写开销，不是事务，不保证原子性。</p>
+<p><strong>怎么工作</strong>：</p>
+<ul>
+<li>先批量发送命令，再批量读取结果</li>
+<li>适合互相独立的批量查询、写入</li>
+</ul>
+<p><strong>与事务的区别</strong>：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>方式</th>
+<th>主要解决问题</th>
+<th>是否允许服务端判断</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pipeline</td>
+<td>减少网络往返和系统调用开销</td>
+<td>不能</td>
+</tr>
+<tr>
+<td>MULTI/EXEC</td>
+<td>多条命令连续执行，避免其他命令插入</td>
+<td>命令先排队，不能直接拿前面的结果决定后面的入队命令</td>
+</tr>
+<tr>
+<td>Lua</td>
+<td>把判断和修改放在服务端一起执行</td>
+<td>可以</td>
+</tr>
+</tbody></table></div>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>Pipeline 批次不能无限增大（Redis 需要缓存响应）</li>
+<li>请求超时后可能无法确认哪些命令已经执行，重试时要考虑幂等</li>
+</ul>
+<hr>
+<h3 id="4-事务-vs-Lua-怎么选？"><a href="#4-事务-vs-Lua-怎么选？" class="headerlink" title="4. 事务 vs Lua 怎么选？"></a>4. 事务 vs Lua 怎么选？</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>事务</th>
+<th>Lua</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原子性</td>
+<td>执行过程不被打断，但无回滚</td>
+<td>天然原子，执行时其他命令全排队</td>
+</tr>
+<tr>
+<td>逻辑能力</td>
+<td>只能一条条顺序执行</td>
+<td>支持 if/else、for 循环</td>
+</tr>
+<tr>
+<td>网络开销</td>
+<td>需 3 次交互（MULTI/命令/EXEC）</td>
+<td>只需发一次脚本</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>简单命令打包</td>
+<td>需要条件判断（如库存扣减）</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="五、线程模型与网络"><a href="#五、线程模型与网络" class="headerlink" title="五、线程模型与网络"></a>五、线程模型与网络</h2><h3 id="1-Redis-为什么单线程？"><a href="#1-Redis-为什么单线程？" class="headerlink" title="1. Redis 为什么单线程？"></a>1. Redis 为什么单线程？</h3><p><strong>一句话本质</strong>：Redis 瓶颈不在 CPU，在内存和网络；单线程无锁、无上下文切换，代码简单且性能极高。</p>
+<p><strong>Redis 单线程的优势</strong>：</p>
+<ul>
+<li>内存操作极快（微秒级），单线程就能扛住高并发</li>
+<li>无需加锁，无锁竞争问题</li>
+<li>无上下文切换开销</li>
+<li>单线程天然保证命令的原子性</li>
+</ul>
+<p><strong>对比 MySQL</strong>：</p>
+<ul>
+<li>MySQL 磁盘 I/O 慢，需要多线程并发读写提升吞吐</li>
+<li>MySQL 需要利用多核 CPU，避免查询互相阻塞</li>
+</ul>
+<hr>
+<h3 id="2-Redis-6-0-多线程"><a href="#2-Redis-6-0-多线程" class="headerlink" title="2. Redis 6.0 多线程"></a>2. Redis 6.0 多线程</h3><p><strong>一句话本质</strong>：Redis 6.0 只对网络 I/O 开启多线程，命令执行仍然是单线程。</p>
+<p><strong>为什么加多线程</strong>：</p>
+<ul>
+<li>随着网络硬件性能提升，Redis 的性能瓶颈有时出现在网络 I/O 处理上</li>
+<li>单 Reactor 单进程无法充分利用多核 CPU</li>
+</ul>
+<p><strong>注意</strong>：不要误解 Redis 有多线程同时执行命令。命令执行仍然是单线程。</p>
+<hr>
+<h3 id="3-网络模型"><a href="#3-网络模型" class="headerlink" title="3. 网络模型"></a>3. 网络模型</h3><p><strong>Redis 6.0 之前</strong>：单 Reactor 单线程模式</p>
+<ul>
+<li>I/O 多路复用（epoll）监听多个连接</li>
+<li>主线程处理读写、命令解析、执行</li>
+</ul>
+<p><strong>Redis 6.0 起</strong>：网络 I/O 多线程</p>
+<ul>
+<li>网络读写由多个 I/O 线程处理</li>
+<li>命令解析和执行仍由主线程完成</li>
+</ul>
+<p><strong>注意</strong>：epoll 通知的是 Socket 的就绪状态，不会替 Redis 解析命令或执行命令。如果主线程执行了一条很慢的命令，其他客户端仍然需要等待。</p>
+<hr>
+<h2 id="六、主从复制与高可用"><a href="#六、主从复制与高可用" class="headerlink" title="六、主从复制与高可用"></a>六、主从复制与高可用</h2><h3 id="1-主从同步"><a href="#1-主从同步" class="headerlink" title="1. 主从同步"></a>1. 主从同步</h3><p><strong>一句话本质</strong>：全量同步是”重新传一份完整数据”，增量同步是”从断点处接着传”，取决于复制历史还在不在。</p>
+<h4 id="全量同步（FULLRESYNC）"><a href="#全量同步（FULLRESYNC）" class="headerlink" title="全量同步（FULLRESYNC）"></a>全量同步（FULLRESYNC）</h4><p><strong>什么时候发生</strong>：</p>
+<ul>
+<li>首次建立复制关系（从节点没有复制信息）</li>
+<li>复制历史不匹配（主节点找不到兼容的复制历史）</li>
+<li>所需数据已经被覆盖（断连时间较长，缺失命令不在复制积压缓冲区中）</li>
+</ul>
+<p><strong>三个阶段</strong>：</p>
+<ol>
+<li>从节点发送 PSYNC ? -1（表示没有可用复制信息）</li>
+<li>主节点生成 RDB 快照（可写磁盘再传输，或无盘复制直接发送）</li>
+<li>主节点发送快照期间的写命令，从节点加载 RDB 后执行增量命令</li>
+</ol>
+<p><strong>注意</strong>：replication buffer（给从节点发送复制数据用）和 repl_backlog_buffer（保留最近复制历史）职责不同。</p>
+<h4 id="增量同步（CONTINUE）"><a href="#增量同步（CONTINUE）" class="headerlink" title="增量同步（CONTINUE）"></a>增量同步（CONTINUE）</h4><p><strong>基于什么</strong>：PSYNC 命令，使用复制 ID（replication ID）和复制偏移量（offset）判断能不能接着同步</p>
+<p><strong>三个步骤</strong>：</p>
+<ol>
+<li>从节点发送 PSYNC <replication_id> <offset>（offset 不是 -1）</offset></replication_id></li>
+<li>主节点检查从节点请求的偏移量是否还在 backlog 保存的范围内</li>
+<li>如果在范围内，从对应偏移量开始发送增量数据</li>
+</ol>
+<p><strong>repl_backlog_buffer</strong>：</p>
+<ul>
+<li>传统实现是环形缓冲区，Redis 7.0 使用共享的复制缓冲块</li>
+<li>默认 repl-backlog-size 是 1MB</li>
+<li>断连时间越长、复制流量越大，从节点需要的数据越容易超出这个窗口</li>
+</ul>
+<p><strong>怎么设置 backlog 大小</strong>：</p>
+<ul>
+<li>根据”每秒复制流量 × 希望容忍的断连时间”，再加一定余量</li>
+<li>例子：每秒复制流量约 2MB，希望覆盖 60 秒断连，至少需要 120MB</li>
+</ul>
+<hr>
+<h3 id="2-哨兵机制（Sentinel）"><a href="#2-哨兵机制（Sentinel）" class="headerlink" title="2. 哨兵机制（Sentinel）"></a>2. 哨兵机制（Sentinel）</h3><p><strong>一句话本质</strong>：哨兵是”监工”，负责监控主从节点、自动故障转移，保证 Redis 高可用。</p>
+<h4 id="哨兵的三大职责"><a href="#哨兵的三大职责" class="headerlink" title="哨兵的三大职责"></a>哨兵的三大职责</h4><ul>
+<li><strong>监控</strong>：不断探测主从节点是否健康</li>
+<li><strong>选主</strong>：主节点故障时，从可用从节点中选出新主节点</li>
+<li><strong>通知</strong>：通知其他从节点和客户端新主节点的信息</li>
+</ul>
+<h4 id="故障转移流程"><a href="#故障转移流程" class="headerlink" title="故障转移流程"></a>故障转移流程</h4><p><strong>1. 主观下线</strong>：</p>
+<ul>
+<li>每个哨兵定时发心跳包检测</li>
+<li>如果节点在 down-after-milliseconds 内没有回复，该哨兵标记它为主观下线</li>
+</ul>
+<p><strong>2. 客观下线</strong>：</p>
+<ul>
+<li>一个哨兵标记主观下线后，询问其他哨兵</li>
+<li>认为主节点下线的哨兵数量达到 quorum（包括自己），标记为客观下线</li>
+</ul>
+<p><strong>3. 选举 Leader</strong>：</p>
+<ul>
+<li>想成为 Leader 的哨兵请求其他哨兵投票</li>
+<li>每个哨兵在同一个纪元里只会投票给一个候选者</li>
+<li>获得票数达到 Leader 最低票数（quorum 和 floor(哨兵数/2)+1 的最大值）则选举成功</li>
+</ul>
+<p><strong>4. 选新主节点</strong>（按顺序比较）：</p>
+<ol>
+<li>过滤不合适的节点（不可用、断连过久、replica-priority 为 0）</li>
+<li>选择 replica-priority 数值更小的节点（数值越小优先级越高）</li>
+<li>优先级相同，比较复制偏移量（更大的说明接收了更多复制数据）</li>
+<li>偏移量也相同，比较 run ID（字典序更小的）</li>
+</ol>
+<p><strong>注意</strong>：这些条件是按顺序比较，不是选不到优先级最大的才去比较偏移量。</p>
+<hr>
+<h3 id="3-脑裂问题"><a href="#3-脑裂问题" class="headerlink" title="3. 脑裂问题"></a>3. 脑裂问题</h3><p><strong>一句话本质</strong>：网络分区后，旧主节点仍被部分客户端当作主节点使用，而另一边已经完成故障转移，出现新旧两个主节点。</p>
+<p><strong>怎么发生的</strong>：</p>
+<ul>
+<li>旧主节点和哨兵、从节点之间的网络断了</li>
+<li>但某些应用还可以访问旧主节点</li>
+<li>哨兵把从节点提升为新主节点</li>
+<li>新旧两个主节点都可能收到写请求</li>
+<li>网络恢复后，旧主节点被改成从节点，它独有的写入可能被新主节点的数据覆盖</li>
+</ul>
+<p><strong>怎么降低影响</strong>：</p>
+<ul>
+<li><strong>限制孤立主节点的写入</strong>：通过 min-replicas-to-write 和 min-replicas-max-lag</li>
+<li><strong>让客户端及时发现新主节点</strong>：使用支持 Sentinel 的客户端</li>
+<li><strong>减少共同故障</strong>：哨兵和主从节点分布在不同故障域</li>
+</ul>
+<p><strong>注意</strong>：这些措施能缩短风险窗口，但不能承诺完全消除数据丢失。</p>
+<hr>
+<h3 id="4-主从能保证数据一致性吗？"><a href="#4-主从能保证数据一致性吗？" class="headerlink" title="4. 主从能保证数据一致性吗？"></a>4. 主从能保证数据一致性吗？</h3><p><strong>不能保证强一致</strong>，因为 Redis 的主从复制默认是异步的。</p>
+<p><strong>典型场景</strong>：</p>
+<ul>
+<li>客户端往主节点写入一条数据，主节点返回成功</li>
+<li>但这条数据还没有复制到从节点</li>
+<li>这时主节点宕机，哨兵把从节点提升为主节点</li>
+<li>新主节点上就没有这条数据了</li>
+</ul>
+<p><strong>读写分离也有类似问题</strong>：刚写完主节点，马上去从节点读取，可能读到旧值。</p>
+<p><strong>缓解方式</strong>：</p>
+<ul>
+<li>对”写完马上读”的场景，优先读主节点</li>
+<li>用 WAIT 等机制等待副本确认</li>
+<li>用 min-replicas-to-write、min-replicas-max-lag 限制副本状态不好时的写入</li>
+</ul>
+<p><strong>注意</strong>：这些措施不会把 Redis 变成强一致系统。</p>
+<hr>
+<h2 id="七、Redis-Cluster"><a href="#七、Redis-Cluster" class="headerlink" title="七、Redis Cluster"></a>七、Redis Cluster</h2><h3 id="1-Cluster-是什么"><a href="#1-Cluster-是什么" class="headerlink" title="1. Cluster 是什么"></a>1. Cluster 是什么</h3><p><strong>一句话本质</strong>：Redis Cluster 通过 16384 个哈希槽把数据分散到多节点，解决单机内存不够和单点故障问题。</p>
+<h4 id="哈希槽怎么计算"><a href="#哈希槽怎么计算" class="headerlink" title="哈希槽怎么计算"></a>哈希槽怎么计算</h4><ol>
+<li>根据 key 按 CRC16 算法计算一个 16 bit 的值</li>
+<li>再用 16bit 值对 16384 取模，得到 0~16383 范围内的模数</li>
+<li>每个模数代表一个哈希槽</li>
+</ol>
+<h4 id="槽位分配"><a href="#槽位分配" class="headerlink" title="槽位分配"></a>槽位分配</h4><ul>
+<li><strong>平均分配</strong>：cluster create 命令自动把所有哈希槽平均分布到主节点</li>
+<li><strong>手动分配</strong>：cluster meet 建立连接，cluster addslots 指定每个节点的槽</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>真实的 Redis Cluster 固定有 16384 个槽，不能改成其他数字</li>
+<li>默认 cluster-require-full-coverage 为 yes，需要全部槽可服务</li>
+<li>槽位只分配给主节点，从节点复制对应主节点的数据，不独立分配新的槽</li>
+</ul>
+<hr>
+<h3 id="2-客户端怎么知道访问哪个分片？"><a href="#2-客户端怎么知道访问哪个分片？" class="headerlink" title="2. 客户端怎么知道访问哪个分片？"></a>2. 客户端怎么知道访问哪个分片？</h3><p><strong>一句话本质</strong>：客户端先获取”槽位 - 节点”映射表缓存到本地，访问 key 时算槽位、查缓存找节点。</p>
+<p><strong>流程</strong>：</p>
+<ol>
+<li>客户端和集群中任意节点建立连接</li>
+<li>通过 CLUSTER SLOTS 或 CLUSTER SHARDS 获取映射关系</li>
+<li>把映射关系缓存到本地</li>
+<li>访问 key 时：<ul>
+<li>对 key 做 CRC16 哈希计算</li>
+<li>对 16384 取模，算出哈希槽位</li>
+<li>查本地缓存的映射表，找到对应节点地址</li>
+<li>直接访问这个节点</li>
+</ul>
+</li>
+</ol>
+<p><strong>遇到槽位迁移或故障切换</strong>：</p>
+<ul>
+<li><strong>MOVED</strong>：表示当前槽位应该访问另一个节点。客户端重发请求，并更新这个槽的路由</li>
+<li><strong>ASK</strong>：通常出现在槽位迁移过程中，只要求这一次请求去目标节点。客户端在目标节点先发送 ASKING，再发送原命令，不能据此永久修改槽位映射</li>
+</ul>
+<hr>
+<h3 id="3-CROSSSLOT-错误与-Hash-Tag"><a href="#3-CROSSSLOT-错误与-Hash-Tag" class="headerlink" title="3. CROSSSLOT 错误与 Hash Tag"></a>3. CROSSSLOT 错误与 Hash Tag</h3><p><strong>一句话本质</strong>：Redis Cluster 的许多多 key 操作要求所有 key 位于同一个哈希槽，Hash Tag（大括号{}）就是用来强行聚集指定 key 的。</p>
+<h4 id="为什么会报-CROSSSLOT"><a href="#为什么会报-CROSSSLOT" class="headerlink" title="为什么会报 CROSSSLOT"></a>为什么会报 CROSSSLOT</h4><ul>
+<li>Redis Cluster 规定，单条命令只能操作同一台机器上的 key</li>
+<li>如果要用事务或 Lua 脚本同时改多个 key，它们必须在同一个槽</li>
+<li>如果 key 分属不同槽，就返回 CROSSSLOT 错误</li>
+</ul>
+<h4 id="Hash-Tag-怎么用"><a href="#Hash-Tag-怎么用" class="headerlink" title="Hash Tag 怎么用"></a>Hash Tag 怎么用</h4><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">seckill:{activity:1001}:stock</span><br><span class="line">seckill:{activity:1001}:buyers</span><br></pre></td></tr></tbody></table></figure>
+<ul>
+<li>Redis 计算槽位时，只对花括号内的内容（activity:1001）做哈希</li>
+<li>所以这两个 key 会落在同一个槽里</li>
+</ul>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>在同一个节点，不等于在同一个槽（一个节点会负责很多槽）</li>
+<li>不是所有 key 都应该使用同一个 hash tag（否则会把数据和流量集中到一个槽，失去分片意义）</li>
+<li>hash tag 应该按需要原子处理的业务范围来设置（如一个活动或一个订单）</li>
+</ul>
+<hr>
+<h3 id="4-Cluster-的优缺点"><a href="#4-Cluster-的优缺点" class="headerlink" title="4. Cluster 的优缺点"></a>4. Cluster 的优缺点</h3><p><strong>优点</strong>：</p>
+<ul>
+<li><strong>容量和吞吐量可以扩展</strong>：多个分片可以并行处理各自的请求</li>
+<li><strong>支持故障转移</strong>：主节点故障时，可以由合适的从节点接替</li>
+<li><strong>可以在线扩缩容</strong>：通过迁移哈希槽及其数据，调整节点负责的数据范围</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li><strong>维护更复杂</strong>：要管理主从关系、槽位、迁移、客户端路由</li>
+<li><strong>多 key 操作受限制</strong>：事务、Lua 脚本以及许多多 key 命令，要求相关 key 在同一个哈希槽</li>
+<li><strong>不能解决所有热点问题</strong>：一个 key 仍然只属于一个槽、由一个主节点处理</li>
+<li><strong>存在复制延迟和数据丢失窗口</strong>：主从异步复制，故障切换不能保证强一致</li>
+<li><strong>只支持数据库 0</strong>：不支持通过 SELECT 切换多个数据库</li>
+</ul>
+<hr>
+<h2 id="八、缓存三大问题"><a href="#八、缓存三大问题" class="headerlink" title="八、缓存三大问题"></a>八、缓存三大问题</h2><h3 id="1-缓存穿透"><a href="#1-缓存穿透" class="headerlink" title="1. 缓存穿透"></a>1. 缓存穿透</h3><p><strong>一句话本质</strong>：查的数据本来就不存在，根本不会失效，每次请求都打到数据库。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li><strong>API 入口校验</strong>：判断参数是否合法</li>
+<li><strong>缓存空值</strong>：对不存在的数据缓存空值标记，设置较短 TTL</li>
+<li><strong>布隆过滤器</strong>：快速判断数据是否存在，不存在就直接拦截</li>
+</ul>
+<h4 id="布隆过滤器详解"><a href="#布隆过滤器详解" class="headerlink" title="布隆过滤器详解"></a>布隆过滤器详解</h4><p><strong>一句话本质</strong>：布隆过滤器是”快速排重筛子”，专门用来判断”某数据绝对不存在”。</p>
+<p><strong>怎么工作的</strong>：</p>
+<ul>
+<li>像一个漏斗，里面有很多小格子（位图）</li>
+<li>存入数据时，经过多个哈希函数把数据打碎，把对应格子标记为 1</li>
+<li>查询时：<ul>
+<li>如果有任何一个格子是 0 → 数据绝对不存在</li>
+<li>如果全是 1 → 数据可能存在（有小概率误判）</li>
+</ul>
+</li>
+</ul>
+<p><strong>重要特性</strong>：</p>
+<ul>
+<li>布隆过滤器的位只能从 0 变成 1，绝不会从 1 变回 0</li>
+<li>“判断不存在”一定不存在；”判断存在”只是可能存在（哈希冲突可能造成误判）</li>
+</ul>
+<hr>
+<h3 id="2-缓存击穿"><a href="#2-缓存击穿" class="headerlink" title="2. 缓存击穿"></a>2. 缓存击穿</h3><p><strong>一句话本质</strong>：一个热点 key 失效，大量请求同时打到数据库。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li><strong>互斥锁</strong>：保证同一时间只有一个线程更新缓存</li>
+<li><strong>逻辑过期或提前刷新</strong>：数据到期后由一个请求异步刷新，其他请求暂时用旧值</li>
+</ul>
+<hr>
+<h3 id="3-缓存雪崩"><a href="#3-缓存雪崩" class="headerlink" title="3. 缓存雪崩"></a>3. 缓存雪崩</h3><p><strong>一句话本质</strong>：一堆 key 一起失效，大量请求同时打到数据库。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li><strong>过期时间加随机数</strong>：避免集中失效</li>
+<li><strong>互斥锁</strong>：保证同一时间只有一个请求重建缓存</li>
+<li><strong>预热和后台刷新</strong>：提前加载热点数据</li>
+<li><strong>Redis 故障时</strong>：用高可用、熔断、限流、降级限制数据库回源并发</li>
+</ul>
+<hr>
+<h3 id="4-缓存更新策略"><a href="#4-缓存更新策略" class="headerlink" title="4. 缓存更新策略"></a>4. 缓存更新策略</h3><p><strong>一句话本质</strong>：先更新数据库再删除缓存（不是更新缓存），但仍有旧值回填的风险。</p>
+<h4 id="为什么删除缓存比更新缓存好？"><a href="#为什么删除缓存比更新缓存好？" class="headerlink" title="为什么删除缓存比更新缓存好？"></a>为什么删除缓存比更新缓存好？</h4><p><strong>更新缓存的问题</strong>：</p>
+<ul>
+<li>请求 A（110）和请求 B（120）并发写缓存</li>
+<li>因为网络延迟，A 可能后到达，把 B 刚写入的 120 覆盖了</li>
+<li>缓存变成 110，但数据库是 120 → 不一致</li>
+</ul>
+<p><strong>删除缓存的好处</strong>：</p>
+<ul>
+<li>请求 A 和 B 更新完数据库后，都把缓存删除</li>
+<li>有人去读时，发现缓存是空的，就去数据库读取最新的 120，写入缓存</li>
+<li>下次读取，缓存就是正确的 120</li>
+</ul>
+<p><strong>餐厅菜单板比喻</strong>：</p>
+<ul>
+<li>MySQL 是后厨的真实菜单，Redis 是门口的小黑板</li>
+<li>更新缓存 = 后厨改完菜价后，服务员跑去门口把黑板上的价格擦掉，写上新的<ul>
+<li>问题：两个服务员同时跑出去改黑板，后到的反而先写到，黑板最终是错的</li>
+</ul>
+</li>
+<li>删缓存 = 后厨改完菜价后，服务员跑去门口把黑板上那道菜直接擦掉，什么都不写<ul>
+<li>好处：两个服务员谁先到都行，第一个人擦掉了，第二个人到了发现已经擦了，再擦一下也没事</li>
+</ul>
+</li>
+</ul>
+<h4 id="先更新再删，还会旧值回填吗？"><a href="#先更新再删，还会旧值回填吗？" class="headerlink" title="先更新再删，还会旧值回填吗？"></a>先更新再删，还会旧值回填吗？</h4><p><strong>会</strong>。典型场景：</p>
+<ol>
+<li>请求 A 查询缓存未命中，去数据库读到旧值 100，随后停顿</li>
+<li>请求 B 把数据库更新成 120 并删除缓存</li>
+<li>请求 A 恢复执行，把读到的 100 写回缓存</li>
+<li>最终数据库是 120，缓存却变成 100</li>
+</ol>
+<p><strong>缓解方式</strong>：</p>
+<ul>
+<li>如果业务能接受短暂旧数据，用较短 TTL 兜底</li>
+<li>必要时增加延迟删除，降低旧值回填的影响</li>
+<li>但延迟双删也不能当成强一致保证</li>
+</ul>
+<hr>
+<h2 id="九、分布式锁"><a href="#九、分布式锁" class="headerlink" title="九、分布式锁"></a>九、分布式锁</h2><h3 id="1-锁过期了业务还没执行完怎么办？"><a href="#1-锁过期了业务还没执行完怎么办？" class="headerlink" title="1. 锁过期了业务还没执行完怎么办？"></a>1. 锁过期了业务还没执行完怎么办？</h3><p><strong>一句话本质</strong>：锁过期但业务没执行完，是因为业务执行时间超过了锁的过期时间。解决办法主要有锁续期和逻辑优化。</p>
+<p><strong>为什么会出现</strong>：</p>
+<ul>
+<li>锁的过期时间设得太短，而业务逻辑执行太慢</li>
+<li>导致锁在业务完成前就自动释放了，其他线程就能拿到锁，造成并发安全问题</li>
+</ul>
+<p><strong>怎么办</strong>：</p>
+<ul>
+<li><strong>锁续期（看门狗机制）</strong>：启动后台线程监控快过期的锁，自动帮它延长寿命，直到业务执行完毕主动释放</li>
+<li><strong>逻辑优化</strong>：把耗时长的操作移到锁外面，或者把过期时间设得比业务最长执行时间还长</li>
+<li><strong>防误删</strong>：释放锁时，先检查锁是不是自己加的（通过唯一 requestId），避免删掉别人刚拿到的锁</li>
+</ul>
+<hr>
+<h3 id="2-为什么要设置定时解锁？"><a href="#2-为什么要设置定时解锁？" class="headerlink" title="2. 为什么要设置定时解锁？"></a>2. 为什么要设置定时解锁？</h3><p><strong>一句话本质</strong>：定时解锁是为了防止死锁。</p>
+<p><strong>矛盾</strong>：</p>
+<ul>
+<li>超时太短：业务没做完锁就没了（并发安全问题）</li>
+<li>超时太长/没超时：万一挂了锁就永远打不开（死锁问题）</li>
+</ul>
+<p><strong>终极解法：看门狗（锁续期）</strong>：</p>
+<ol>
+<li>加锁时不设固定长超时，而是设一个较短的默认值（如 30 秒）</li>
+<li>启动一个”看门狗”后台线程，每隔 10 秒检查一次</li>
+<li>如果发现业务还没做完，就自动帮锁续期 30 秒</li>
+<li>等业务真正执行完，主动释放锁，看门狗停止</li>
+</ol>
+<hr>
+<h2 id="十、其他工具命令"><a href="#十、其他工具命令" class="headerlink" title="十、其他工具命令"></a>十、其他工具命令</h2><h3 id="1-INCR-原子计数器"><a href="#1-INCR-原子计数器" class="headerlink" title="1. INCR 原子计数器"></a>1. INCR 原子计数器</h3><p><strong>一句话本质</strong>：INCR 是 Redis 的原子自增命令，让某个数字值 +1，多台机器同时加减不会错。</p>
+<p><strong>怎么用</strong>：</p>
+<ul>
+<li>INCR mykey：如果 mykey 不存在，先初始化为 0 再加 1</li>
+<li>DECR mykey：数字减 1</li>
+<li>INCRBY mykey 5：数字加 5（指定步长）</li>
+</ul>
+<p><strong>为什么好用</strong>：</p>
+<ul>
+<li><strong>原子性</strong>：多台机器同时让同一个数字加 1，不会像 String 那样出现覆盖错乱</li>
+<li><strong>典型场景</strong>：文章点赞数、视频播放量、接口限流（统计每秒请求数）</li>
+</ul>
+<hr>
+<h3 id="2-UNLINK-异步删除"><a href="#2-UNLINK-异步删除" class="headerlink" title="2. UNLINK 异步删除"></a>2. UNLINK 异步删除</h3><p><strong>一句话本质</strong>：UNLINK 是异步删除，主线程把 key 从键空间中摘除后由后台线程释放内存，避免 DEL 大 key 时阻塞。</p>
+<hr>
+<h2 id="十一、学习地图（知识域-×-状态）"><a href="#十一、学习地图（知识域-×-状态）" class="headerlink" title="十一、学习地图（知识域 × 状态）"></a>十一、学习地图（知识域 × 状态）</h2><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>知识域</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据结构</td>
+<td>🟢</td>
+<td>String/Hash/List/Set/ZSet/GEO 底层实现 + 应用场景</td>
+</tr>
+<tr>
+<td>过期与淘汰</td>
+<td>🟢</td>
+<td>EXPIRE/TTL、惰性 + 定期删除、LRU/LFU、8 种淘汰策略</td>
+</tr>
+<tr>
+<td>持久化</td>
+<td>🟢</td>
+<td>RDB/AOF 对比、AOF 重写、写时复制、混合持久化</td>
+</tr>
+<tr>
+<td>事务与原子性</td>
+<td>🟢</td>
+<td>单条命令原子、Lua、MULTI/EXEC、WATCH 乐观锁、Pipeline</td>
+</tr>
+<tr>
+<td>线程模型</td>
+<td>🟢</td>
+<td>单线程原因、6.0 多线程、网络模型</td>
+</tr>
+<tr>
+<td>主从与高可用</td>
+<td>🟢</td>
+<td>全量/增量同步、哨兵机制、脑裂、一致性边界</td>
+</tr>
+<tr>
+<td>Cluster</td>
+<td>🟢</td>
+<td>哈希槽、客户端路由、CROSSSLOT、Hash Tag</td>
+</tr>
+<tr>
+<td>缓存问题</td>
+<td>🟢</td>
+<td>穿透/击穿/雪崩、布隆过滤器、更新策略、旧值回填</td>
+</tr>
+<tr>
+<td>分布式锁</td>
+<td>🟢</td>
+<td>锁过期、看门狗、防误删</td>
+</tr>
+</tbody></table></div>
+<hr>
+<p><strong>一句话收口</strong>：Hash 管对象，String 管缓存和计数，Zset 管排序，过期机制管清理，持久化管数据不丢，事务/Lua 管原子性，主从/哨兵/Cluster 管高可用，缓存三大问题要防住。</p>
+</article>
+<div class="article-tags slide-up"><a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>数据库</a><a class="tag" href="/tags/redis/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>redis</a><a class="tag" href="/tags/%E7%BC%93%E5%AD%98/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>缓存</a></div>
+
+
+  <div class="article-share slide-up" id="share">
+    <div class="body">
+      <div class="social-wrap dis-select"><a class="social share-item qrcode ui-interactive is-icon-only" onclick="util.toggle(&quot;share-qrcode&quot;)" aria-label="分享文章: QR Code" title="分享文章: QR Code"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M10.553 13.447c-.424-.424-.95-.596-1.535-.675c-.553-.074-1.25-.074-2.086-.074H5.827c-.58 0-1.065 0-1.459.037c-.411.04-.795.124-1.146.34c-.345.21-.634.5-.845.844c-.216.352-.3.735-.34 1.147C2 15.459 2 15.944 2 16.525v.068c0 .884 0 1.597.055 2.17c.056.592.175 1.108.459 1.571c.288.47.682.864 1.152 1.152c.463.284.979.403 1.57.46C5.81 22 6.524 22 7.407 22h.07c.58 0 1.064 0 1.458-.037c.412-.04.795-.124 1.147-.34c.344-.21.633-.5.844-.844c.216-.352.3-.736.34-1.147c.037-.394.037-.879.037-1.46v-1.104c0-.836 0-1.533-.074-2.086c-.079-.584-.251-1.111-.675-1.535m-1.62-11.41c.412.04.795.124 1.147.34c.344.21.633.5.844.845c.216.351.3.735.34 1.146c.037.394.037.879.037 1.46v1.104c0 .836 0 1.533-.074 2.086c-.079.584-.251 1.111-.675 1.535s-.95.596-1.535.675c-.553.074-1.25.074-2.086.074H5.827c-.58 0-1.065 0-1.459-.037c-.411-.04-.795-.124-1.146-.34a2.56 2.56 0 0 1-.845-.844c-.216-.352-.3-.735-.34-1.147C2 8.54 2 8.056 2 7.475v-.068c0-.884 0-1.597.055-2.17c.056-.592.175-1.108.459-1.571c.288-.47.682-.864 1.152-1.152c.463-.284.979-.403 1.57-.46C5.81 2 6.524 2 7.407 2h.07c.58 0 1.064 0 1.458.037M16.593 2h-.068c-.58 0-1.065 0-1.46.037c-.41.04-.794.124-1.146.34c-.344.21-.633.5-.844.845c-.216.351-.3.735-.34 1.146c-.037.394-.037.879-.037 1.46v1.104c0 .836 0 1.533.074 2.086c.079.584.251 1.111.675 1.535s.95.596 1.535.675c.553.074 1.25.074 2.086.074h1.105c.58 0 1.065 0 1.459-.037c.411-.04.795-.124 1.146-.34c.345-.21.634-.5.845-.844c.216-.352.3-.735.34-1.147C22 8.54 22 8.056 22 7.475v-.068c0-.884 0-1.597-.055-2.17c-.056-.592-.175-1.108-.459-1.571a3.5 3.5 0 0 0-1.152-1.152c-.463-.284-.979-.403-1.57-.46C18.19 2 17.477 2 16.594 2" opacity=".5"/><path fill="currentColor" d="M14.093 21.302a.698.698 0 1 1-1.396 0v-2.79h1.396z" opacity=".4"/><path fill="currentColor" d="M21.302 12.698a.7.7 0 0 0-.697.697v3.256H22v-3.256a.7.7 0 0 0-.698-.697" opacity=".5"/><path fill="currentColor" d="M16.076 16.617c-.076.184-.076.417-.076.883s0 .699.076.883a1 1 0 0 0 .541.54c.184.077.417.077.883.077s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C18.199 16 17.966 16 17.5 16s-.699 0-.883.076a1 1 0 0 0-.54.541"/><path fill="currentColor" d="M22 18.535v-.023h-1.396c0 .443 0 .74-.016.97c-.015.224-.043.333-.073.405a1.16 1.16 0 0 1-.629.63c-.072.029-.18.056-.405.072c-.23.015-.527.016-.97.016h-1.86V22h1.883c.414 0 .759 0 1.042-.02a2.6 2.6 0 0 0 .844-.175a2.56 2.56 0 0 0 1.384-1.384c.112-.27.156-.549.176-.844c.02-.283.02-.628.02-1.042" opacity=".7"/><path fill="currentColor" d="M12.697 16.616v.035h1.396c0-.668 0-1.116.035-1.458c.034-.33.093-.482.16-.583a1.2 1.2 0 0 1 .321-.32c.101-.068.254-.128.584-.161c.342-.035.79-.036 1.458-.036h1.86v-1.395h-1.896c-.623 0-1.142 0-1.563.043c-.44.044-.85.142-1.218.388c-.28.187-.519.426-.706.706c-.246.368-.343.777-.388 1.217c-.043.421-.043.94-.043 1.564" opacity=".6"/><path fill="currentColor" d="M5.508 18.69c.219.155.528.155 1.146.155c.619 0 .928 0 1.146-.155a.8.8 0 0 0 .2-.199c.154-.218.154-.527.154-1.146s0-.927-.155-1.146A.8.8 0 0 0 7.8 16c-.218-.155-.527-.155-1.146-.155s-.927 0-1.146.155a.8.8 0 0 0-.199.2c-.155.218-.155.527-.155 1.145c0 .619 0 .928.155 1.146a.8.8 0 0 0 .2.2M6.654 8.155c-.618 0-.927 0-1.146-.155a.8.8 0 0 1-.199-.2c-.155-.217-.155-.527-.155-1.145c0-.619 0-.928.155-1.146a.8.8 0 0 1 .2-.2c.218-.154.527-.154 1.145-.154c.619 0 .928 0 1.146.155a.8.8 0 0 1 .2.199c.154.218.154.527.154 1.146s0 .928-.155 1.146A.8.8 0 0 1 7.8 8c-.218.155-.527.155-1.146.155M16.2 8c.218.155.527.155 1.146.155s.927 0 1.146-.155a.8.8 0 0 0 .199-.199c.155-.218.155-.528.155-1.146c0-.619 0-.928-.155-1.146a.8.8 0 0 0-.2-.2c-.218-.154-.527-.154-1.145-.154c-.619 0-.928 0-1.146.155a.8.8 0 0 0-.2.199c-.154.218-.154.527-.154 1.146s0 .928.155 1.146A.8.8 0 0 0 16.2 8"/></svg></span></a><a class="social share-item weibo ui-interactive is-icon-only" href="https:&#x2F;&#x2F;service.weibo.com&#x2F;share&#x2F;share.php?url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F&amp;title&#x3D;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;summary&#x3D;%E4%B8%80%E3%80%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%841.%20String%EF%BC%88%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%89%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%AC%E8%B4%A8%EF%BC%9ARedis%20%E7%9A%84%20String%20%E4%B8%8D%E6%98%AF%20C%20%E8%AF%AD%E8%A8%80%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%8C%E8%80%8C%E6%98%AF%E7%94%A8%20SDS%EF%BC%88Simple%20Dynamic%20String%EF%BC%89%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%8C%E8%A7%A3%E5%86%B3%20C%20%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E4%B8%89%E5%A4%A7%E7%97%9B%E7%82%B9%E3%80%82%0A%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8%20C%20%E5%AD%97%E7%AC%A6%E4%B8%B2%EF%BC%9FC%20%E5%AD%97%E7%AC%A6..." target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Weibo" title="分享文章: Weibo"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.737 5.439l-.002.004zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.346.672-.24.239.09.315.36.18.601l.014-.028zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.57-.18-.405-.615.375-.977.42-1.804 0-2.404-.781-1.112-2.915-1.053-5.364-.03 0 0-.766.331-.571-.271.376-1.217.315-2.224-.27-2.809-1.338-1.337-4.869.045-7.888 3.08C1.309 10.87 0 13.273 0 15.348c0 3.981 5.099 6.395 10.086 6.395 6.536 0 10.888-3.801 10.888-6.82 0-1.822-1.547-2.854-2.915-3.284v.01zm1.908-5.092c-.766-.856-1.908-1.187-2.96-.962-.436.09-.706.511-.616.932.09.42.511.691.932.602.511-.105 1.067.044 1.442.465.376.421.466.977.316 1.473-.136.406.089.856.51.992.405.119.857-.105.992-.512.33-1.021.12-2.178-.646-3.035l.03.045zm2.418-2.195c-1.576-1.757-3.905-2.419-6.054-1.968-.496.104-.812.587-.706 1.081.104.496.586.813 1.082.707 1.532-.331 3.185.15 4.296 1.383 1.112 1.246 1.429 2.943.947 4.416-.165.48.106 1.007.586 1.157.479.165.991-.104 1.157-.586.675-2.088.241-4.478-1.338-6.235l.03.045z"/></svg></span></a><a class="social share-item x ui-interactive is-icon-only" href="https:&#x2F;&#x2F;x.com&#x2F;intent&#x2F;tweet?text&#x3D;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: X" title="分享文章: X"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"/></svg></span></a><a class="social share-item telegram ui-interactive is-icon-only" href="https:&#x2F;&#x2F;t.me&#x2F;share&#x2F;url?url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F&amp;text&#x3D;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Telegram" title="分享文章: Telegram"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024q-.159.037-5.061 3.345q-.72.495-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789q.04-.324.893-.663q5.247-2.286 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635"/></svg></span></a><a class="social share-item whatsapp ui-interactive is-icon-only" href="https:&#x2F;&#x2F;wa.me&#x2F;?text&#x3D;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!%0Ahttps%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: WhatsApp" title="分享文章: WhatsApp"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52s.198-.298.298-.497c.099-.198.05-.371-.025-.52s-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51a13 13 0 0 0-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074s2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413s.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"/></svg></span></a><a class="social share-item email ui-interactive is-icon-only" href="mailto:?subject&#x3D;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;body&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F" aria-label="分享文章: Email" title="分享文章: Email"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828C4.343 20 6.229 20 10 20h4c3.771 0 5.657 0 6.828-1.172C22 17.657 22 15.771 22 12s0-5.657-1.172-6.828C19.657 4 17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172m15.404 2.348a.75.75 0 0 1-.096 1.056l-2.196 1.83c-.887.739-1.605 1.338-2.24 1.746-.66.424-1.303.693-2.044.693s-1.384-.269-2.045-.693c-.634-.408-1.352-1.007-2.239-1.745L5.52 8.576a.75.75 0 1 1 .96-1.152l2.159 1.799c.933.777 1.58 1.315 2.128 1.667.529.34.888.455 1.233.455s.704-.115 1.233-.455c.547-.352 1.195-.89 2.128-1.667l2.159-1.8a.75.75 0 0 1 1.056.097" clip-rule="evenodd"/></svg></span></a></div>
+      <div class="share-qrcode" id="share-qrcode" style="opacity:0;height:0"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FRedis%2520%25E5%25AD%25A6%25E4%25B9%25A0%25E7%25AC%2594%25E8%25AE%25B0%2F" onerror="this.onerror&#x3D;null;this.src&#x3D;&quot;&#x2F;images&#x2F;stellar-error.491ee870f4940739.svg&quot;"/></div>
+    </div>
+  </div>
+
+<div class="article-footer slide-up">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section></div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"></div><div class="item" id="next"><div class="note">较早文章 <svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-right" aria-hidden="true"></svg></div><a href="/2026/11/19/IM%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3-5%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/">IM 项目架构详解：5 个服务怎么协作</a></div></section></div>
+
+
+
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="text"><p>本站由 <a href="/">Qiu Yinlan</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0">Stellar 2.0.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
+</main></div><button type="button" class="site-scrim" data-shell-action="dismiss-drawer" aria-label="Close navigation" tabindex="-1"></button><div data-stellar-runtime-region class="site-dock" role="group" aria-label="Layout panels">
+  <button type="button" class="site-dock__button site-dock__button--rightbar ui-interactive" aria-label="Open rightbar" aria-controls="rightbar-region" aria-expanded="false" data-shell-action="toggle-rightbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type="button" class="site-dock__button site-dock__button--leftbar ui-interactive" aria-label="Open leftbar" aria-controls="leftbar-region" aria-expanded="false" data-shell-action="toggle-leftbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+
+<dialog data-stellar-runtime-region class="search-dialog" id="site-search-dialog" aria-labelledby="site-search-title">
+  <div class="search-dialog__panel search-wrapper" id="site-search-wrapper" searching="false">
+    <div class="search-dialog__header">
+      <div class="search-form" role="search">
+        <span class="search-button" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"/><circle cx="14" cy="11" r="4"/></g></svg></span>
+        <input type="search" class="search-input" id="site-search-input" aria-labelledby="site-search-title" placeholder="搜索">
+      </div>
+      <button type="button" class="search-dialog__close" data-shell-action="close-search" aria-label="关闭搜索">×</button>
+    </div>
+    
+      <div class="search-dialog__scope" role="radiogroup" aria-labelledby="site-search-title" hidden>
+        <label class="search-dialog__scope-option" data-search-scope-option="all">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="all">
+          <span>全站</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="blog" hidden>
+          <input class="ui-radio" type="radio" name="site-search-scope" value="blog">
+          <span>博客</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="current" hidden>
+          <input class="ui-radio" type="radio" name="site-search-scope" value="current">
+          <span data-search-scope-current-label></span>
+        </label>
+      </div>
+    
+    <h2 class="search-dialog__title" id="site-search-title">站内搜索</h2>
+    <div class="search-result" id="site-search-result"></div>
+    <div class="search-no-result">没有找到内容！</div>
+  </div>
+</dialog>
+</div><div class="site-scripts">
+<script data-stellar-script="core" src="/js/stellar-icons.js?v=39c6ac17e854ffe2"></script>
+
+<script data-stellar-script="defines">
+  window.canonical = window.stellarClientData.canonical;
+  const ctx = window.stellarClientData.ctx;
+  window.canonical.param = {permalink: "https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/", checklink: ctx.services.video.js};
+  ctx.date_suffix = {"just":"刚刚","min":"分钟前","hour":"小时前","day":"天前"};
+  if (ctx.search) Object.assign(ctx.search, {"more":"更多","no_more":"没有更多了"});
+  const def = window.stellarClientData.def;
+  window.ctx = ctx;
+  window.def = def;
+</script>
+
+
+<!-- core: 迁移期 DOM/资源兼容工具；Extension 注册与生命周期由 ESM runtime 所有 -->
+<script data-stellar-script="core" src="/js/utils.js?v=2.0.0"></script>
+<script data-stellar-script="core" src="/js/main.js?v=2.0.0" defer></script>
+<script data-stellar-script="core" defer src="/js/profile.js?v=2.0.0"></script>
+
+
+
+
+
+<script data-stellar-script="core" type="application/json" id="stellar-runtime-config">{"version":1,"root":"/","policy":{"cache":{"enabled":true,"defaultTtl":3600,"ttl":{"giscus":600,"waline":600,"artalk":600,"memos":600,"memos-user":86400,"sites":86400,"friends":86400,"friends_and_posts":86400,"siteinfo":86400},"maxEntries":200},"request":{"retries":2,"timeoutMs":5000,"idleTimeoutMs":3000,"maxCacheEntryBytes":204800},"features":{"codeCopyToastMs":2500},"providers":{"linkPrefetch":"flying_pages","lightbox":"fancybox","diagrams":"mermaid"}},"extensions":[{"id":"pin-slider","module":"/js/runtime/extensions/pin-slider.js","scope":"region","when":{"selector":".pin-slider"},"config":{}},{"id":"page-controls","module":"/js/runtime/extensions/page-controls.js","scope":"region","when":{"always":true},"config":{"highlight":"/js/search/highlight.js","tagtree":"/js/tagtree.js"}},{"id":"partial-navigation","module":"/js/runtime/extensions/partial-navigation.js","scope":"document","when":{"always":true},"config":{}},{"id":"search","module":"/js/runtime/extensions/search.js","scope":"document","when":{"selector":".search-input"},"config":{"provider":"local","options":{"scope":"all","includeContent":true,"cacheTtlSeconds":86400},"assets":{"client":null,"provider":"/js/search/local-search.js","shortcut":"/js/search/shortcut.js"}}},{"id":"hero-parallax","module":"/js/runtime/extensions/hero-parallax.js","scope":"region","when":{"selector":".wiki-hero"},"config":{}},{"id":"hero-effect","module":"/js/runtime/extensions/hero-effect.js","scope":"region","when":{"selector":"canvas[data-hero-effect]"},"config":{}},{"id":"lazy-loading","module":"/js/runtime/extensions/lazy-loading.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"}},{"id":"deferred-icons","module":"/js/runtime/extensions/deferred-icons.js","scope":"region","when":{"selector":"svg.icon[data-icon]"},"config":{}},{"id":"dropdown","module":"/js/runtime/extensions/dropdown.js","scope":"region","when":{"selector":"details.dropdown"},"config":{}},{"id":"services","module":"/js/runtime/extensions/services.js","scope":"region","when":{"selector":"#artalk_container, #twikoo_container, #waline_container, .data-service, [class*='ds-'], a[cardlink], a[data-md-link][data-siteinfo-api], .site-card [data-siteinfo-api], .voice\u003eaudio, .video\u003evideo, .chat-file"},"config":{"marked":"https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js"}},{"id":"settings","module":"/js/runtime/extensions/settings.js","scope":"region","when":{"selector":".settings-page"},"config":{}},{"id":"link-prefetch","module":"/js/runtime/extensions/link-prefetch.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"}},{"id":"lightbox","module":"/js/runtime/extensions/lightbox.js","scope":"region","when":{"selector":"[data-fancybox]:not(.error), .with-fancybox, .ds-memos, .timenode p\u003eimg"},"config":{"enabled":true,"selector":".timenode p\u003eimg","assets":{"localCss":"/css/plugins/fancybox.css","js":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js","css":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"}}},{"id":"reveal","module":"/js/runtime/extensions/reveal.js","scope":"region","when":{"selector":".slide-up"},"config":{"enabled":true,"duration":800,"interval":200,"distance":8,"blur":4}},{"id":"code-copy","module":"/js/runtime/extensions/code-copy.js","scope":"region","when":{"selector":".code"},"config":{"assets":{"js":"/js/plugins/copycode.js"},"messages":{"label":"复制","copied":"复制成功","denied":"未获得剪贴板权限","unsupported":"当前浏览器不支持剪贴板或页面不是 HTTPS"}}},{"id":"adaptive-text","module":"/js/runtime/extensions/adaptive-text.js","scope":"region","when":{"selector":"[data-text-adaptive]"},"config":{"assets":{"colorJs":"/js/color.js","js":"/js/plugins/adaptive-text.js"}}},{"id":"swiper","module":"/js/runtime/extensions/swiper.js","scope":"region","when":{"selector":"#swiper-api"},"config":{"assets":{"localCss":"/css/plugins/swiper.css","js":"https://unpkg.com/swiper@10.3/swiper-bundle.min.js","css":"https://unpkg.com/swiper@10.3/swiper-bundle.min.css"}}}]}</script>
+<script data-stellar-script="core" type="module" src="/js/runtime/index.js?v=2.0.0&runtime=1"></script>
+
+
+<!-- inject -->
+<script src="/js/toc-float.js?v=20261117" defer></script>
+<script src="/js/category-filter.js?v=20261117" defer></script>
+<script src="/js/show-wordcount.js?v=20261117" defer></script>
+
+
+<script data-stellar-script="core" defer src="/js/navigation-init.js?v=2.0.0"></script>
+</div></body></html>
+
