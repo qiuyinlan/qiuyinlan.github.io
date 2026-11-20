@@ -42,7 +42,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-19T04:40:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-19T04:50:50.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-20T03:48:43.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="redis" data-stellar-page-meta="">
 <meta property="article:tag" content="数据库" data-stellar-page-meta="">
 <meta property="article:tag" content="缓存" data-stellar-page-meta="">
@@ -63,7 +63,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T12:40:00+08:00","dateModified":"2026-11-19T12:50:50+08:00","datePublished":"2026-11-19T12:40:00+08:00","description":"一、数据结构1. String（字符串）一句话本质：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。\n为什么不用 C 字符串？C 字符串的缺陷：\n\n长度获取慢：必须遍历到 \\0，O(n)\n缓冲区溢出：修改时不检查空间，容易越界\n无法二进制安全：依赖 \\0 判断结尾，不能存包含 \\0 的数据\n\n...","headline":"Redis 学习笔记","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"redis, 缓存, 数据库","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T12:40:00+08:00","dateModified":"2026-11-20T11:48:43+08:00","datePublished":"2026-11-19T12:40:00+08:00","description":"一、数据结构1. String（字符串）一句话本质：Redis 的 String 不是 C 语言字符串，而是用 SDS（Simple Dynamic String）实现的，解决 C 字符串的三大痛点。\n为什么不用 C 字符串？C 字符串的缺陷：\n\n长度获取慢：必须遍历到 \\0，O(n)\n缓冲区溢出：修改时不检查空间，容易越界\n无法二进制安全：依赖 \\0 判断结尾，不能存包含 \\0 的数据\n\n...","headline":"Redis 学习笔记","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"redis, 缓存, 数据库","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css?v=20261117">
 <link rel="stylesheet" href="/css/card-style.css?v=20261117">
 
@@ -201,6 +201,24 @@
   <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
   
     
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;" title="Redis 学习笔记">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">R</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Redis 学习笔记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
 <a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;20&#x2F;Redis-%E9%9B%B6%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20%E7%BC%93%E5%AD%98%E7%AD%96%E7%95%A5%20-%20%E6%8C%81%E4%B9%85%E5%8C%96%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B&#x2F;" title="Redis 零基础学习笔记：缓存策略、持久化与多线程模型">
   
   
@@ -227,24 +245,6 @@
     <span class="ui-collection__content">
       
       <span class="ui-collection__title">IM 项目架构详解：5 个服务怎么协作</span>
-      
-      
-    </span>
-  
-  
-  
-</a>
-
-  
-    
-<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;" title="Redis 学习笔记">
-  
-  
-  <span class="ui-collection__initial" aria-hidden="true">R</span>
-  
-    <span class="ui-collection__content">
-      
-      <span class="ui-collection__title">Redis 学习笔记</span>
       
       
     </span>
@@ -410,7 +410,7 @@
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E5%85%AB%E8%82%A1/">八股</a>
 </div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T04:40:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-19T04:50:50.000Z">2026-11-19</time></span></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T04:40:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-20T03:48:43.000Z">2026-11-20</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -764,29 +764,33 @@
 <tr>
 <th>策略</th>
 <th>说明</th>
-<th>优点</th>
-<th>缺点</th>
+<th>安全性</th>
+<th>性能</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>always</td>
-<td>每次写命令后都 fsync 刷盘</td>
-<td>数据最安全</td>
-<td>磁盘同步开销大</td>
+<td><code>always</code></td>
+<td>每条命令都 fsync 落盘</td>
+<td>最安全，几乎不丢数据</td>
+<td>最慢，相当于每次写都同步磁盘 I/O</td>
 </tr>
 <tr>
-<td>everysec（推荐）</td>
-<td>每秒由后台线程 fsync 一次</td>
-<td>通常丢失≤1 秒数据</td>
-<td>磁盘卡顿时可能延迟</td>
+<td><code>everysec</code></td>
+<td>每秒刷一次（默认推荐）</td>
+<td>最多丢 1 秒数据</td>
+<td>平衡，99% 场景够用</td>
 </tr>
 <tr>
-<td>no</td>
-<td>不主动 fsync，由操作系统决定</td>
-<td>性能最好</td>
-<td>数据丢失窗口难控制</td>
+<td><code>no</code></td>
+<td>交给操作系统决定何时刷</td>
+<td>可能丢更多（系统崩溃时）</td>
+<td>最快，但风险最大</td>
 </tr>
 </tbody></table></div>
+<p><strong>配置示例</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendfsync everysec</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>建议</strong>：除非对数据极其敏感（如金融交易），否则用默认 <code>everysec</code> 即可。</p>
 <p><strong>AOF 缺点</strong>：</p>
 <ul>
 <li>纯命令格式的 AOF 通常比 RDB 大</li>
@@ -827,6 +831,24 @@
 <ul>
 <li>fork 本身有成本（创建进程、复制页表），数据量大时会短暂阻塞主线程</li>
 <li>写入会增加内存占用（修改的共享页越多，COW 产生的额外内存越多）</li>
+</ul>
+<p><strong>RDB 和 AOF 重写都依赖 fork</strong>：</p>
+<ol>
+<li>主进程 fork 出子进程写文件</li>
+<li>主线程继续服务请求</li>
+<li>期间修改的数据通过**写时复制（Copy-on-Write）**保证快照一致</li>
+</ol>
+<p><strong>潜在问题</strong>：</p>
+<ul>
+<li>fork 瞬间会阻塞主线程（虽然很短）</li>
+<li>内存较大时（如几十 GB），fork 可能阻塞数毫秒到数十毫秒</li>
+<li>写时复制会额外消耗内存（修改的数据越多，消耗越大）</li>
+</ul>
+<p><strong>建议</strong>：</p>
+<ul>
+<li>大内存实例避免频繁 RDB</li>
+<li>AOF 重写阈值设合理（如 64MB 以上才重写）</li>
+<li>监控 fork 延迟（Redis 4.0+ 有相关指标）</li>
 </ul>
 <hr>
 <h3 id="4-同时开启-RDB-和-AOF，重启时加载哪个？"><a href="#4-同时开启-RDB-和-AOF，重启时加载哪个？" class="headerlink" title="4. 同时开启 RDB 和 AOF，重启时加载哪个？"></a>4. 同时开启 RDB 和 AOF，重启时加载哪个？</h3><p><strong>正常情况下</strong>：开启 AOF 后，Redis 重启会优先使用 AOF 恢复数据（因为它通常保留更多近期变化）。</p>
@@ -982,10 +1004,47 @@
 </ul>
 <hr>
 <h3 id="2-Redis-6-0-多线程"><a href="#2-Redis-6-0-多线程" class="headerlink" title="2. Redis 6.0 多线程"></a>2. Redis 6.0 多线程</h3><p><strong>一句话本质</strong>：Redis 6.0 只对网络 I/O 开启多线程，命令执行仍然是单线程。</p>
-<p><strong>为什么加多线程</strong>：</p>
+<h4 id="6-0-之前：单线程一肩挑"><a href="#6-0-之前：单线程一肩挑" class="headerlink" title="6.0 之前：单线程一肩挑"></a>6.0 之前：单线程一肩挑</h4><p><strong>架构</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">网络读写（socket read/write）→ 命令执行（解析 + 执行）→ 响应写出</span><br><span class="line">              ↑                    ↑                     ↑</span><br><span class="line">              └───────── 主线程 ────────────┘</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>瓶颈</strong>：高并发下，网络 I/O 占用大量 CPU，命令执行反而很快。</p>
+<h4 id="6-0-之后：I-O-多线程化"><a href="#6-0-之后：I-O-多线程化" class="headerlink" title="6.0 之后：I/O 多线程化"></a>6.0 之后：I/O 多线程化</h4><p><strong>架构</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">网络读入 → I/O 线程池（并行） → 主线程（命令执行） → I/O 线程池（并行） → 网络写出</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>关键点</strong>：</p>
 <ul>
-<li>随着网络硬件性能提升，Redis 的性能瓶颈有时出现在网络 I/O 处理上</li>
-<li>单 Reactor 单进程无法充分利用多核 CPU</li>
+<li><strong>I/O 线程</strong>：只负责网络数据读写（读入请求、写出响应）</li>
+<li><strong>主线程</strong>：仍然单线程串行执行命令</li>
+</ul>
+<h4 id="为什么只多线程化网络-I-O？"><a href="#为什么只多线程化网络-I-O？" class="headerlink" title="为什么只多线程化网络 I/O？"></a>为什么只多线程化网络 I/O？</h4><p><strong>原因 1：瓶颈在网络</strong></p>
+<ul>
+<li>高流量下，Redis 的瓶颈通常在<strong>网络 I/O</strong>（读写 socket 很耗 CPU）</li>
+<li>命令执行本身很快（内存操作，纳秒/微秒级）</li>
+</ul>
+<p><strong>原因 2：避免复杂度</strong></p>
+<ul>
+<li>让命令保持单线程可以继续<strong>避免竞态和锁带来的复杂度</strong></li>
+<li>不需要为每个命令加锁，保持代码简单可维护</li>
+</ul>
+<p><strong>原因 3：兼容性</strong></p>
+<ul>
+<li>现有命令逻辑不用改，直接复用</li>
+<li>用户无感知，行为一致</li>
+</ul>
+<h4 id="性能提升"><a href="#性能提升" class="headerlink" title="性能提升"></a>性能提升</h4><p>官方测试数据：</p>
+<ul>
+<li>纯网络 I/O 场景：<strong>2~3 倍提升</strong></li>
+<li>混合负载：<strong>1.5~2 倍提升</strong></li>
+<li>CPU 密集型命令（如排序、集合运算）：提升有限</li>
+</ul>
+<p><strong>配置</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">io-threads 4          # I/O 线程数（默认 4）</span><br><span class="line">io-threads-do-reads yes  # 是否用 I/O 线程读请求（默认 no，只写响应）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>建议</strong>：</p>
+<ul>
+<li>CPU 核心数 ≤ 4：不用开多线程</li>
+<li>CPU 核心数 ≥ 8：开到 4~6 个 I/O 线程</li>
+<li>监控 CPU 使用率，避免过度配置</li>
 </ul>
 <p><strong>注意</strong>：不要误解 Redis 有多线程同时执行命令。命令执行仍然是单线程。</p>
 <hr>
@@ -1169,7 +1228,58 @@
 <li><strong>只支持数据库 0</strong>：不支持通过 SELECT 切换多个数据库</li>
 </ul>
 <hr>
-<h2 id="八、缓存三大问题"><a href="#八、缓存三大问题" class="headerlink" title="八、缓存三大问题"></a>八、缓存三大问题</h2><h3 id="1-缓存穿透"><a href="#1-缓存穿透" class="headerlink" title="1. 缓存穿透"></a>1. 缓存穿透</h3><p><strong>一句话本质</strong>：查的数据本来就不存在，根本不会失效，每次请求都打到数据库。</p>
+<h2 id="八、缓存三大策略（新增）"><a href="#八、缓存三大策略（新增）" class="headerlink" title="八、缓存三大策略（新增）"></a>八、缓存三大策略（新增）</h2><h3 id="1-缓存预热"><a href="#1-缓存预热" class="headerlink" title="1. 缓存预热"></a>1. 缓存预热</h3><p><strong>定义</strong>：系统上线或大促前，把热点数据提前加载到缓存。</p>
+<p><strong>为什么</strong>：避免刚上线时大量请求穿透到数据库，导致数据库压力骤增。</p>
+<p><strong>典型场景</strong>：</p>
+<ul>
+<li>电商大促前，把热门商品、库存信息提前塞进 Redis</li>
+<li>新闻 App 上线，把首页推荐文章预加载</li>
+<li>游戏开服，把排行榜、配置表提前缓存</li>
+</ul>
+<p><strong>实现方式</strong>：</p>
+<ul>
+<li>启动时异步加载热点数据</li>
+<li>定时任务扫描热点 Key 主动刷新</li>
+<li>管理后台手动触发预热</li>
+</ul>
+<hr>
+<h3 id="2-缓存降级"><a href="#2-缓存降级" class="headerlink" title="2. 缓存降级"></a>2. 缓存降级</h3><p><strong>定义</strong>：当缓存或下游依赖故障时，返回兜底数据。</p>
+<p><strong>兜底数据来源</strong>：</p>
+<ul>
+<li>默认值（如空列表、0、默认配置）</li>
+<li>旧缓存（过期但还能用的数据）</li>
+<li>静态页（硬编码的 HTML 或 JSON）</li>
+</ul>
+<p><strong>为什么</strong>：保证核心功能可用而不是直接报错，属于高可用兜底手段。</p>
+<p><strong>典型场景</strong>：</p>
+<ul>
+<li>Redis 挂了，返回本地内存缓存的旧数据</li>
+<li>推荐系统超时，返回热门榜单代替个性化推荐</li>
+<li>数据库宕机，返回静态配置的兜底页面</li>
+</ul>
+<p><strong>代码思路</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">try:</span><br><span class="line">    data = redis.get(key)</span><br><span class="line">except RedisError:</span><br><span class="line">    data = get_fallback_data()  # 降级兜底</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h3 id="3-多级缓存"><a href="#3-多级缓存" class="headerlink" title="3. 多级缓存"></a>3. 多级缓存</h3><p><strong>定义</strong>：本地缓存（如 Caffeine）+ Redis 缓存 + 数据库 的三级结构。</p>
+<p><strong>查询顺序</strong>：先查本地 → 再查 Redis → 最后查数据库，逐级回源。</p>
+<p><strong>为什么</strong>：</p>
+<ul>
+<li>减少网络开销（本地缓存零网络）</li>
+<li>减轻 Redis 压力（热点中的热点拦在本地）</li>
+<li>保护数据库（最后一道防线）</li>
+</ul>
+<p><strong>典型架构</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">请求 → 本地缓存 (Caffeine/Guava) </span><br><span class="line">      ↓ 未命中</span><br><span class="line">      → Redis 集群</span><br><span class="line">          ↓ 未命中</span><br><span class="line">          → 数据库 (MySQL/PG)</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>注意事项</strong>：</p>
+<ul>
+<li>本地缓存要设较短过期时间，避免数据不一致</li>
+<li>集群环境下，本地缓存只在单节点有效</li>
+<li>缓存更新时要考虑多级失效策略</li>
+</ul>
+<hr>
+<h2 id="九、缓存三大问题"><a href="#九、缓存三大问题" class="headerlink" title="九、缓存三大问题"></a>九、缓存三大问题</h2><h3 id="1-缓存穿透"><a href="#1-缓存穿透" class="headerlink" title="1. 缓存穿透"></a>1. 缓存穿透</h3><p><strong>一句话本质</strong>：查的数据本来就不存在，根本不会失效，每次请求都打到数据库。</p>
 <p><strong>解决方案</strong>：</p>
 <ul>
 <li><strong>API 入口校验</strong>：判断参数是否合法</li>
@@ -1209,7 +1319,7 @@
 <li><strong>Redis 故障时</strong>：用高可用、熔断、限流、降级限制数据库回源并发</li>
 </ul>
 <hr>
-<h3 id="4-缓存更新策略"><a href="#4-缓存更新策略" class="headerlink" title="4. 缓存更新策略"></a>4. 缓存更新策略</h3><p><strong>一句话本质</strong>：先更新数据库再删除缓存（不是更新缓存），但仍有旧值回填的风险。</p>
+<h3 id="5-缓存更新策略"><a href="#5-缓存更新策略" class="headerlink" title="5. 缓存更新策略"></a>5. 缓存更新策略</h3><p><strong>一句话本质</strong>：先更新数据库再删除缓存（不是更新缓存），但仍有旧值回填的风险。</p>
 <h4 id="为什么删除缓存比更新缓存好？"><a href="#为什么删除缓存比更新缓存好？" class="headerlink" title="为什么删除缓存比更新缓存好？"></a>为什么删除缓存比更新缓存好？</h4><p><strong>更新缓存的问题</strong>：</p>
 <ul>
 <li>请求 A（110）和请求 B（120）并发写缓存</li>
@@ -1248,7 +1358,7 @@
 <li>但延迟双删也不能当成强一致保证</li>
 </ul>
 <hr>
-<h2 id="九、分布式锁"><a href="#九、分布式锁" class="headerlink" title="九、分布式锁"></a>九、分布式锁</h2><h3 id="1-锁过期了业务还没执行完怎么办？"><a href="#1-锁过期了业务还没执行完怎么办？" class="headerlink" title="1. 锁过期了业务还没执行完怎么办？"></a>1. 锁过期了业务还没执行完怎么办？</h3><p><strong>一句话本质</strong>：锁过期但业务没执行完，是因为业务执行时间超过了锁的过期时间。解决办法主要有锁续期和逻辑优化。</p>
+<h2 id="十、分布式锁"><a href="#十、分布式锁" class="headerlink" title="十、分布式锁"></a>十、分布式锁</h2><h3 id="1-锁过期了业务还没执行完怎么办？"><a href="#1-锁过期了业务还没执行完怎么办？" class="headerlink" title="1. 锁过期了业务还没执行完怎么办？"></a>1. 锁过期了业务还没执行完怎么办？</h3><p><strong>一句话本质</strong>：锁过期但业务没执行完，是因为业务执行时间超过了锁的过期时间。解决办法主要有锁续期和逻辑优化。</p>
 <p><strong>为什么会出现</strong>：</p>
 <ul>
 <li>锁的过期时间设得太短，而业务逻辑执行太慢</li>
@@ -1275,7 +1385,7 @@
 <li>等业务真正执行完，主动释放锁，看门狗停止</li>
 </ol>
 <hr>
-<h2 id="十、其他工具命令"><a href="#十、其他工具命令" class="headerlink" title="十、其他工具命令"></a>十、其他工具命令</h2><h3 id="1-INCR-原子计数器"><a href="#1-INCR-原子计数器" class="headerlink" title="1. INCR 原子计数器"></a>1. INCR 原子计数器</h3><p><strong>一句话本质</strong>：INCR 是 Redis 的原子自增命令，让某个数字值 +1，多台机器同时加减不会错。</p>
+<h2 id="十一、其他工具命令"><a href="#十一、其他工具命令" class="headerlink" title="十一、其他工具命令"></a>十一、其他工具命令</h2><h3 id="1-INCR-原子计数器"><a href="#1-INCR-原子计数器" class="headerlink" title="1. INCR 原子计数器"></a>1. INCR 原子计数器</h3><p><strong>一句话本质</strong>：INCR 是 Redis 的原子自增命令，让某个数字值 +1，多台机器同时加减不会错。</p>
 <p><strong>怎么用</strong>：</p>
 <ul>
 <li>INCR mykey：如果 mykey 不存在，先初始化为 0 再加 1</li>
@@ -1290,7 +1400,7 @@
 <hr>
 <h3 id="2-UNLINK-异步删除"><a href="#2-UNLINK-异步删除" class="headerlink" title="2. UNLINK 异步删除"></a>2. UNLINK 异步删除</h3><p><strong>一句话本质</strong>：UNLINK 是异步删除，主线程把 key 从键空间中摘除后由后台线程释放内存，避免 DEL 大 key 时阻塞。</p>
 <hr>
-<h2 id="十一、学习地图（知识域-×-状态）"><a href="#十一、学习地图（知识域-×-状态）" class="headerlink" title="十一、学习地图（知识域 × 状态）"></a>十一、学习地图（知识域 × 状态）</h2><div class="md-table-scroll"><table>
+<h2 id="十二、学习地图（知识域-×-状态）"><a href="#十二、学习地图（知识域-×-状态）" class="headerlink" title="十二、学习地图（知识域 × 状态）"></a>十二、学习地图（知识域 × 状态）</h2><div class="md-table-scroll"><table>
 <thead>
 <tr>
 <th>知识域</th>
@@ -1309,9 +1419,19 @@
 <td>EXPIRE/TTL、惰性 + 定期删除、LRU/LFU、8 种淘汰策略</td>
 </tr>
 <tr>
+<td>缓存策略</td>
+<td>🟢</td>
+<td>预热/降级/多级缓存</td>
+</tr>
+<tr>
+<td>缓存问题</td>
+<td>🟢</td>
+<td>穿透/击穿/雪崩、布隆过滤器、更新策略、旧值回填</td>
+</tr>
+<tr>
 <td>持久化</td>
 <td>🟢</td>
-<td>RDB/AOF 对比、AOF 重写、写时复制、混合持久化</td>
+<td>RDB/AOF 对比、AOF 重写、写时复制、混合持久化、fork 代价</td>
 </tr>
 <tr>
 <td>事务与原子性</td>
@@ -1321,7 +1441,7 @@
 <tr>
 <td>线程模型</td>
 <td>🟢</td>
-<td>单线程原因、6.0 多线程、网络模型</td>
+<td>单线程原因、6.0 多线程 I/O、网络模型</td>
 </tr>
 <tr>
 <td>主从与高可用</td>
@@ -1334,18 +1454,13 @@
 <td>哈希槽、客户端路由、CROSSSLOT、Hash Tag</td>
 </tr>
 <tr>
-<td>缓存问题</td>
-<td>🟢</td>
-<td>穿透/击穿/雪崩、布隆过滤器、更新策略、旧值回填</td>
-</tr>
-<tr>
 <td>分布式锁</td>
 <td>🟢</td>
 <td>锁过期、看门狗、防误删</td>
 </tr>
 </tbody></table></div>
 <hr>
-<p><strong>一句话收口</strong>：Hash 管对象，String 管缓存和计数，Zset 管排序，过期机制管清理，持久化管数据不丢，事务/Lua 管原子性，主从/哨兵/Cluster 管高可用，缓存三大问题要防住。</p>
+<p><strong>一句话收口</strong>：Hash 管对象，String 管缓存和计数，Zset 管排序，缓存三策略（预热/降级/多级）管高可用，过期机制管清理，持久化管数据不丢，事务/Lua 管原子性，主从/哨兵/Cluster 管高可用，缓存三问题（穿透/击穿/雪崩）要防住。</p>
 </article>
 <div class="article-tags slide-up"><a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>数据库</a><a class="tag" href="/tags/redis/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>redis</a><a class="tag" href="/tags/%E7%BC%93%E5%AD%98/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>缓存</a></div>
 
