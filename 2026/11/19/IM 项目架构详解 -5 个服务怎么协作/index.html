@@ -42,7 +42,7 @@
 <meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
 <meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
 <meta property="article:published_time" content="2026-11-19T03:50:00.000Z" data-stellar-page-meta="">
-<meta property="article:modified_time" content="2026-11-20T11:20:00.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-20T12:35:00.000Z" data-stellar-page-meta="">
 <meta property="article:tag" content="IM" data-stellar-page-meta="">
 <meta property="article:tag" content="后端" data-stellar-page-meta="">
 <meta property="article:tag" content="架构" data-stellar-page-meta="">
@@ -63,7 +63,7 @@
 
   
 
-  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T11:50:00+08:00","dateModified":"2026-11-20T19:20:00+08:00","datePublished":"2026-11-19T11:50:00+08:00","description":"IM 项目架构详解：5 个服务怎么协作\n用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。\n\n\n一、一句话本质IM 项目要解决的核心问题：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。\n为此，系统拆成 5 个独立服务，每个服务只干一件事。\n\n二、5 个服务全景图\n\n\n服务名\n端口\n职责\n关键依赖\n\n\n\nga...","headline":"IM 项目架构详解：5 个服务怎么协作","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"IM, 后端, 架构","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T11:50:00+08:00","dateModified":"2026-11-20T20:35:00+08:00","datePublished":"2026-11-19T11:50:00+08:00","description":"IM 项目架构详解：5 个服务怎么协作\n用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。\n\n\n一、一句话本质IM 项目要解决的核心问题：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。\n为此，系统拆成 5 个独立服务，每个服务只干一件事。\n\n二、5 个服务全景图\n\n\n服务名\n端口\n职责\n关键依赖\n\n\n\nga...","headline":"IM 项目架构详解：5 个服务怎么协作","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"IM, 后端, 架构","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
   <link rel="stylesheet" href="/css/toc-float.css?v=20261117">
 <link rel="stylesheet" href="/css/card-style.css?v=20261117">
 
@@ -410,7 +410,7 @@
     <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
 <span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/IM/">IM</a>
 </div></div><div class="meta-row">
-<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T03:50:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-20T11:20:00.000Z">2026-11-20</time></span></div>
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T03:50:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-20T12:35:00.000Z">2026-11-20</time></span></div>
 </div></div>
     
     <div class="bottom only-title">
@@ -786,9 +786,6 @@
 </tbody></table></div>
 <p><strong>三者关系一句话</strong>：通过 Key 找到一组数据，每条数据由 Member（唯一标识）和 Score（排序依据）组成。</p>
 <p>在离线消息场景中，利用 ZSet 的这种结构，用户上线时可以按 Score（时间戳）顺序取出所有 Member（消息），保证消息按序、不重、不漏地送达。</p>
-<p><strong>ZSet 结构</strong>：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Key: offline:1002</span><br><span class="line">Member: msg_001, msg_002, ...（消息 JSON，唯一）</span><br><span class="line">Score: 1717000000, 1717000001, ...（时间戳，自动排序）</span><br></pre></td></tr></tbody></table></figure>
-
 <h3 id="8-2-客户端怎么拉取离线消息"><a href="#8-2-客户端怎么拉取离线消息" class="headerlink" title="8.2 客户端怎么拉取离线消息"></a>8.2 客户端怎么拉取离线消息</h3><p>客户端重新上线后：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET /api/offline/messages?cursor=0&amp;limit=50</span><br><span class="line">Authorization: Bearer eyJhbGc...</span><br></pre></td></tr></tbody></table></figure>
 
@@ -843,19 +840,7 @@
 <p><strong>最终设计</strong>：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">离线消息 → Kafka → offline-api → Redis（7 天热数据，拉完就删）</span><br><span class="line">                                  ↓</span><br><span class="line">                          异步落 MySQL（永久冷数据，只查历史不删）</span><br></pre></td></tr></tbody></table></figure>
 
-<h3 id="8-3-为什么不用-MySQL-直接存？"><a href="#8-3-为什么不用-MySQL-直接存？" class="headerlink" title="8.3 为什么不用 MySQL 直接存？"></a>8.3 为什么不用 MySQL 直接存？</h3><p>两个问题：</p>
-<p><strong>问题 1：分页查询慢</strong></p>
-<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- MySQL 分页要扫描前面的数据</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> offline_messages </span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ? </span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">timestamp</span> </span><br><span class="line">LIMIT <span class="number">50</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>; <span class="comment">-- 越往后越慢</span></span><br></pre></td></tr></tbody></table></figure>
-
-<p>Redis ZSet：</p>
-<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZRANGE key 0 50 WITHSCORES -- O(log n)，恒定快</span><br></pre></td></tr></tbody></table></figure>
-
-<p><strong>问题 2：删除频繁</strong></p>
-<ul>
-<li>每次用户上线都要删一批数据</li>
-<li>MySQL 频繁 DELETE 会产生碎片</li>
-<li>Redis 删除 ZSet 元素是 O(log n)，很快</li>
-</ul>
+<p>7 天内：从 Redis 拉（秒查，拉完就删）<br>7 天前：从 MySQL 拉（慢，但只查历史，不删）</p>
 <hr>
 <h2 id="九、核心问题：服务地址随时在变，怎么找？"><a href="#九、核心问题：服务地址随时在变，怎么找？" class="headerlink" title="九、核心问题：服务地址随时在变，怎么找？"></a>九、核心问题：服务地址随时在变，怎么找？</h2><p>生产环境里，服务会<strong>扩容、缩容、宕机</strong>，IP 地址随时在变。</p>
 <p><strong>问题</strong>：客户端怎么知道该连哪台服务器？gateway 怎么知道 realtime 在哪？</p>
