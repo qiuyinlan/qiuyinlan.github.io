@@ -555,9 +555,15 @@
 <li>refreshToken = 补办门禁卡的资格，只在卡过期时用来续命</li>
 </ul>
 <p>这样你不用每隔 2 小时重新登录一次。</p>
-<h3 id="4-3-token-写进-Redis-的三个-Key"><a href="#4-3-token-写进-Redis-的三个-Key" class="headerlink" title="4.3 token 写进 Redis 的三个 Key"></a>4.3 token 写进 Redis 的三个 Key</h3><p>user-api 生成 token 后，会写进 Redis：</p>
+<h3 id="4-3-token-写进-Redis-的三个-Key"><a href="#4-3-token-写进-Redis-的三个-Key" class="headerlink" title="4.3 token 写进 Redis 的三个 Key"></a>4.3 token 写进 Redis 的三个 Key</h3><p>user-api 生成 token 后，会写进 Redis 三个 Key：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">access:eyJhbGc... → userId:1001          # 验证 accessToken 时用</span><br><span class="line">refresh:dGhpcyBp... → userId:1001       # 刷新 accessToken 时用</span><br><span class="line">user:tokens:1001 → refreshToken         # 单点登录：一个用户只能有一个有效 refreshToken</span><br></pre></td></tr></tbody></table></figure>
 
+<p><strong>每个 Key 的作用</strong>：</p>
+<ul>
+<li><code>access:xxx</code>：验证 accessToken 时查这个 Key，拿到 userId</li>
+<li><code>refresh:xxx</code>：刷新 accessToken 时查这个 Key，验证 refreshToken 是否有效</li>
+<li><code>user:tokens:userId</code>：单点登录控制，一个用户只能有一个有效 refreshToken，新的会覆盖旧的</li>
+</ul>
 <h3 id="4-4-选一台-realtime-节点"><a href="#4-4-选一台-realtime-节点" class="headerlink" title="4.4 选一台 realtime 节点"></a>4.4 选一台 realtime 节点</h3><p>user-api 从 etcd 拿所有 realtime 节点，用 userId 做<strong>一致性哈希</strong>选一台，拼出 WebSocket 地址。</p>
 <p>然后把路由表写进 Redis：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws:route:1001 → ws://192.168.1.10:9101/ws/chat</span><br></pre></td></tr></tbody></table></figure>
@@ -624,7 +630,46 @@
 </tr>
 </tbody></table></div>
 <p>然后回 ACK 给发送者，客户端 5 秒没收到 ACK 会重传。</p>
+<p><strong>为什么不能用一个 Topic？</strong> 一个 Topic 同时做推送和存储会耦合，两个 Topic 让各自独立、互不影响：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>一个 Topic</th>
+<th>两个 Topic</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>速度要求</td>
+<td>推送要快（毫秒级），存储要稳（写 DB 可能慢），混在一起存储慢了会拖累推送</td>
+<td>推送和存储互不影响</td>
+</tr>
+<tr>
+<td>消费者职责</td>
+<td>一个消费者同时干两件事，出问题很难定位</td>
+<td>realtime 消费者只管推送，store 消费者只管写 MySQL</td>
+</tr>
+<tr>
+<td>独立扩缩容</td>
+<td>无法独立扩容</td>
+<td>推送高峰期多扩 realtime 消费者，存储高峰期多扩 store 消费者</td>
+</tr>
+<tr>
+<td>容错隔离</td>
+<td>存储挂了推送也受影响</td>
+<td>存储挂了推送不受影响，推送挂了消息照样能存</td>
+</tr>
+</tbody></table></div>
+<p><strong>通俗比喻</strong>：就像快递公司，一个负责送货上门（推送），一个负责入库存档（存储）。如果让一个人同时干两件事，送货慢了、入库慢了，两边都受影响。分两个 Topic，就是把这两条流水线分开。</p>
 <h3 id="6-4-为什么用-sessionId-做-Key？"><a href="#6-4-为什么用-sessionId-做-Key？" class="headerlink" title="6.4 为什么用 sessionId 做 Key？"></a>6.4 为什么用 sessionId 做 Key？</h3><p><strong>问题</strong>：消息在网络上可能乱序——A 先发的消息 1 因为网络延迟反而后到。如果直接把消息投进 Kafka 随便分区，接收者看到的顺序就乱了。</p>
+<p><strong>这里的”网络”是指生产者端网络</strong>（A 到 Kafka 之间的网络），不是 Kafka 到消费者的网络。</p>
+<p><strong>具体流程</strong>：</p>
+<ol>
+<li>A 先发消息 1，后发消息 2</li>
+<li>消息 1 走的是慢网络，消息 2 走的是快网络 → 消息 2 先到达 Kafka，消息 1 后到达 Kafka</li>
+<li>它们进入同一个分区的顺序就变成了 2→1</li>
+<li>Kafka 按进入顺序存储和投递，消费者拿到的就是乱的</li>
+</ol>
 <p><strong>解决</strong>：用 sessionId 做 Kafka 的 key：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">partition = hash(sessionId) % 分区数</span><br></pre></td></tr></tbody></table></figure>
 
@@ -637,12 +682,29 @@
 </ol>
 <hr>
 <h2 id="七、推送链路：消息消费后，怎么准确送到接收者手里？"><a href="#七、推送链路：消息消费后，怎么准确送到接收者手里？" class="headerlink" title="七、推送链路：消息消费后，怎么准确送到接收者手里？"></a>七、推送链路：消息消费后，怎么准确送到接收者手里？</h2><h3 id="7-1-消费者组与-Offset"><a href="#7-1-消费者组与-Offset" class="headerlink" title="7.1 消费者组与 Offset"></a>7.1 消费者组与 Offset</h3><p>realtime 用消费者组（组名 <code>realtime-consumer-group</code>）订阅 message-topic：</p>
-<ul>
-<li>同一组的多个消费者<strong>分摊消费不同分区</strong>（负载均衡）</li>
-<li>一个分区同一时间只被组内一个消费者处理</li>
-<li>消费的核心是 ConsumeClaim：一个分区一个 claim，<strong>单线程处理</strong>保证分区内有序</li>
-</ul>
-<p><strong>Offset 是什么</strong>：分区里每条消息的”流水号”或”页码”。消费者处理完一条消息后，会把”当前读到了哪个 offset”提交给 Kafka，相当于在书上夹了个书签。</p>
+<p><strong>分组负载均衡</strong>：同一组的多个消费者一起读消息，每人分管几个分区。一个分区同一时间只被组内一个人吃，避免重复处理。</p>
+<p><strong>单线程保序</strong>：每个分区对应一个任务（ConsumeClaim），单线程处理，保证同一个分区的消息按顺序来，不会乱序。</p>
+<p><strong>Offset 是什么</strong>：分区里每条消息的”流水号”或”页码”。</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>唯一标识</td>
+<td>分区里的每条消息都有一个唯一的 offset 编号（从 0 开始递增），用来区分消息的先后顺序</td>
+</tr>
+<tr>
+<td>记录进度</td>
+<td>消费者处理完一条消息后，会把”当前读到了哪个 offset”这个位置提交给 Kafka，相当于在书上夹了个书签</td>
+</tr>
+<tr>
+<td>故障恢复</td>
+<td>如果消费者挂了重启，只要拿着上次提交的 offset，就能精准跳到那个位置接着读，既不会丢消息，也不会重复处理太多</td>
+</tr>
+</tbody></table></div>
 <p><strong>黄金法则</strong>：<strong>先处理，再提交 Offset</strong>。</p>
 <ul>
 <li>先提交后处理：万一处理后挂了，消息就丢了</li>
@@ -697,6 +759,33 @@
 <li>List 无法强制排序（消息乱序到达时顺序会错）</li>
 <li>ZSet 用 score（时间戳）强制保证顺序，member（消息 ID）天然去重</li>
 </ul>
+<p><strong>ZSet 结构详解</strong>：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>作用</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Key（键）</strong></td>
+<td>唯一标识这一组数据，相当于一把”钥匙”</td>
+<td><code>offline:1002</code> 表示用户 1002 的离线消息集合</td>
+</tr>
+<tr>
+<td><strong>Member（成员）</strong></td>
+<td>集合中的每个元素，不可重复，起到去重作用</td>
+<td><code>msg_001</code>、<code>msg_002</code>（消息 JSON）</td>
+</tr>
+<tr>
+<td><strong>Score（分数）</strong></td>
+<td>每个成员关联的数字，用于自动排序</td>
+<td>消息发送的时间戳 <code>1717000000</code></td>
+</tr>
+</tbody></table></div>
+<p><strong>三者关系一句话</strong>：通过 Key 找到一组数据，每条数据由 Member（唯一标识）和 Score（排序依据）组成。</p>
+<p>在离线消息场景中，利用 ZSet 的这种结构，用户上线时可以按 Score（时间戳）顺序取出所有 Member（消息），保证消息按序、不重、不漏地送达。</p>
 <p><strong>ZSet 结构</strong>：</p>
 <figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Key: offline:1002</span><br><span class="line">Member: msg_001, msg_002, ...（消息 JSON，唯一）</span><br><span class="line">Score: 1717000000, 1717000001, ...（时间戳，自动排序）</span><br></pre></td></tr></tbody></table></figure>
 
@@ -709,13 +798,51 @@
 <li>如果不够 limit 条，再去 MySQL 查冷数据补齐</li>
 <li>返回给客户端后，用 <code>ZRemRangeByScore</code> 把已读部分从 Redis 删掉</li>
 </ol>
+<p><strong>重要设计</strong>：离线消息是**「拉完就删」**，不是「标记已读」。</p>
+<p>流程：</p>
+<ol>
+<li>客户端上线 → 调 <code>/api/offline/messages?cursor=0&amp;limit=50</code></li>
+<li>offline-api 从 Redis ZSet 里取 50 条</li>
+<li>返回给客户端</li>
+<li>服务端删除这 50 条（<code>ZRemRangeByScore</code>）</li>
+</ol>
+<p>离线消息的定义是「你不在时别人发给你的」，你上线拉走了就算「已投递」。至于你有没有点开看，那是「已读回执」的事（另一个功能）。</p>
 <p><strong>常见疑问</strong>：</p>
 <ul>
 <li><strong>问</strong>：离线消息只拉一次，为什么还要用 Redis？</li>
 <li><strong>答</strong>：离线消息不是”一辈子只拉一次”，是”每次离线期间”的消息。你可能多次上线下线，每次都要拉离线期间的消息。</li>
-<li><strong>问</strong>：拉完就删，那”已读”状态怎么算？</li>
-<li><strong>答</strong>：离线消息的定义是”你不在时别人发给你的”，你上线拉走了就算”已投递”。至于你有没有点开看，那是”已读回执”的事（另一个功能）。</li>
 </ul>
+<p><strong>场景</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">10:00 你手机没电关机</span><br><span class="line">10:01 A 发消息 1 → 存离线</span><br><span class="line">10:02 B 发消息 2 → 存离线</span><br><span class="line">10:03 C 发消息 3 → 存离线</span><br><span class="line">11:00 你开机上线 → 拉走 1,2,3 → Redis 删除</span><br><span class="line">14:00 你又离线了</span><br><span class="line">14:01 D 发消息 4 → 存离线</span><br><span class="line">15:00 你又上线 → 拉走 4 → Redis 删除</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><strong>问</strong>：多设备登录怎么办？</li>
+<li><strong>答</strong>：Redis 可以按 <code>userId_deviceId</code> 存多份，每个设备都有自己的离线状态。</li>
+</ul>
+<p><strong>为什么用 Redis 不用 MySQL？</strong> 三个理由：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>理由</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>读写性能</td>
+<td>Redis 读写延迟 &lt;1ms，MySQL 10-100ms；离线消息要高频读写</td>
+</tr>
+<tr>
+<td>分页查询</td>
+<td>MySQL 分页 <code>OFFSET 1000</code> 要扫描前面的数据，越往后越慢；Redis ZSet <code>ZRANGE</code> 是 O(log n) 恒定快</td>
+</tr>
+<tr>
+<td>删除频繁</td>
+<td>每次用户上线都要删一批数据，MySQL 频繁 DELETE 会产生碎片；Redis 删除 ZSet 元素是 O(log n) 很快</td>
+</tr>
+</tbody></table></div>
+<p><strong>最终设计</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">离线消息 → Kafka → offline-api → Redis（7 天热数据，拉完就删）</span><br><span class="line">                                  ↓</span><br><span class="line">                          异步落 MySQL（永久冷数据，只查历史不删）</span><br></pre></td></tr></tbody></table></figure>
+
 <h3 id="8-3-为什么不用-MySQL-直接存？"><a href="#8-3-为什么不用-MySQL-直接存？" class="headerlink" title="8.3 为什么不用 MySQL 直接存？"></a>8.3 为什么不用 MySQL 直接存？</h3><p>两个问题：</p>
 <p><strong>问题 1：分页查询慢</strong></p>
 <figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- MySQL 分页要扫描前面的数据</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> offline_messages </span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ? </span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">timestamp</span> </span><br><span class="line">LIMIT <span class="number">50</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>; <span class="comment">-- 越往后越慢</span></span><br></pre></td></tr></tbody></table></figure>
