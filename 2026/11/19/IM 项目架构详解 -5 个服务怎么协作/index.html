@@ -1,0 +1,972 @@
+
+
+<!DOCTYPE html><html lang="zh-CN">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="hexo-theme" content="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0" theme-name="Stellar" theme-version="2.0.0">
+  
+  
+  <meta name="generator" content="Hexo 8.1.2">
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000">
+  <meta name="theme-color" content="#f9fafb">
+  <title data-stellar-page-meta>IM 项目架构详解：5 个服务怎么协作 - hi,it's Qiu Yinlan!</title>
+  <script data-stellar-script="core">
+    (function () {
+      var key = 'stellar:v2:leftbar-state';
+      var fallback = "expanded";
+      try {
+        var value = localStorage.getItem(key);
+        document.documentElement.dataset.leftbarState = value === 'collapsed' || value === 'expanded' ? value : fallback;
+      } catch (error) {
+        document.documentElement.dataset.leftbarState = fallback;
+      }
+    })();
+  </script>
+
+  <meta name="description" content="IM 项目架构详解：5 个服务怎么协作 用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。   一、一句话本质IM 项目要解决的核心问题：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。 为此，系统拆成 5 个独立服务，每个服务只干一件事。  二、5 个服务全景图   服务名 端口 职责 关键依赖    gatew" data-stellar-page-meta="">
+<meta property="og:type" content="article" data-stellar-page-meta="">
+<meta property="og:title" content="IM 项目架构详解：5 个服务怎么协作" data-stellar-page-meta="">
+<meta property="og:url" content="https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/" data-stellar-page-meta="">
+<meta property="og:site_name" content="hi,it's Qiu Yinlan!" data-stellar-page-meta="">
+<meta property="og:description" content="IM 项目架构详解：5 个服务怎么协作 用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。   一、一句话本质IM 项目要解决的核心问题：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。 为此，系统拆成 5 个独立服务，每个服务只干一件事。  二、5 个服务全景图   服务名 端口 职责 关键依赖    gatew" data-stellar-page-meta="">
+<meta property="og:locale" content="zh_CN" data-stellar-page-meta="">
+<meta property="article:author" content="Qiu Yinlan" data-stellar-page-meta="">
+<meta property="article:published_time" content="2026-11-19T03:50:00.000Z" data-stellar-page-meta="">
+<meta property="article:modified_time" content="2026-11-20T04:10:00.000Z" data-stellar-page-meta="">
+<meta property="article:tag" content="IM" data-stellar-page-meta="">
+<meta property="article:tag" content="后端" data-stellar-page-meta="">
+<meta property="article:tag" content="架构" data-stellar-page-meta="">
+<meta name="twitter:card" content="summary" data-stellar-page-meta=""><meta name="twitter:title" content="IM 项目架构详解：5 个服务怎么协作" data-stellar-page-meta="">
+  
+  
+  <meta name="keywords" content="IM,后端,架构" data-stellar-page-meta="">
+
+  <!-- feed -->
+  
+
+  <link rel="preload" href="/css/main.css?v=2.0.0" as="style">
+  <link rel="stylesheet" href="/css/main.css?v=2.0.0">
+  <style>:root{--text-loading:"正在加载";--text-loading-error:"加载失败，请稍后重试。"}</style>
+
+
+  
+
+  
+
+  <script type="application/ld+json" data-stellar-page-meta="">{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Qiu Yinlan","sameAs":[]},"dateCreated":"2026-11-19T11:50:00+08:00","dateModified":"2026-11-20T12:10:00+08:00","datePublished":"2026-11-19T11:50:00+08:00","description":"IM 项目架构详解：5 个服务怎么协作\n用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。\n\n\n一、一句话本质IM 项目要解决的核心问题：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。\n为此，系统拆成 5 个独立服务，每个服务只干一件事。\n\n二、5 个服务全景图\n\n\n服务名\n端口\n职责\n关键依赖\n\n\n\nga...","headline":"IM 项目架构详解：5 个服务怎么协作","mainEntityOfPage":{"@type":"WebPage","@id":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/"},"publisher":{"@type":"Organization","name":"Qiu Yinlan","sameAs":[]},"url":"https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/","image":["https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"],"keywords":"IM, 后端, 架构","thumbnailUrl":"https://gcore.jsdelivr.net/gh/cdn-x/placeholder@1.0.12/cover/76b86c0226ffd.svg"}</script>
+  <link rel="stylesheet" href="/css/toc-float.css?v=20261117">
+<link rel="stylesheet" href="/css/card-style.css?v=20261117">
+
+
+  <link rel="stylesheet" href="/css/stellar-icons.css?v=7c185ad1a9a79674">
+  <link rel="preload" as="script" href="/js/stellar-icons.js?v=39c6ac17e854ffe2">
+  
+  
+</head>
+<body data-page-type="content" data-page-layout="post" data-article-style="tech"><div data-stellar-runtime-region id="site-cover" class="site-cover"></div><div class="site-shell" id="start" data-regions="leftbar"><div class="site-workspace">
+<aside data-stellar-runtime-region id="leftbar-region" class="site-region site-region--leftbar" data-region="leftbar" aria-label="Leftbar"><div class="site-region__surface ui-surface"><div class="site-region__decoration" aria-hidden="true"></div><div class="site-region__viewport"><header class="site-region__header site-region__zone site-region__zone--top">
+    <div class="widget-instance widget-instance--brand" data-widget-id="leftbar:fixed:brand" data-presentation="leftbar" data-leftbar-rail>
+<header class="brand-header brand-header--regular brand-header--site"><div class="brand-wrap"><a class="brand-image brand-image--avatar" href="&#x2F;"><img no-lazy src="&#x2F;favicon.png" alt="" onerror="this.onerror&#x3D;null;this.src&#x3D;&quot;&#x2F;images&#x2F;stellar-error.491ee870f4940739.svg&quot;"></a><a class="brand-title" href="&#x2F;"><div class="brand-name">Qiu Yinlan</div><div class="brand-tagline cap">分享技术、生活和学习笔记</div></a></div><div class="brand-search">
+
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<button class="ui-collection__item ui-interactive card-hover card-hover--spotlight search-trigger has-hover-surface" type="button" title="搜索" aria-label="搜索" data-shell-action="open-search" data-search-instance="leftbar-brand-search" data-search-domain="blog" data-search-domain-label="博客" data-search-domain-blog="true">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"/><circle cx="14" cy="11" r="4"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">搜索</span>
+      
+      
+    </span>
+  
+  <kbd class="search-shortcut" aria-hidden="true">⌘K</kbd>
+
+  
+</button>
+
+  
+</div>
+
+
+</div></header>
+</div>
+  </header>
+  <div class="site-region__body site-region__zone site-region__zone--body">
+    <div class="widget-instance widget-instance--menu" data-widget-id="leftbar:fixed:menu" data-presentation="leftbar" data-leftbar-rail>
+
+
+<nav class="menu dis-select">
+<div class="ui-collection" data-layout="list" data-variant="nav" data-density="auto">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-active is-themed" href="&#x2F;" title="近期发布" aria-current="page" style="--item-theme:#1BCDFC;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5.879 2.879C5 3.757 5 5.172 5 8v8c0 2.828 0 4.243.879 5.121C6.757 22 8.172 22 11 22h2c2.828 0 4.243 0 5.121-.879C19 20.243 19 18.828 19 16V8c0-2.828 0-4.243-.879-5.121C17.243 2 15.828 2 13 2h-2c-2.828 0-4.243 0-5.121.879M8.25 17a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75M9 12.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zM8.25 9A.75.75 0 0 1 9 8.25h6a.75.75 0 0 1 0 1.5H9A.75.75 0 0 1 8.25 9" clip-rule="evenodd"/><path fill="currentColor" d="M5.235 4.058C5 4.941 5 6.177 5 8v8c0 1.823 0 3.058.235 3.942L5 19.924c-.975-.096-1.631-.313-2.121-.803C2 18.243 2 16.828 2 14v-4c0-2.829 0-4.243.879-5.121c.49-.49 1.146-.707 2.121-.803zm13.53 15.884C19 19.058 19 17.822 19 16V8c0-1.823 0-3.059-.235-3.942l.235.018c.975.096 1.631.313 2.121.803C22 5.757 22 7.17 22 9.999v4c0 2.83 0 4.243-.879 5.122c-.49.49-1.146.707-2.121.803z" opacity=".5"/></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">近期发布</span>
+      
+      
+    </span>
+  
+  
+  <span class="ui-collection__indicator"></span>
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="&#x2F;categories&#x2F;" title="分类" style="--item-theme:#FF6B6B;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M2 6.94975C2 6.06722 2 5.62595 2.06935 5.25839C2.37464 3.64031 3.64031 2.37464 5.25839 2.06935C5.62595 2 6.06722 2 6.94975 2C7.33642 2 7.52976 2 7.71557 2.01738C8.51665 2.09229 9.27652 2.40704 9.89594 2.92051C10.0396 3.03961 10.1763 3.17633 10.4497 3.44975L11 4C11.8158 4.81578 12.2237 5.22367 12.7121 5.49543C12.9804 5.64471 13.2651 5.7626 13.5604 5.84678C14.0979 6 14.6747 6 15.8284 6H16.2021C18.8345 6 20.1506 6 21.0062 6.76946C21.0849 6.84024 21.1598 6.91514 21.2305 6.99383C22 7.84935 22 9.16554 22 11.7979V14C22 17.7712 22 19.6569 20.8284 20.8284C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.8284C2 19.6569 2 17.7712 2 14V6.94975Z" opacity=".5"/><path d="M20 6.23751C19.9992 5.94016 19.9949 5.76263 19.9746 5.60842C19.7974 4.26222 18.7381 3.2029 17.3919 3.02567C17.1969 3 16.9647 3 16.5003 3H9.98828C10.1042 3.10392 10.2347 3.23445 10.45 3.44975L11.0003 4C11.8161 4.81578 12.2239 5.22367 12.7124 5.49543C12.9807 5.64471 13.2653 5.7626 13.5606 5.84678C14.0982 6 14.675 6 15.8287 6H16.2024C17.9814 6 19.1593 6 20 6.23751Z"/><path fill-rule="evenodd" d="M12.25 10C12.25 9.58579 12.5858 9.25 13 9.25H18C18.4142 9.25 18.75 9.58579 18.75 10C18.75 10.4142 18.4142 10.75 18 10.75H13C12.5858 10.75 12.25 10.4142 12.25 10Z" clip-rule="evenodd"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">分类</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight is-themed" href="&#x2F;archives&#x2F;" title="归档" style="--item-theme:#7C4DFF;">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><g fill="currentColor"><path d="M6.94028 2C7.35614 2 7.69326 2.32421 7.69326 2.72414V4.18487C8.36117 4.17241 9.10983 4.17241 9.95219 4.17241H13.9681C14.8104 4.17241 15.5591 4.17241 16.227 4.18487V2.72414C16.227 2.32421 16.5641 2 16.98 2C17.3958 2 17.733 2.32421 17.733 2.72414V4.24894C19.178 4.36022 20.1267 4.63333 20.8236 5.30359C21.5206 5.97385 21.8046 6.88616 21.9203 8.27586L22 9H2.92456H2V8.27586C2.11571 6.88616 2.3997 5.97385 3.09665 5.30359C3.79361 4.63333 4.74226 4.36022 6.1873 4.24894V2.72414C6.1873 2.32421 6.52442 2 6.94028 2Z"/><path d="M21.9995 14.0001V12.0001C21.9995 11.161 21.9963 9.66527 21.9834 9H2.00917C1.99626 9.66527 1.99953 11.161 1.99953 12.0001V14.0001C1.99953 17.7713 1.99953 19.6569 3.1711 20.8285C4.34267 22.0001 6.22829 22.0001 9.99953 22.0001H13.9995C17.7708 22.0001 19.6564 22.0001 20.828 20.8285C21.9995 19.6569 21.9995 17.7713 21.9995 14.0001Z" opacity=".5"/><path d="M18 17C18 17.5523 17.5523 18 17 18C16.4477 18 16 17.5523 16 17C16 16.4477 16.4477 16 17 16C17.5523 16 18 16.4477 18 17Z"/><path d="M18 13C18 13.5523 17.5523 14 17 14C16.4477 14 16 13.5523 16 13C16 12.4477 16.4477 12 17 12C17.5523 12 18 12.4477 18 13Z"/><path d="M13 17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17C11 16.4477 11.4477 16 12 16C12.5523 16 13 16.4477 13 17Z"/><path d="M13 13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12C12.5523 12 13 12.4477 13 13Z"/><path d="M8 17C8 17.5523 7.55228 18 7 18C6.44772 18 6 17.5523 6 17C6 16.4477 6.44772 16 7 16C7.55228 16 8 16.4477 8 17Z"/><path d="M8 13C8 13.5523 7.55228 14 7 14C6.44772 14 6 13.5523 6 13C6 12.4477 6.44772 12 7 12C7.55228 12 8 12.4477 8 13Z"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">归档</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;about&#x2F;" title="关于">
+  
+  <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20" opacity=".5"/><path d="M12 6a3 3 0 1 0 0 6a3 3 0 0 0 0-6m0 7.5c-3.04 0-5.5 1.57-5.5 3.5c0 .65.28 1.26.77 1.77A7.96 7.96 0 0 0 12 20.5a7.96 7.96 0 0 0 4.73-1.73c.49-.51.77-1.12.77-1.77c0-1.93-2.46-3.5-5.5-3.5"/></g></svg></span>
+  
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">关于</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+</div>
+
+</nav>
+
+</div>
+    <div class="widgets widget-stack widget-stack--leftbar widget-stack--body"><div class="widget-instance widget-instance--recent" data-widget-id="leftbar:1:recent" data-presentation="leftbar">
+
+<widget class="widget-wrapper slide-up recent-widget">
+  
+    <div class="widget-header dis-select">
+      <span class="name">最近更新</span>
+      
+    </div>
+  
+  <div class="widget-body"><div class="ui-collection" data-layout="list" data-variant="nav" data-density="compact">
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C&#x2F;" title="IM 项目架构详解：5 个服务怎么协作">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">I</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">IM 项目架构详解：5 个服务怎么协作</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0&#x2F;" title="Redis 学习笔记">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">R</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Redis 学习笔记</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;08&#x2F;Agent-%E6%9E%B6%E6%9E%84-Eino-%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6%E4%B8%8E%E5%A4%9A-Agent-%E7%BC%96%E6%8E%92&#x2F;" title="Agent 架构、Eino 内部机制与多 Agent 编排">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">A</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Agent 架构、Eino 内部机制与多 Agent 编排</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;16&#x2F;Pilot-%E8%AE%B0%E5%BF%86%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1-Redis%20%E4%B8%8E%20MySQL%20%E5%86%B7%E7%83%AD%E5%88%86%E5%B1%82&#x2F;" title="Pilot 记忆系统设计：Redis 工作记忆与 MySQL 历史档案的冷热分层">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Pilot 记忆系统设计：Redis 工作记忆与 MySQL 历史档案的冷热分层</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;pilot-%E7%9A%84%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7%E9%93%BE%E8%B7%AF-AI-Agent-%E4%B8%8D%E9%87%87%E9%9B%86%20-%20%E5%8F%AA%E6%9F%A5-Prometheus&#x2F;" title="pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">P</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">pilot 的可观测性链路：AI Agent 不采集，只查 Prometheus</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;09&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-TCP%20%E5%8F%AF%E9%9D%A0%20-%20%E7%A0%81%E6%B5%81%E8%BE%B9%E7%95%8C%E4%B8%8E%20HTTPS%20%E5%8A%A0%E5%AF%86%E8%BE%B9%E7%95%8C&#x2F;" title="计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">计</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">计算机网络学习笔记：TCP 可靠传输、字节流边界与 HTTPS 的加密边界</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;19&#x2F;IM%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3-5%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C&#x2F;" title="IM 项目架构详解：5 个服务怎么协作">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">I</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">IM 项目架构详解：5 个服务怎么协作</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;17&#x2F;MySQL-%E9%9B%B6%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8-%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%88%B0GROUP-BY&#x2F;" title="MySQL 零基础入门：从数据库到 GROUP BY">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">M</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">MySQL 零基础入门：从数据库到 GROUP BY</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;17&#x2F;%E9%AA%A8%E7%9B%86%E6%97%8B%E8%BD%AC%20-%20%E8%85%B9%E6%96%9C%E8%82%8C%E5%A4%B1%E8%A1%A1&#x2F;" title="骨盆右旋时，腹斜肌到底是怎么失衡的">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">骨</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">骨盆右旋时，腹斜肌到底是怎么失衡的</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+    
+<a class="ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;2026&#x2F;11&#x2F;16&#x2F;Kafka%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-%20%E5%88%86%E5%8C%BA%E6%9C%89%E5%BA%8F%E4%B8%8E%E8%A7%A3%E8%80%A6%E5%89%8A%E5%B3%B0&#x2F;" title="Kafka 学习笔记 - 分区有序与解耦削峰">
+  
+  
+  <span class="ui-collection__initial" aria-hidden="true">K</span>
+  
+    <span class="ui-collection__content">
+      
+      <span class="ui-collection__title">Kafka 学习笔记 - 分区有序与解耦削峰</span>
+      
+      
+    </span>
+  
+  
+  
+</a>
+
+  
+</div></div>
+  
+</widget>
+
+
+</div></div>
+  </div>
+  <footer class="site-region__footer">
+    
+    <div class="site-region__system ui-collection" data-layout="inline" data-variant="nav" data-density="compact">
+      <div class="site-region__settings"><div class="widget-instance widget-instance--settings" data-widget-id="leftbar:fixed:settings" data-presentation="leftbar" data-leftbar-rail>
+<a class="settings-widget ui-collection__item ui-interactive card-hover card-hover--spotlight" href="&#x2F;settings&#x2F;" data-profile-provider="" data-profile-identity-enabled="false" data-profile-fallback-avatar="https:&#x2F;&#x2F;gcore.jsdelivr.net&#x2F;gh&#x2F;cdn-x&#x2F;placeholder@1.0.12&#x2F;avatar&#x2F;round&#x2F;3442075.svg" data-settings-placement="leftbar" data-settings-label="设置" aria-label="设置" title="设置">
+  <span class="settings-widget__avatar" aria-hidden="true">
+    <span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="currentColor"><path fill-rule="evenodd" d="M12.4277 2C11.3139 2 10.2995 2.6007 8.27081 3.80211L7.58466 4.20846C5.55594 5.40987 4.54158 6.01057 3.98466 7C3.42773 7.98943 3.42773 9.19084 3.42773 11.5937V12.4063C3.42773 14.8092 3.42773 16.0106 3.98466 17C4.54158 17.9894 5.55594 18.5901 7.58466 19.7915L8.27081 20.1979C10.2995 21.3993 11.3139 22 12.4277 22C13.5416 22 14.5559 21.3993 16.5847 20.1979L17.2708 19.7915C19.2995 18.5901 20.3139 17.9894 20.8708 17C21.4277 16.0106 21.4277 14.8092 21.4277 12.4063V11.5937C21.4277 9.19084 21.4277 7.98943 20.8708 7C20.3139 6.01057 19.2995 5.40987 17.2708 4.20846L16.5847 3.80211C14.5559 2.6007 13.5416 2 12.4277 2Z" clip-rule="evenodd" opacity=".5"/><path d="M12.4277 8.25C10.3567 8.25 8.67773 9.92893 8.67773 12C8.67773 14.0711 10.3567 15.75 12.4277 15.75C14.4988 15.75 16.1777 14.0711 16.1777 12C16.1777 9.92893 14.4988 8.25 12.4277 8.25Z"/></g></svg></span>
+  </span>
+  <span class="settings-widget__name ui-collection__title">设置</span>
+</a>
+</div></div>
+      <button type="button" class="leftbar-state-toggle ui-collection__item ui-interactive card-hover card-hover--spotlight is-icon-only" aria-label="Collapse leftbar" aria-expanded="true" data-shell-action="toggle-leftbar"><span class="ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M3.172 4.172C2 5.343 2 7.229 2 11v2c0 3.771 0 5.657 1.172 6.828S6.229 21 10 21h5V3h-5C6.229 3 4.343 3 3.172 4.172" clip-rule="evenodd" opacity=".5"/><path fill="currentColor" d="M5.5 9.25a.75.75 0 0 0 0 1.5h6a.75.75 0 0 0 0-1.5zm1 4a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5zM22 13v-2c0-3.771 0-5.657-1.172-6.828c-.974-.975-3.192-1.139-5.828-1.166v17.988c2.636-.027 4.854-.191 5.828-1.166C22 18.657 22 16.771 22 13"/></svg></span></button>
+    </div>
+  </footer></div></div></aside>
+<main data-stellar-runtime-region class="site-main" id="main">
+
+
+<div class="article-banner-wrap slide-up"><div class="article banner top">
+  <div class="content">
+    
+    <div class="top bread-nav footnote"><div class="top-row"><div class="left" id="breadcrumb"><a class="cap breadcrumb" href="/">主页</a>
+<span class="sep"></span><a class="cap breadcrumb" href="/">文章</a><span class="sep"></span><a class="cap breadcrumb-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+</div></div><div class="meta-row">
+<div class="flex-row" id="post-meta"><span class="text created">发布于：<time datetime="2026-11-19T03:50:00.000Z">2026-11-19</time></span><span class="sep updated"></span><span class="text updated">更新于：<time datetime="2026-11-20T04:10:00.000Z">2026-11-20</time></span></div>
+</div></div>
+    
+    <div class="bottom only-title">
+      
+      <div class="text-area">
+        <h1 class="text title"><span>IM 项目架构详解：5 个服务怎么协作</span></h1>
+        
+      </div>
+    </div>
+    
+  </div>
+  </div></div>
+<article class="md-text content slide-up"><h1 id="IM-项目架构详解：5-个服务怎么协作"><a href="#IM-项目架构详解：5-个服务怎么协作" class="headerlink" title="IM 项目架构详解：5 个服务怎么协作"></a>IM 项目架构详解：5 个服务怎么协作</h1><blockquote>
+<p>用第一性原理拆解：IM 要解决什么问题 → 为什么需要 5 个服务 → 服务之间怎么发现对方 → 一条消息的完整旅程。</p>
+</blockquote>
+<hr>
+<h2 id="一、一句话本质"><a href="#一、一句话本质" class="headerlink" title="一、一句话本质"></a>一、一句话本质</h2><p><strong>IM 项目要解决的核心问题</strong>：让 10 万 + 用户能实时收到消息，同时保证消息不丢、不乱序。</p>
+<p>为此，系统拆成 5 个独立服务，每个服务只干一件事。</p>
+<hr>
+<h2 id="二、5-个服务全景图"><a href="#二、5-个服务全景图" class="headerlink" title="二、5 个服务全景图"></a>二、5 个服务全景图</h2><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>服务名</th>
+<th>端口</th>
+<th>职责</th>
+<th>关键依赖</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gateway</td>
+<td>10010</td>
+<td>HTTP 统一入口，鉴权，路由</td>
+<td>Redis、etcd</td>
+</tr>
+<tr>
+<td>user-api</td>
+<td>8104</td>
+<td>注册登录、好友、群聊、余额</td>
+<td>MySQL、Redis</td>
+</tr>
+<tr>
+<td>user-rpc</td>
+<td>9090</td>
+<td>给其他服务提供用户校验（gRPC）</td>
+<td>MySQL、Redis</td>
+</tr>
+<tr>
+<td>realtime</td>
+<td>9101</td>
+<td>WebSocket 长连接管理，在线推送</td>
+<td>Redis、Kafka</td>
+</tr>
+<tr>
+<td>offline-api</td>
+<td>8101</td>
+<td>离线消息存储 + 历史消息查询</td>
+<td>MySQL、Redis</td>
+</tr>
+<tr>
+<td>redpacket-api</td>
+<td>8103</td>
+<td>发红包、抢红包、详情</td>
+<td>MySQL、Redis、Kafka</td>
+</tr>
+</tbody></table></div>
+<p><strong>一句话总结</strong>：</p>
+<blockquote>
+<p>网关收 HTTP；user 管人、关系、群；realtime 管长连接和在线推送；offline 管历史和离线；redpacket 是独立的业务子系统。</p>
+</blockquote>
+<hr>
+<h2 id="三、五条关键链路"><a href="#三、五条关键链路" class="headerlink" title="三、五条关键链路"></a>三、五条关键链路</h2><p>整个 IM 可以拆成五条关键链路，每条链路各司其职：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>链路</th>
+<th>路径</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>登录链路</strong></td>
+<td>客户端 → gateway → user-api</td>
+<td>认证，拿 token 和 WebSocket 地址</td>
+</tr>
+<tr>
+<td><strong>连接链路</strong></td>
+<td>客户端 → realtime</td>
+<td>建立 WebSocket 长连接</td>
+</tr>
+<tr>
+<td><strong>发送链路</strong></td>
+<td>客户端 → realtime → Kafka</td>
+<td>发消息，权限校验，投队列</td>
+</tr>
+<tr>
+<td><strong>推送链路</strong></td>
+<td>Kafka → realtime → 客户端</td>
+<td>在线推送，跨节点转发</td>
+</tr>
+<tr>
+<td><strong>离线链路</strong></td>
+<td>Kafka → offline-api → Redis/MySQL</td>
+<td>存离线消息，上线拉取</td>
+</tr>
+</tbody></table></div>
+<p><strong>学习 IM 的最好方式</strong>：沿着一条消息的旅程，把这五条链路挨个走一遍，就知道每个服务为什么存在。</p>
+<hr>
+<h2 id="四、登录链路：登录成功到底拿到了什么？"><a href="#四、登录链路：登录成功到底拿到了什么？" class="headerlink" title="四、登录链路：登录成功到底拿到了什么？"></a>四、登录链路：登录成功到底拿到了什么？</h2><h3 id="4-1-两样东西"><a href="#4-1-两样东西" class="headerlink" title="4.1 两样东西"></a>4.1 两样东西</h3><p>打开 App 的第一步是登录。登录成功后，客户端要拿到<strong>两样东西</strong>：</p>
+<ol>
+<li><strong>token</strong>：用来证明”你是你”，之后每次请求都带着它</li>
+<li><strong>wsServerUri</strong>：WebSocket 地址，告诉客户端该连哪台 realtime 服务器</li>
+</ol>
+<p><strong>登录请求</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST http://gateway:10010/api/user/loginPassword</span><br><span class="line">Body: { "userId": "1001", "password": "xxx" }</span><br></pre></td></tr></tbody></table></figure>
+
+<p>gateway 转发给 user-api，最后返回：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"accessToken"</span><span class="punctuation">:</span> <span class="string">"eyJhbGc..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"refreshToken"</span><span class="punctuation">:</span> <span class="string">"dGhpcyBp..."</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"wsServerUri"</span><span class="punctuation">:</span> <span class="string">"ws://192.168.1.10:9101/ws/chat"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-2-双-Token-设计：平衡方便与安全"><a href="#4-2-双-Token-设计：平衡方便与安全" class="headerlink" title="4.2 双 Token 设计：平衡方便与安全"></a>4.2 双 Token 设计：平衡方便与安全</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>Token</th>
+<th>有效期</th>
+<th>作用</th>
+<th>安全考虑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>accessToken</td>
+<td>2 小时</td>
+<td>日常通行证，每次请求都带着</td>
+<td>短期有效，丢了影响小</td>
+</tr>
+<tr>
+<td>refreshToken</td>
+<td>24 小时</td>
+<td>续命凭证，只在 accessToken 过期时用来换新的</td>
+<td>不参与日常业务，降低暴露风险</td>
+</tr>
+</tbody></table></div>
+<p><strong>通俗比喻</strong>：</p>
+<ul>
+<li>accessToken = 日常门禁卡，每次进门都要刷</li>
+<li>refreshToken = 补办门禁卡的资格，只在卡过期时用来续命</li>
+</ul>
+<p>这样你不用每隔 2 小时重新登录一次。</p>
+<h3 id="4-3-token-写进-Redis-的三个-Key"><a href="#4-3-token-写进-Redis-的三个-Key" class="headerlink" title="4.3 token 写进 Redis 的三个 Key"></a>4.3 token 写进 Redis 的三个 Key</h3><p>user-api 生成 token 后，会写进 Redis：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">access:eyJhbGc... → userId:1001          # 验证 accessToken 时用</span><br><span class="line">refresh:dGhpcyBp... → userId:1001       # 刷新 accessToken 时用</span><br><span class="line">user:tokens:1001 → refreshToken         # 单点登录：一个用户只能有一个有效 refreshToken</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="4-4-选一台-realtime-节点"><a href="#4-4-选一台-realtime-节点" class="headerlink" title="4.4 选一台 realtime 节点"></a>4.4 选一台 realtime 节点</h3><p>user-api 从 etcd 拿所有 realtime 节点，用 userId 做<strong>一致性哈希</strong>选一台，拼出 WebSocket 地址。</p>
+<p>然后把路由表写进 Redis：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws:route:1001 → ws://192.168.1.10:9101/ws/chat</span><br></pre></td></tr></tbody></table></figure>
+
+<p>这个路由表超重要——别人给你发消息时要查它，才知道你在哪台服务器上。</p>
+<hr>
+<h2 id="五、连接链路：WebSocket-长连接是怎么建立的？"><a href="#五、连接链路：WebSocket-长连接是怎么建立的？" class="headerlink" title="五、连接链路：WebSocket 长连接是怎么建立的？"></a>五、连接链路：WebSocket 长连接是怎么建立的？</h2><h3 id="5-1-客户端发起连接"><a href="#5-1-客户端发起连接" class="headerlink" title="5.1 客户端发起连接"></a>5.1 客户端发起连接</h3><p>客户端拿到 wsServerUri 后，用 WebSocket 发起连接：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws://192.168.1.10:9101/ws/chat?token=eyJhbGc...</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>注意</strong>：URL 里要带 token 参数，realtime 会验证它。</p>
+<h3 id="5-2-realtime-握手六步"><a href="#5-2-realtime-握手六步" class="headerlink" title="5.2 realtime 握手六步"></a>5.2 realtime 握手六步</h3><p>realtime 收到连接请求后做六件事：</p>
+<ol>
+<li><strong>解析 token</strong> 拿到 userId（无效直接 401）</li>
+<li><strong>升级协议</strong>：用 upgrader 把 HTTP 升级成 WebSocket</li>
+<li><strong>存本地内存表</strong>：<code>s.connections[userId] = conn</code>（加锁保证并发安全）</li>
+<li><strong>注册路由表</strong>：把 <code>ws:route:userId → 本节点地址</code> 写进 Redis（覆盖旧值，因为用户可能重连到不同节点）</li>
+<li><strong>启动读协程</strong>：一直等收消息</li>
+<li><strong>启动心跳协程</strong>：每 60 秒发一次 ping 保活</li>
+</ol>
+<p><strong>两个表的作用</strong>：</p>
+<ul>
+<li><strong>本地内存表</strong>：让本节点能直接推送消息给客户端</li>
+<li><strong>Redis 路由表</strong>：让其他节点知道用户在哪个节点，跨节点推送时查它</li>
+</ul>
+<p><strong>重要</strong>：消息里的 SenderId 不能信客户端传的，必须从 token 里解析出来，防止伪造身份。</p>
+<h3 id="5-3-读循环与心跳保活"><a href="#5-3-读循环与心跳保活" class="headerlink" title="5.3 读循环与心跳保活"></a>5.3 读循环与心跳保活</h3><p><strong>读循环</strong>：</p>
+<figure class="highlight go"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> {</span><br><span class="line">    msg, err := conn.ReadMessage()  <span class="comment">// 阻塞等待，有数据才唤醒</span></span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> {</span><br><span class="line">        <span class="comment">// 断线，清理连接</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 解析 JSON 并处理</span></span><br><span class="line">}</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>心跳协程</strong>：</p>
+<ul>
+<li>每 60 秒发一次 ping，客户端收到会自动回 pong（库自动处理）</li>
+<li>检查 lastActive，90 秒没有活动就断开连接</li>
+</ul>
+<p><strong>为什么需要心跳</strong>：防止”僵尸连接”——客户端已经挂了，服务端却不知道，连接一直占着资源。</p>
+<p><strong>常见疑问</strong>：ReadMessage() 是阻塞调用，不会一直占用 CPU。底层基于 epoll（Go 的 netpoller），阻塞时协程挂起，有数据来了才被唤醒。所以”读循环 + 心跳”看起来是死循环，但不会空转 CPU。</p>
+<hr>
+<h2 id="六、发送链路：消息是怎么进-Kafka-的？"><a href="#六、发送链路：消息是怎么进-Kafka-的？" class="headerlink" title="六、发送链路：消息是怎么进 Kafka 的？"></a>六、发送链路：消息是怎么进 Kafka 的？</h2><h3 id="6-1-权限校验"><a href="#6-1-权限校验" class="headerlink" title="6.1 权限校验"></a>6.1 权限校验</h3><p>客户端通过 WebSocket 发 JSON 消息：</p>
+<figure class="highlight json"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">{</span></span><br><span class="line">  <span class="attr">"receiverId"</span><span class="punctuation">:</span> <span class="string">"1002"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"content"</span><span class="punctuation">:</span> <span class="string">"你好"</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">"type"</span><span class="punctuation">:</span> <span class="string">"text"</span></span><br><span class="line"><span class="punctuation">}</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>realtime 收到后先做权限校验：调 user-rpc 查”发送者是不是接收者的好友”，不是好友直接拒绝。</p>
+<h3 id="6-2-生成-msgId-和-sessionId"><a href="#6-2-生成-msgId-和-sessionId" class="headerlink" title="6.2 生成 msgId 和 sessionId"></a>6.2 生成 msgId 和 sessionId</h3><p>校验通过后：</p>
+<ul>
+<li><strong>msgId</strong>：雪花算法生成 64 位唯一 ID，用于幂等去重</li>
+<li><strong>sessionId</strong>：按字典序排序的两个 userId 拼接（如 <code>user1001_user1002</code>），保证双向聊天是同一个会话</li>
+</ul>
+<h3 id="6-3-投进两个-Topic"><a href="#6-3-投进两个-Topic" class="headerlink" title="6.3 投进两个 Topic"></a>6.3 投进两个 Topic</h3><p>realtime 把消息投进两个 Kafka topic：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>消费者</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>message-topic</td>
+<td>realtime 消费者</td>
+<td>在线推送</td>
+</tr>
+<tr>
+<td>store-topic</td>
+<td>store 消费者</td>
+<td>落 MySQL</td>
+</tr>
+</tbody></table></div>
+<p>然后回 ACK 给发送者，客户端 5 秒没收到 ACK 会重传。</p>
+<h3 id="6-4-为什么用-sessionId-做-Key？"><a href="#6-4-为什么用-sessionId-做-Key？" class="headerlink" title="6.4 为什么用 sessionId 做 Key？"></a>6.4 为什么用 sessionId 做 Key？</h3><p><strong>问题</strong>：消息在网络上可能乱序——A 先发的消息 1 因为网络延迟反而后到。如果直接把消息投进 Kafka 随便分区，接收者看到的顺序就乱了。</p>
+<p><strong>解决</strong>：用 sessionId 做 Kafka 的 key：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">partition = hash(sessionId) % 分区数</span><br></pre></td></tr></tbody></table></figure>
+
+<p>同一个 sessionId 永远进同一个分区，而 Kafka 保证<strong>同一个分区内消息有序</strong>。所以 A 和 B 之间所有的消息，无论先发后发，都会进入同一个分区按顺序存储和消费。</p>
+<h3 id="6-5-为什么先投-Kafka-不直接落库？"><a href="#6-5-为什么先投-Kafka-不直接落库？" class="headerlink" title="6.5 为什么先投 Kafka 不直接落库？"></a>6.5 为什么先投 Kafka 不直接落库？</h3><p>三个原因：</p>
+<ol>
+<li><strong>削峰填谷</strong>：高峰期消息量巨大（比如春节抢红包），直接写数据库扛不住，Kafka 先缓存，消费者慢慢处理</li>
+<li><strong>解耦</strong>：推送和存储是两件事，投进两个 topic 后，推送失败不影响存储，存储失败不影响推送，两边可以独立扩容、独立重试</li>
+<li><strong>可靠性</strong>：Kafka 持久化落盘，消费者挂了消息不丢，还能重放重新消费</li>
+</ol>
+<hr>
+<h2 id="七、推送链路：消息消费后，怎么准确送到接收者手里？"><a href="#七、推送链路：消息消费后，怎么准确送到接收者手里？" class="headerlink" title="七、推送链路：消息消费后，怎么准确送到接收者手里？"></a>七、推送链路：消息消费后，怎么准确送到接收者手里？</h2><h3 id="7-1-消费者组与-Offset"><a href="#7-1-消费者组与-Offset" class="headerlink" title="7.1 消费者组与 Offset"></a>7.1 消费者组与 Offset</h3><p>realtime 用消费者组（组名 <code>realtime-consumer-group</code>）订阅 message-topic：</p>
+<ul>
+<li>同一组的多个消费者<strong>分摊消费不同分区</strong>（负载均衡）</li>
+<li>一个分区同一时间只被组内一个消费者处理</li>
+<li>消费的核心是 ConsumeClaim：一个分区一个 claim，<strong>单线程处理</strong>保证分区内有序</li>
+</ul>
+<p><strong>Offset 是什么</strong>：分区里每条消息的”流水号”或”页码”。消费者处理完一条消息后，会把”当前读到了哪个 offset”提交给 Kafka，相当于在书上夹了个书签。</p>
+<p><strong>黄金法则</strong>：<strong>先处理，再提交 Offset</strong>。</p>
+<ul>
+<li>先提交后处理：万一处理后挂了，消息就丢了</li>
+<li>先处理后提交：最多导致消息重复，配合 msgId 幂等去重即可</li>
+</ul>
+<h3 id="7-2-推送四步"><a href="#7-2-推送四步" class="headerlink" title="7.2 推送四步"></a>7.2 推送四步</h3><p>realtime 消费到消息后开始推送：</p>
+<p><strong>第 1 步：查 Redis 路由表</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ws:route:1002 → ws://192.168.1.10:9101/ws/chat</span><br></pre></td></tr></tbody></table></figure>
+<p>没有记录说明接收者不在线，走离线流程。</p>
+<p><strong>第 2 步：判断接收者在不在本节点</strong><br>解析 wsUri 的 IP 和本节点对比，不在本节点就转发给远程节点。</p>
+<p><strong>第 3 步：查本地连接表</strong><br>在本节点的 <code>s.connections</code> 里找接收者的连接，找不到说明刚断线，也走离线流程。</p>
+<p><strong>第 4 步：真正推送</strong><br>通过 WebSocket 把消息写出去；写失败就标记离线并清理连接。</p>
+<p>每一步都有兜底，消息绝不会”无声消失”。</p>
+<h3 id="7-3-节点间转发"><a href="#7-3-节点间转发" class="headerlink" title="7.3 节点间转发"></a>7.3 节点间转发</h3><p>接收者在其他 realtime 节点时，当前节点调用目标节点的内部接口：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">POST http://目标节点:8102/internal/forward</span><br><span class="line">Body: { "userId": "1002", "message": {...} }</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>为什么走 HTTP</strong>？因为节点间是内部网络、可信环境，HTTP 简单直接；而客户端和服务端之间才用 WebSocket 长连接。</p>
+<p><strong>完整推送路径</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Kafka → 本节点 realtime 消费者 → 查路由表 → (跨节点则 HTTP 转发) → 目标节点 → WebSocket 推给客户端</span><br></pre></td></tr></tbody></table></figure>
+
+<hr>
+<h2 id="八、离线链路：离线消息存哪？怎么保证不丢不重？"><a href="#八、离线链路：离线消息存哪？怎么保证不丢不重？" class="headerlink" title="八、离线链路：离线消息存哪？怎么保证不丢不重？"></a>八、离线链路：离线消息存哪？怎么保证不丢不重？</h2><h3 id="8-1-冷热分离存储"><a href="#8-1-冷热分离存储" class="headerlink" title="8.1 冷热分离存储"></a>8.1 冷热分离存储</h3><p>接收者不在线时，realtime 把消息投进 offline-topic，由 offline-api 消费处理。</p>
+<p>存储分两层：</p>
+<div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>层级</th>
+<th>存储</th>
+<th>结构</th>
+<th>过期</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>热数据</strong></td>
+<td>Redis</td>
+<td>ZSet（score=时间戳）</td>
+<td>7 天</td>
+<td>秒查，拉完就删</td>
+</tr>
+<tr>
+<td><strong>冷数据</strong></td>
+<td>MySQL</td>
+<td>表存储</td>
+<td>永久</td>
+<td>历史消息查询</td>
+</tr>
+</tbody></table></div>
+<p><strong>为什么用 ZSet 不用 List</strong>？</p>
+<ul>
+<li>List 无法去重（网络重试时会存多次）</li>
+<li>List 无法强制排序（消息乱序到达时顺序会错）</li>
+<li>ZSet 用 score（时间戳）强制保证顺序，member（消息 ID）天然去重</li>
+</ul>
+<p><strong>ZSet 结构</strong>：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Key: offline:1002</span><br><span class="line">Member: msg_001, msg_002, ...（消息 JSON，唯一）</span><br><span class="line">Score: 1717000000, 1717000001, ...（时间戳，自动排序）</span><br></pre></td></tr></tbody></table></figure>
+
+<h3 id="8-2-客户端怎么拉取离线消息"><a href="#8-2-客户端怎么拉取离线消息" class="headerlink" title="8.2 客户端怎么拉取离线消息"></a>8.2 客户端怎么拉取离线消息</h3><p>客户端重新上线后：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GET /api/offline/messages?cursor=0&amp;limit=50</span><br><span class="line">Authorization: Bearer eyJhbGc...</span><br></pre></td></tr></tbody></table></figure>
+
+<p>处理逻辑：</p>
+<ol>
+<li>先查 Redis 热数据，用 <code>ZRange</code> 按 score 范围取一页</li>
+<li>如果不够 limit 条，再去 MySQL 查冷数据补齐</li>
+<li>返回给客户端后，用 <code>ZRemRangeByScore</code> 把已读部分从 Redis 删掉</li>
+</ol>
+<p><strong>常见疑问</strong>：</p>
+<ul>
+<li><strong>问</strong>：离线消息只拉一次，为什么还要用 Redis？</li>
+<li><strong>答</strong>：离线消息不是”一辈子只拉一次”，是”每次离线期间”的消息。你可能多次上线下线，每次都要拉离线期间的消息。</li>
+<li><strong>问</strong>：拉完就删，那”已读”状态怎么算？</li>
+<li><strong>答</strong>：离线消息的定义是”你不在时别人发给你的”，你上线拉走了就算”已投递”。至于你有没有点开看，那是”已读回执”的事（另一个功能）。</li>
+</ul>
+<h3 id="8-3-为什么不用-MySQL-直接存？"><a href="#8-3-为什么不用-MySQL-直接存？" class="headerlink" title="8.3 为什么不用 MySQL 直接存？"></a>8.3 为什么不用 MySQL 直接存？</h3><p>两个问题：</p>
+<p><strong>问题 1：分页查询慢</strong></p>
+<figure class="highlight sql"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- MySQL 分页要扫描前面的数据</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> offline_messages </span><br><span class="line"><span class="keyword">WHERE</span> user_id <span class="operator">=</span> ? </span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="type">timestamp</span> </span><br><span class="line">LIMIT <span class="number">50</span> <span class="keyword">OFFSET</span> <span class="number">1000</span>; <span class="comment">-- 越往后越慢</span></span><br></pre></td></tr></tbody></table></figure>
+
+<p>Redis ZSet：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZRANGE key 0 50 WITHSCORES -- O(log n)，恒定快</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>问题 2：删除频繁</strong></p>
+<ul>
+<li>每次用户上线都要删一批数据</li>
+<li>MySQL 频繁 DELETE 会产生碎片</li>
+<li>Redis 删除 ZSet 元素是 O(log n)，很快</li>
+</ul>
+<hr>
+<h2 id="九、核心问题：服务地址随时在变，怎么找？"><a href="#九、核心问题：服务地址随时在变，怎么找？" class="headerlink" title="九、核心问题：服务地址随时在变，怎么找？"></a>九、核心问题：服务地址随时在变，怎么找？</h2><p>生产环境里，服务会<strong>扩容、缩容、宕机</strong>，IP 地址随时在变。</p>
+<p><strong>问题</strong>：客户端怎么知道该连哪台服务器？gateway 怎么知道 realtime 在哪？</p>
+<p><strong>答案</strong>：用一个「服务通讯录」—— <strong>etcd</strong>。</p>
+<h3 id="9-1-服务注册（我是谁，我在哪）"><a href="#9-1-服务注册（我是谁，我在哪）" class="headerlink" title="9.1 服务注册（我是谁，我在哪）"></a>9.1 服务注册（我是谁，我在哪）</h3><p>每个服务启动时，<strong>自己</strong>向 etcd 注册：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/services/gateway/192.168.1.12:10010</span><br><span class="line">/services/user-api/192.168.1.11:8104</span><br><span class="line">/services/realtime/192.168.1.10:9101</span><br><span class="line">/services/offline-api/192.168.1.13:8101</span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li>定期发心跳（比如 30 秒一次）</li>
+<li>挂了/缩容了，etcd 自动摘掉（TTL 过期）</li>
+</ul>
+<p><strong>这步跟网关没关系</strong>——每个服务自己负责自己。</p>
+<h3 id="9-2-服务发现（我要调谁，去哪调）"><a href="#9-2-服务发现（我要调谁，去哪调）" class="headerlink" title="9.2 服务发现（我要调谁，去哪调）"></a>9.2 服务发现（我要调谁，去哪调）</h3><p>调用方从 etcd 拿服务列表：</p>
+<ul>
+<li><strong>客户端</strong>启动时，从 etcd 拿 gateway 地址列表，选一台连</li>
+<li><strong>gateway</strong>收到请求后，从 etcd 查 realtime 地址，做路由</li>
+<li><strong>realtime</strong>要校验权限时，从 etcd 查 user-rpc 地址，发起 gRPC 调用</li>
+</ul>
+<p><strong>etcd 的核心能力</strong>：</p>
+<ol>
+<li>存键值对（服务地址）</li>
+<li>监听变化（某个 key 变了，订阅者立刻收到通知）</li>
+</ol>
+<hr>
+<h2 id="十、gateway-的价值"><a href="#十、gateway-的价值" class="headerlink" title="十、gateway 的价值"></a>十、gateway 的价值</h2><h3 id="10-1-没有-gateway-会怎样？"><a href="#10-1-没有-gateway-会怎样？" class="headerlink" title="10.1 没有 gateway 会怎样？"></a>10.1 没有 gateway 会怎样？</h3><p>客户端要连 5 个不同的地址：</p>
+<ul>
+<li>登录 → 连 user-api:8104</li>
+<li>发消息 → 连 realtime:9101</li>
+<li>查离线消息 → 连 offline-api:8101</li>
+<li>发红包 → 连 redpacket-api:8103</li>
+</ul>
+<p><strong>问题</strong>：</p>
+<ol>
+<li>客户端要记 5 个地址，麻烦</li>
+<li>某个服务扩容/缩容，客户端要重新配置</li>
+<li>每个服务都要自己写鉴权逻辑，重复</li>
+</ol>
+<h3 id="10-2-有了-gateway"><a href="#10-2-有了-gateway" class="headerlink" title="10.2 有了 gateway"></a>10.2 有了 gateway</h3><p>客户端只需要知道<strong>一个地址</strong>：<code>gateway:10010</code></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">客户端 → gateway:10010/login   → gateway 转发 → user-api:8104</span><br><span class="line">客户端 → gateway:10010/ws      → gateway 转发 → realtime:9101</span><br><span class="line">客户端 → gateway:10010/offline → gateway 转发 → offline-api:8101</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>gateway 干了 3 件事</strong>：</p>
+<ol>
+<li><strong>统一入口</strong> — 客户端只认一个地址</li>
+<li><strong>鉴权</strong> — 验证 token，检查用户是否登录（只验证一次，后端服务不用重复验证）</li>
+<li><strong>路由</strong> — 根据请求路径，转发到对应的后端服务</li>
+</ol>
+<p><strong>注意</strong>：WebSocket 连接不经过 gateway，是客户端直接连 realtime。gateway 只在登录时帮你找到该连哪台 realtime，连上之后 gateway 就退出了。</p>
+<p><strong>通俗比喻</strong>：</p>
+<ul>
+<li>gateway = 前台接待（帮你查分机号）</li>
+<li>realtime = 你要找的人（接通后你们直接聊，前台不管了）</li>
+</ul>
+<hr>
+<h2 id="十一、扩缩容时发生了什么"><a href="#十一、扩缩容时发生了什么" class="headerlink" title="十一、扩缩容时发生了什么"></a>十一、扩缩容时发生了什么</h2><p><strong>场景</strong>：user-api 从 3 台扩容到 5 台。</p>
+<p><strong>客户端</strong>：✅ 不需要改配置</p>
+<ul>
+<li>客户端只知道 <code>gateway:10010</code></li>
+<li>后端 user-api 从 3 台变 5 台，客户端根本不知道</li>
+</ul>
+<p><strong>gateway</strong>：✅ 也不需要重启</p>
+<ul>
+<li>gateway 启动时从 etcd 拉一次服务列表</li>
+<li>然后<strong>监听 etcd 的变化</strong></li>
+<li>user-api 新实例注册到 etcd → gateway 自动收到通知 → 更新路由表</li>
+</ul>
+<p><strong>这就是用 etcd 的好处</strong>：</p>
+<ul>
+<li>服务动态扩缩容，调用方<strong>无感知</strong></li>
+<li>不用重启，不用改配置</li>
+</ul>
+<hr>
+<h2 id="十二、可靠性保障：不丢、不重、挂了怎么办"><a href="#十二、可靠性保障：不丢、不重、挂了怎么办" class="headerlink" title="十二、可靠性保障：不丢、不重、挂了怎么办"></a>十二、可靠性保障：不丢、不重、挂了怎么办</h2><h3 id="12-1-消息不丢（三层保障）"><a href="#12-1-消息不丢（三层保障）" class="headerlink" title="12.1 消息不丢（三层保障）"></a>12.1 消息不丢（三层保障）</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>层级</th>
+<th>措施</th>
+<th>防什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>客户端</td>
+<td>5 秒没收到 ACK 就重传</td>
+<td>防网络丢包</td>
+</tr>
+<tr>
+<td>Kafka</td>
+<td>持久化落盘，消费者挂了可重放</td>
+<td>防服务端宕机</td>
+</tr>
+<tr>
+<td>离线存储</td>
+<td>接收者离线时存 Redis/MySQL，上线后能拉到</td>
+<td>防接收者不在线</td>
+</tr>
+</tbody></table></div>
+<h3 id="12-2-消息不重（两层保障）"><a href="#12-2-消息不重（两层保障）" class="headerlink" title="12.2 消息不重（两层保障）"></a>12.2 消息不重（两层保障）</h3><div class="md-table-scroll"><table>
+<thead>
+<tr>
+<th>层级</th>
+<th>措施</th>
+<th>原理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>msgId 幂等</td>
+<td>接收者用 msgId 去重，同一 msgId 只处理一次</td>
+<td>业务层去重</td>
+</tr>
+<tr>
+<td>Kafka Offset</td>
+<td>处理完再提交，避免重复消费</td>
+<td>消费层防重</td>
+</tr>
+</tbody></table></div>
+<h3 id="12-3-realtime-挂了怎么办"><a href="#12-3-realtime-挂了怎么办" class="headerlink" title="12.3 realtime 挂了怎么办"></a>12.3 realtime 挂了怎么办</h3><ol>
+<li>心跳停止 → etcd TTL 过期自动删 key</li>
+<li>gateway 监听到变化更新路由表</li>
+<li>客户端断线重连，重新拿新的 wsServerUri</li>
+<li>连到新的 realtime 节点</li>
+</ol>
+<p><strong>已投 Kafka 的消息不会丢</strong>；还在 realtime 内存里的会丢，所以客户端必须有重传机制兜底。</p>
+<hr>
+<h2 id="十三、总结：IM-架构设计原则"><a href="#十三、总结：IM-架构设计原则" class="headerlink" title="十三、总结：IM 架构设计原则"></a>十三、总结：IM 架构设计原则</h2><ol>
+<li><strong>服务拆分</strong> — 每个服务只干一件事，独立扩缩容</li>
+<li><strong>服务发现</strong> — 用 etcd 做「通讯录」，地址变化对调用方透明</li>
+<li><strong>统一入口</strong> — gateway 做鉴权和路由，后端服务不用重复实现</li>
+<li><strong>异步解耦</strong> — Kafka 削峰填谷，推送和存储解耦</li>
+<li><strong>冷热分离</strong> — Redis 存热数据（快），MySQL 存冷数据（久）</li>
+<li><strong>无感知扩缩容</strong> — 调用方监听 etcd 变化，自动更新路由表</li>
+</ol>
+<p><strong>本质</strong>：</p>
+<blockquote>
+<p>分布式系统的核心问题不是「怎么跑」，而是「怎么找」—— 找到对的服务，在对的时间，用对的方式。</p>
+</blockquote>
+<hr>
+<p><em>整理于 2026-11-20，基于 Redis 零基础闯关课堂 IM 课程</em></p>
+</article>
+<div class="article-tags slide-up"><a class="tag" href="/tags/IM/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>IM</a><a class="tag" href="/tags/%E5%90%8E%E7%AB%AF/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>后端</a><a class="tag" href="/tags/%E6%9E%B6%E6%9E%84/"><svg class="icon" viewBox="0 0 1 1" data-icon="default:hashtag" aria-hidden="true"></svg>架构</a></div>
+
+
+  <div class="article-share slide-up" id="share">
+    <div class="body">
+      <div class="social-wrap dis-select"><a class="social share-item qrcode ui-interactive is-icon-only" onclick="util.toggle(&quot;share-qrcode&quot;)" aria-label="分享文章: QR Code" title="分享文章: QR Code"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" d="M10.553 13.447c-.424-.424-.95-.596-1.535-.675c-.553-.074-1.25-.074-2.086-.074H5.827c-.58 0-1.065 0-1.459.037c-.411.04-.795.124-1.146.34c-.345.21-.634.5-.845.844c-.216.352-.3.735-.34 1.147C2 15.459 2 15.944 2 16.525v.068c0 .884 0 1.597.055 2.17c.056.592.175 1.108.459 1.571c.288.47.682.864 1.152 1.152c.463.284.979.403 1.57.46C5.81 22 6.524 22 7.407 22h.07c.58 0 1.064 0 1.458-.037c.412-.04.795-.124 1.147-.34c.344-.21.633-.5.844-.844c.216-.352.3-.736.34-1.147c.037-.394.037-.879.037-1.46v-1.104c0-.836 0-1.533-.074-2.086c-.079-.584-.251-1.111-.675-1.535m-1.62-11.41c.412.04.795.124 1.147.34c.344.21.633.5.844.845c.216.351.3.735.34 1.146c.037.394.037.879.037 1.46v1.104c0 .836 0 1.533-.074 2.086c-.079.584-.251 1.111-.675 1.535s-.95.596-1.535.675c-.553.074-1.25.074-2.086.074H5.827c-.58 0-1.065 0-1.459-.037c-.411-.04-.795-.124-1.146-.34a2.56 2.56 0 0 1-.845-.844c-.216-.352-.3-.735-.34-1.147C2 8.54 2 8.056 2 7.475v-.068c0-.884 0-1.597.055-2.17c.056-.592.175-1.108.459-1.571c.288-.47.682-.864 1.152-1.152c.463-.284.979-.403 1.57-.46C5.81 2 6.524 2 7.407 2h.07c.58 0 1.064 0 1.458.037M16.593 2h-.068c-.58 0-1.065 0-1.46.037c-.41.04-.794.124-1.146.34c-.344.21-.633.5-.844.845c-.216.351-.3.735-.34 1.146c-.037.394-.037.879-.037 1.46v1.104c0 .836 0 1.533.074 2.086c.079.584.251 1.111.675 1.535s.95.596 1.535.675c.553.074 1.25.074 2.086.074h1.105c.58 0 1.065 0 1.459-.037c.411-.04.795-.124 1.146-.34c.345-.21.634-.5.845-.844c.216-.352.3-.735.34-1.147C22 8.54 22 8.056 22 7.475v-.068c0-.884 0-1.597-.055-2.17c-.056-.592-.175-1.108-.459-1.571a3.5 3.5 0 0 0-1.152-1.152c-.463-.284-.979-.403-1.57-.46C18.19 2 17.477 2 16.594 2" opacity=".5"/><path fill="currentColor" d="M14.093 21.302a.698.698 0 1 1-1.396 0v-2.79h1.396z" opacity=".4"/><path fill="currentColor" d="M21.302 12.698a.7.7 0 0 0-.697.697v3.256H22v-3.256a.7.7 0 0 0-.698-.697" opacity=".5"/><path fill="currentColor" d="M16.076 16.617c-.076.184-.076.417-.076.883s0 .699.076.883a1 1 0 0 0 .541.54c.184.077.417.077.883.077s.699 0 .883-.076a1 1 0 0 0 .54-.541c.077-.184.077-.417.077-.883s0-.699-.076-.883a1 1 0 0 0-.541-.54C18.199 16 17.966 16 17.5 16s-.699 0-.883.076a1 1 0 0 0-.54.541"/><path fill="currentColor" d="M22 18.535v-.023h-1.396c0 .443 0 .74-.016.97c-.015.224-.043.333-.073.405a1.16 1.16 0 0 1-.629.63c-.072.029-.18.056-.405.072c-.23.015-.527.016-.97.016h-1.86V22h1.883c.414 0 .759 0 1.042-.02a2.6 2.6 0 0 0 .844-.175a2.56 2.56 0 0 0 1.384-1.384c.112-.27.156-.549.176-.844c.02-.283.02-.628.02-1.042" opacity=".7"/><path fill="currentColor" d="M12.697 16.616v.035h1.396c0-.668 0-1.116.035-1.458c.034-.33.093-.482.16-.583a1.2 1.2 0 0 1 .321-.32c.101-.068.254-.128.584-.161c.342-.035.79-.036 1.458-.036h1.86v-1.395h-1.896c-.623 0-1.142 0-1.563.043c-.44.044-.85.142-1.218.388c-.28.187-.519.426-.706.706c-.246.368-.343.777-.388 1.217c-.043.421-.043.94-.043 1.564" opacity=".6"/><path fill="currentColor" d="M5.508 18.69c.219.155.528.155 1.146.155c.619 0 .928 0 1.146-.155a.8.8 0 0 0 .2-.199c.154-.218.154-.527.154-1.146s0-.927-.155-1.146A.8.8 0 0 0 7.8 16c-.218-.155-.527-.155-1.146-.155s-.927 0-1.146.155a.8.8 0 0 0-.199.2c-.155.218-.155.527-.155 1.145c0 .619 0 .928.155 1.146a.8.8 0 0 0 .2.2M6.654 8.155c-.618 0-.927 0-1.146-.155a.8.8 0 0 1-.199-.2c-.155-.217-.155-.527-.155-1.145c0-.619 0-.928.155-1.146a.8.8 0 0 1 .2-.2c.218-.154.527-.154 1.145-.154c.619 0 .928 0 1.146.155a.8.8 0 0 1 .2.199c.154.218.154.527.154 1.146s0 .928-.155 1.146A.8.8 0 0 1 7.8 8c-.218.155-.527.155-1.146.155M16.2 8c.218.155.527.155 1.146.155s.927 0 1.146-.155a.8.8 0 0 0 .199-.199c.155-.218.155-.528.155-1.146c0-.619 0-.928-.155-1.146a.8.8 0 0 0-.2-.2c-.218-.154-.527-.154-1.145-.154c-.619 0-.928 0-1.146.155a.8.8 0 0 0-.2.199c-.154.218-.154.527-.154 1.146s0 .928.155 1.146A.8.8 0 0 0 16.2 8"/></svg></span></a><a class="social share-item weibo ui-interactive is-icon-only" href="https:&#x2F;&#x2F;service.weibo.com&#x2F;share&#x2F;share.php?url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F&amp;title&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;summary&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%0A%E7%94%A8%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E7%90%86%E6%8B%86%E8%A7%A3%EF%BC%9AIM%20%E8%A6%81%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%20%E2%86%92%20%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%205%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%20%E2%86%92%20%E6%9C%8D%E5%8A%A1%E4%B9%8B%E9%97%B4%E6%80%8E%E4%B9%88%E5%8F%91%E7%8E%B0%E5%AF%B9%E6%96%B9%20%E2%86%92%20%E4%B8%80%E6%9D%A1%E6%B6%88%E6%81%AF%E7%9A%84%E5%AE%8C%E6%95%B4%E6%97%85%E7%A8%8B%E3%80%82%0A%0A%0A%E4%B8%80%E3%80%81%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%9C%AC%E8%B4%A8IM%20%E9%A1%B9%E7%9B%AE%E8%A6%81%E8%A7%A3%E5%86%B3%E7%9A%84%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98%EF%BC%9A%E8%AE%A9%2010%20%E4%B8%87%20%2B%20%E7%94%A8%E6%88%B7%E8%83%BD%E5%AE%9E%E6%97%B6..." target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Weibo" title="分享文章: Weibo"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.671 4.018.259 2.6-2.759 5.049-6.737 5.439l-.002.004zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.346.672-.24.239.09.315.36.18.601l.014-.028zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.57-.18-.405-.615.375-.977.42-1.804 0-2.404-.781-1.112-2.915-1.053-5.364-.03 0 0-.766.331-.571-.271.376-1.217.315-2.224-.27-2.809-1.338-1.337-4.869.045-7.888 3.08C1.309 10.87 0 13.273 0 15.348c0 3.981 5.099 6.395 10.086 6.395 6.536 0 10.888-3.801 10.888-6.82 0-1.822-1.547-2.854-2.915-3.284v.01zm1.908-5.092c-.766-.856-1.908-1.187-2.96-.962-.436.09-.706.511-.616.932.09.42.511.691.932.602.511-.105 1.067.044 1.442.465.376.421.466.977.316 1.473-.136.406.089.856.51.992.405.119.857-.105.992-.512.33-1.021.12-2.178-.646-3.035l.03.045zm2.418-2.195c-1.576-1.757-3.905-2.419-6.054-1.968-.496.104-.812.587-.706 1.081.104.496.586.813 1.082.707 1.532-.331 3.185.15 4.296 1.383 1.112 1.246 1.429 2.943.947 4.416-.165.48.106 1.007.586 1.157.479.165.991-.104 1.157-.586.675-2.088.241-4.478-1.338-6.235l.03.045z"/></svg></span></a><a class="social share-item x ui-interactive is-icon-only" href="https:&#x2F;&#x2F;x.com&#x2F;intent&#x2F;tweet?text&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: X" title="分享文章: X"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M14.234 10.162L22.977 0h-2.072l-7.591 8.824L7.251 0H.258l9.168 13.343L.258 24H2.33l8.016-9.318L16.749 24h6.993zm-2.837 3.299l-.929-1.329L3.076 1.56h3.182l5.965 8.532l.929 1.329l7.754 11.09h-3.182z"/></svg></span></a><a class="social share-item telegram ui-interactive is-icon-only" href="https:&#x2F;&#x2F;t.me&#x2F;share&#x2F;url?url&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F&amp;text&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: Telegram" title="分享文章: Telegram"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12a12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.5.5 0 0 1 .171.325c.016.093.036.306.02.472c-.18 1.898-.962 6.502-1.36 8.627c-.168.9-.499 1.201-.82 1.23c-.696.065-1.225-.46-1.9-.902c-1.056-.693-1.653-1.124-2.678-1.8c-1.185-.78-.417-1.21.258-1.91c.177-.184 3.247-2.977 3.307-3.23c.007-.032.014-.15-.056-.212s-.174-.041-.249-.024q-.159.037-5.061 3.345q-.72.495-1.302.48c-.428-.008-1.252-.241-1.865-.44c-.752-.245-1.349-.374-1.297-.789q.04-.324.893-.663q5.247-2.286 6.998-3.014c3.332-1.386 4.025-1.627 4.476-1.635"/></svg></span></a><a class="social share-item whatsapp ui-interactive is-icon-only" href="https:&#x2F;&#x2F;wa.me&#x2F;?text&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!%0Ahttps%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F" target="_blank" rel="external nofollow noopener noreferrer" aria-label="分享文章: WhatsApp" title="分享文章: WhatsApp"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Simple Icons - https://creativecommons.org/publicdomain/zero/1.0/ --><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967c-.273-.099-.471-.148-.67.15c-.197.297-.767.966-.94 1.164c-.173.199-.347.223-.644.075c-.297-.15-1.255-.463-2.39-1.475c-.883-.788-1.48-1.761-1.653-2.059c-.173-.297-.018-.458.13-.606c.134-.133.298-.347.446-.52s.198-.298.298-.497c.099-.198.05-.371-.025-.52s-.669-1.612-.916-2.207c-.242-.579-.487-.5-.669-.51a13 13 0 0 0-.57-.01c-.198 0-.52.074-.792.372c-.272.297-1.04 1.016-1.04 2.479c0 1.462 1.065 2.875 1.213 3.074s2.096 3.2 5.077 4.487c.709.306 1.262.489 1.694.625c.712.227 1.36.195 1.871.118c.571-.085 1.758-.719 2.006-1.413s.248-1.289.173-1.413c-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214l-3.741.982l.998-3.648l-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884c2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.82 11.82 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.9 11.9 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.82 11.82 0 0 0-3.48-8.413"/></svg></span></a><a class="social share-item email ui-interactive is-icon-only" href="mailto:?subject&#x3D;IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%EF%BC%9A5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C%20-%20hi%2Cit&#39;s%20Qiu%20Yinlan!&amp;body&#x3D;https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F" aria-label="分享文章: Email" title="分享文章: Email"><span class="share-item__icon ui-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ --><path fill="currentColor" fill-rule="evenodd" d="M3.172 5.172C2 6.343 2 8.229 2 12s0 5.657 1.172 6.828C4.343 20 6.229 20 10 20h4c3.771 0 5.657 0 6.828-1.172C22 17.657 22 15.771 22 12s0-5.657-1.172-6.828C19.657 4 17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172m15.404 2.348a.75.75 0 0 1-.096 1.056l-2.196 1.83c-.887.739-1.605 1.338-2.24 1.746-.66.424-1.303.693-2.044.693s-1.384-.269-2.045-.693c-.634-.408-1.352-1.007-2.239-1.745L5.52 8.576a.75.75 0 1 1 .96-1.152l2.159 1.799c.933.777 1.58 1.315 2.128 1.667.529.34.888.455 1.233.455s.704-.115 1.233-.455c.547-.352 1.195-.89 2.128-1.667l2.159-1.8a.75.75 0 0 1 1.056.097" clip-rule="evenodd"/></svg></span></a></div>
+      <div class="share-qrcode" id="share-qrcode" style="opacity:0;height:0"><img class="lazy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" data-src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&amp;data=https%3A%2F%2Fqiuyinlan.github.io%2F2026%2F11%2F19%2FIM%2520%25E9%25A1%25B9%25E7%259B%25AE%25E6%259E%25B6%25E6%259E%2584%25E8%25AF%25A6%25E8%25A7%25A3%2520-5%2520%25E4%25B8%25AA%25E6%259C%258D%25E5%258A%25A1%25E6%2580%258E%25E4%25B9%2588%25E5%258D%258F%25E4%25BD%259C%2F" onerror="this.onerror&#x3D;null;this.src&#x3D;&quot;&#x2F;images&#x2F;stellar-error.491ee870f4940739.svg&quot;"/></div>
+    </div>
+  </div>
+
+<div class="article-footer slide-up">
+    <section id="license">
+      <div class="header"><span>许可协议</span></div>
+      <div class="body"><p>本文采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">署名-非商业性使用-相同方式共享 4.0 国际</a> 许可协议，转载请注明出处。</p>
+</div>
+    </section></div>
+
+<div class="related-wrap slide-up" id="read-next"><section class="body"><div class="item" id="prev"><div class="note"><svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-left" aria-hidden="true"></svg> 较新文章</div><a href="/2026/11/19/Redis%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">Redis 学习笔记</a></div><div class="item" id="next"><div class="note">较早文章 <svg class="icon" viewBox="0 0 1 1" data-icon="default:arrow-right" aria-hidden="true"></svg></div><a href="/2026/11/19/IM%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3-5%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/">IM 项目架构详解：5 个服务怎么协作</a></div></section></div>
+
+
+
+
+
+
+<footer class="page-footer slide-up footnote"><hr><div class="text"><p>本站由 <a href="/">Qiu Yinlan</a> 使用 <a target="_blank" rel="noopener" href="https://github.com/xaoxuu/hexo-theme-stellar/tree/2.0.0">Stellar 2.0.0</a> 主题创建。<br>本博客所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> 许可协议，转载请注明出处。</p>
+</div></footer>
+</main></div><button type="button" class="site-scrim" data-shell-action="dismiss-drawer" aria-label="Close navigation" tabindex="-1"></button><div data-stellar-runtime-region class="site-dock" role="group" aria-label="Layout panels">
+  <button type="button" class="site-dock__button site-dock__button--rightbar ui-interactive" aria-label="Open rightbar" aria-controls="rightbar-region" aria-expanded="false" data-shell-action="toggle-rightbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6h11m-11 6h11m-11 6h11M4 6h1v4m-1 0h2m0 8H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+  </button>
+  <button type="button" class="site-dock__button site-dock__button--leftbar ui-interactive" aria-label="Open leftbar" aria-controls="leftbar-region" aria-expanded="false" data-shell-action="toggle-leftbar-drawer">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828C4.343 3 6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172C22 5.343 22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828C19.657 21 17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172C2 18.657 2 16.771 2 13z"/><path id="sep" stroke-linecap="round" d="M5.5 10h6m-5 4h4m4.5 7V3"/></g></svg>
+  </button>
+</div>
+
+<dialog data-stellar-runtime-region class="search-dialog" id="site-search-dialog" aria-labelledby="site-search-title">
+  <div class="search-dialog__panel search-wrapper" id="site-search-wrapper" searching="false">
+    <div class="search-dialog__header">
+      <div class="search-form" role="search">
+        <span class="search-button" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Adapted from Google Material Icons by Material Design Authors - https://github.com/material-icons/material-icons/blob/master/LICENSE --><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h3M3 13h3M3 18h8M16.83 13.83l3.76 3.76"/><circle cx="14" cy="11" r="4"/></g></svg></span>
+        <input type="search" class="search-input" id="site-search-input" aria-labelledby="site-search-title" placeholder="搜索">
+      </div>
+      <button type="button" class="search-dialog__close" data-shell-action="close-search" aria-label="关闭搜索">×</button>
+    </div>
+    
+      <div class="search-dialog__scope" role="radiogroup" aria-labelledby="site-search-title" hidden>
+        <label class="search-dialog__scope-option" data-search-scope-option="all">
+          <input class="ui-radio" type="radio" name="site-search-scope" value="all">
+          <span>全站</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="blog" hidden>
+          <input class="ui-radio" type="radio" name="site-search-scope" value="blog">
+          <span>博客</span>
+        </label>
+        <label class="search-dialog__scope-option" data-search-scope-option="current" hidden>
+          <input class="ui-radio" type="radio" name="site-search-scope" value="current">
+          <span data-search-scope-current-label></span>
+        </label>
+      </div>
+    
+    <h2 class="search-dialog__title" id="site-search-title">站内搜索</h2>
+    <div class="search-result" id="site-search-result"></div>
+    <div class="search-no-result">没有找到内容！</div>
+  </div>
+</dialog>
+</div><div class="site-scripts">
+<script data-stellar-script="core" src="/js/stellar-icons.js?v=39c6ac17e854ffe2"></script>
+
+<script data-stellar-script="defines">
+  window.canonical = window.stellarClientData.canonical;
+  const ctx = window.stellarClientData.ctx;
+  window.canonical.param = {permalink: "https://qiuyinlan.github.io/2026/11/19/IM%20%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%A6%E8%A7%A3%20-5%20%E4%B8%AA%E6%9C%8D%E5%8A%A1%E6%80%8E%E4%B9%88%E5%8D%8F%E4%BD%9C/", checklink: ctx.services.video.js};
+  ctx.date_suffix = {"just":"刚刚","min":"分钟前","hour":"小时前","day":"天前"};
+  if (ctx.search) Object.assign(ctx.search, {"more":"更多","no_more":"没有更多了"});
+  const def = window.stellarClientData.def;
+  window.ctx = ctx;
+  window.def = def;
+</script>
+
+
+<!-- core: 迁移期 DOM/资源兼容工具；Extension 注册与生命周期由 ESM runtime 所有 -->
+<script data-stellar-script="core" src="/js/utils.js?v=2.0.0"></script>
+<script data-stellar-script="core" src="/js/main.js?v=2.0.0" defer></script>
+<script data-stellar-script="core" defer src="/js/profile.js?v=2.0.0"></script>
+
+
+
+
+
+<script data-stellar-script="core" type="application/json" id="stellar-runtime-config">{"version":1,"root":"/","policy":{"cache":{"enabled":true,"defaultTtl":3600,"ttl":{"giscus":600,"waline":600,"artalk":600,"memos":600,"memos-user":86400,"sites":86400,"friends":86400,"friends_and_posts":86400,"siteinfo":86400},"maxEntries":200},"request":{"retries":2,"timeoutMs":5000,"idleTimeoutMs":3000,"maxCacheEntryBytes":204800},"features":{"codeCopyToastMs":2500},"providers":{"linkPrefetch":"flying_pages","lightbox":"fancybox","diagrams":"mermaid"}},"extensions":[{"id":"pin-slider","module":"/js/runtime/extensions/pin-slider.js","scope":"region","when":{"selector":".pin-slider"},"config":{}},{"id":"page-controls","module":"/js/runtime/extensions/page-controls.js","scope":"region","when":{"always":true},"config":{"highlight":"/js/search/highlight.js","tagtree":"/js/tagtree.js"}},{"id":"partial-navigation","module":"/js/runtime/extensions/partial-navigation.js","scope":"document","when":{"always":true},"config":{}},{"id":"search","module":"/js/runtime/extensions/search.js","scope":"document","when":{"selector":".search-input"},"config":{"provider":"local","options":{"scope":"all","includeContent":true,"cacheTtlSeconds":86400},"assets":{"client":null,"provider":"/js/search/local-search.js","shortcut":"/js/search/shortcut.js"}}},{"id":"hero-parallax","module":"/js/runtime/extensions/hero-parallax.js","scope":"region","when":{"selector":".wiki-hero"},"config":{}},{"id":"hero-effect","module":"/js/runtime/extensions/hero-effect.js","scope":"region","when":{"selector":"canvas[data-hero-effect]"},"config":{}},{"id":"lazy-loading","module":"/js/runtime/extensions/lazy-loading.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/vanilla-lazyload@19.1/dist/lazyload.min.js"}},{"id":"deferred-icons","module":"/js/runtime/extensions/deferred-icons.js","scope":"region","when":{"selector":"svg.icon[data-icon]"},"config":{}},{"id":"dropdown","module":"/js/runtime/extensions/dropdown.js","scope":"region","when":{"selector":"details.dropdown"},"config":{}},{"id":"services","module":"/js/runtime/extensions/services.js","scope":"region","when":{"selector":"#artalk_container, #twikoo_container, #waline_container, .data-service, [class*='ds-'], a[cardlink], a[data-md-link][data-siteinfo-api], .site-card [data-siteinfo-api], .voice\u003eaudio, .video\u003evideo, .chat-file"},"config":{"marked":"https://gcore.jsdelivr.net/npm/marked@13.0/lib/marked.umd.min.js"}},{"id":"settings","module":"/js/runtime/extensions/settings.js","scope":"region","when":{"selector":".settings-page"},"config":{}},{"id":"link-prefetch","module":"/js/runtime/extensions/link-prefetch.js","scope":"document","when":{"always":true},"config":{"asset":"https://gcore.jsdelivr.net/npm/flying-pages@2/flying-pages.min.js"}},{"id":"lightbox","module":"/js/runtime/extensions/lightbox.js","scope":"region","when":{"selector":"[data-fancybox]:not(.error), .with-fancybox, .ds-memos, .timenode p\u003eimg"},"config":{"enabled":true,"selector":".timenode p\u003eimg","assets":{"localCss":"/css/plugins/fancybox.css","js":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js","css":"https://gcore.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"}}},{"id":"reveal","module":"/js/runtime/extensions/reveal.js","scope":"region","when":{"selector":".slide-up"},"config":{"enabled":true,"duration":800,"interval":200,"distance":8,"blur":4}},{"id":"code-copy","module":"/js/runtime/extensions/code-copy.js","scope":"region","when":{"selector":".code"},"config":{"assets":{"js":"/js/plugins/copycode.js"},"messages":{"label":"复制","copied":"复制成功","denied":"未获得剪贴板权限","unsupported":"当前浏览器不支持剪贴板或页面不是 HTTPS"}}},{"id":"adaptive-text","module":"/js/runtime/extensions/adaptive-text.js","scope":"region","when":{"selector":"[data-text-adaptive]"},"config":{"assets":{"colorJs":"/js/color.js","js":"/js/plugins/adaptive-text.js"}}},{"id":"swiper","module":"/js/runtime/extensions/swiper.js","scope":"region","when":{"selector":"#swiper-api"},"config":{"assets":{"localCss":"/css/plugins/swiper.css","js":"https://unpkg.com/swiper@10.3/swiper-bundle.min.js","css":"https://unpkg.com/swiper@10.3/swiper-bundle.min.css"}}}]}</script>
+<script data-stellar-script="core" type="module" src="/js/runtime/index.js?v=2.0.0&runtime=1"></script>
+
+
+<!-- inject -->
+<script src="/js/toc-float.js?v=20261117" defer></script>
+<script src="/js/category-filter.js?v=20261117" defer></script>
+<script src="/js/show-wordcount.js?v=20261117" defer></script>
+
+
+<script data-stellar-script="core" defer src="/js/navigation-init.js?v=2.0.0"></script>
+</div></body></html>
+
